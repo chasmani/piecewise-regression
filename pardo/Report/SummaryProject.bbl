@@ -1,0 +1,131 @@
+\begin{thebibliography}{xx}
+
+\harvarditem{Baayen}{1992}{Baayen}
+Baayen, H.  \harvardyearleft 1992\harvardyearright , `Statistical models for
+  word frequency distributions: {A} linguistic evaluation', {\em Computers and
+  the Humanities} {\bf 26}(5-6),~347--363.
+\newline\harvardurl{http://link.springer.com/article/10.1007/BF00136980}
+
+\harvarditem[Bernhardsson et~al.]{Bernhardsson, Rocha \harvardand\
+  Minnhagen}{2009}{size}
+Bernhardsson, S., Rocha, L. E. C.~d. \harvardand\ Minnhagen, P.
+  \harvardyearleft 2009\harvardyearright , `The meta book and size-dependent
+  properties of written language', {\em New Journal of Physics} {\bf
+  11}(12),~123015.
+\newline\harvardurl{http://iopscience.iop.org/1367-2630/11/12/123015}
+
+\harvarditem{Chen}{1991}{programming}
+Chen, Y.-S.  \harvardyearleft 1991\harvardyearright , `Zipf's law in natural
+  languages, programming languages, and command languages: the {Simon}-{Yule}
+  approach', {\em International journal of systems science} {\bf
+  22}(11),~2299--2312.
+\newline\harvardurl{http://www.tandfonline.com/doi/abs/10.1080/00207729108910791}
+
+\harvarditem[Clauset et~al.]{Clauset, Shalizi \harvardand\
+  Newman}{2009}{Clauset}
+Clauset, A., Shalizi, C.~R. \harvardand\ Newman, M.~E.  \harvardyearleft
+  2009\harvardyearright , `Power-law distributions in empirical data', {\em
+  SIAM review} {\bf 51}(4),~661--703.
+\newline\harvardurl{http://epubs.siam.org/doi/abs/10.1137/070710111}
+
+\harvarditem[Corral et~al.]{Corral, Boleda \harvardand\ Ferrer-i
+  Cancho}{2014}{lemmas}
+Corral, A., Boleda, G. \harvardand\ Ferrer-i Cancho, R.  \harvardyearleft
+  2014\harvardyearright , `Zipf's law for word frequencies: word forms versus
+  lemmas in long texts', {\em arXiv:1407.8322 [physics]} .
+\newblock arXiv: 1407.8322.
+\newline\harvardurl{http://arxiv.org/abs/1407.8322}
+
+\harvarditem[Di~Guilmi et~al.]{Di~Guilmi, Gaffeo \harvardand\
+  Gallegati}{2003}{income}
+Di~Guilmi, C., Gaffeo, E. \harvardand\ Gallegati, M.  \harvardyearleft
+  2003\harvardyearright , `Power {Law} {Scaling} in {World} {Income}
+  {Distribution}'.
+\newline\harvardurl{https://opus.lib.uts.edu.au/research/handle/10453/9990}
+
+\harvarditem{Ferrer~i Cancho}{2005}{zipf-variation}
+Ferrer~i Cancho, R.  \harvardyearleft 2005\harvardyearright , `The variation of
+  {Zipf}'s law in human language', {\em The European Physical Journal
+  B-Condensed Matter and Complex Systems} {\bf 44}(2),~249--257.
+\newline\harvardurl{http://www.springerlink.com/index/R21442X656V47318.pdf}
+
+\harvarditem{Ferrer~i Cancho \harvardand\ Sol\'e}{2001}{regimes}
+Ferrer~i Cancho, R. \harvardand\ Sol\'e, R.~V.  \harvardyearleft
+  2001\harvardyearright , `Two {Regimes} in the {Frequency} of {Words} and the
+  {Origins} of {Complex} {Lexicons}: {Zipf}'s {Law} {Revisited}', {\em Journal
+  of Quantitative Linguistics} {\bf 8}(3),~165--173.
+\newline\harvardurl{http://www.tandfonline.com/doi/abs/10.1076/jqul.8.3.165.4101}
+
+\harvarditem[Font-Clos et~al.]{Font-Clos, Boleda \harvardand\
+  Corral}{2013}{scaling}
+Font-Clos, F., Boleda, G. \harvardand\ Corral, A.  \harvardyearleft
+  2013\harvardyearright , `A scaling law beyond {Zipf}'s law and its relation
+  to {Heaps}' law', {\em New Journal of Physics} {\bf 15}(9),~093033.
+\newline\harvardurl{http://iopscience.iop.org/1367-2630/15/9/093033}
+
+\harvarditem{Gabaix}{1999}{cities}
+Gabaix, X.  \harvardyearleft 1999\harvardyearright , `Zipf's {Law} and the
+  {Growth} of {Cities}', {\em American Economic Review} pp.~129--132.
+\newline\harvardurl{http://www.jstor.org/stable/117093}
+
+\harvarditem{Greenfield}{2013}{psychology}
+Greenfield, P.~M.  \harvardyearleft 2013\harvardyearright , `The {Changing}
+  {Psychology} of {Culture} {From} 1800 {Through} 2000', {\em Psychological
+  Science} p.~0956797613479387.
+\newline\harvardurl{http://pss.sagepub.com/content/early/2013/08/07/0956797613479387}
+
+\harvarditem{Mandelbrot}{1953}{mandelbrot}
+Mandelbrot, B.  \harvardyearleft 1953\harvardyearright , `An informational
+  theory of the statistical structure of language', {\em Communication theory}
+  {\bf 84},~486--502.
+\newline\harvardurl{http://www.uvm.edu/~pdodds/files/papers/others/1953/mandelbrot1953a.pdf}
+
+\harvarditem[Michel et~al.]{Michel, Shen, Aiden, Veres, Gray, Pickett, Hoiberg,
+  Clancy, Norvig, Orwant, Pinker, Nowak \harvardand\ Aiden}{2011}{Culturomics}
+Michel, J.-B., Shen, Y.~K., Aiden, A.~P., Veres, A., Gray, M.~K., Pickett,
+  J.~P., Hoiberg, D., Clancy, D., Norvig, P., Orwant, J., Pinker, S., Nowak,
+  M.~A. \harvardand\ Aiden, E.~L.  \harvardyearleft 2011\harvardyearright ,
+  `Quantitative {Analysis} of {Culture} {Using} {Millions} of {Digitized}
+  {Books}', {\em Science} {\bf 331}(6014),~176--182.
+\newline\harvardurl{http://www.sciencemag.org/content/331/6014/176}
+
+\harvarditem{Muggeo}{2003}{segmented}
+Muggeo, V. M.~R.  \harvardyearleft 2003\harvardyearright , `Estimating
+  regression models with unknown break-points', {\em Statistics in Medicine}
+  {\bf 22}(19),~3055--3071.
+\newline\harvardurl{http://0-onlinelibrary.wiley.com.pugwash.lib.warwick.ac.uk/doi/10.1002/sim.1545/abstract}
+
+\harvarditem[Petersen et~al.]{Petersen, Tenenbaum, Havlin \harvardand\
+  Stanley}{2012}{death}
+Petersen, A.~M., Tenenbaum, J., Havlin, S. \harvardand\ Stanley, H.~E.
+  \harvardyearleft 2012\harvardyearright , `Statistical {Laws} {Governing}
+  {Fluctuations} in {Word} {Use} from {Word} {Birth} to {Word} {Death}', {\em
+  Scientific Reports} {\bf 2}.
+\newline\harvardurl{http://www.nature.com/srep/2012/120315/srep00313/full/srep00313.html}
+
+\harvarditem{Piantadosi}{2014}{review}
+Piantadosi, S.~T.  \harvardyearleft 2014\harvardyearright , `Zipf's word
+  frequency law in natural language: {A} critical review and future
+  directions', {\em Psychonomic bulletin \& review} {\bf 21}(5),~1112--1130.
+\newline\harvardurl{http://link.springer.com/article/10.3758/s13423-014-0585-6}
+
+\harvarditem{Piotrowska \harvardand\ Piotrowska}{2004}{schi}
+Piotrowska, W. \harvardand\ Piotrowska, X.  \harvardyearleft
+  2004\harvardyearright , `Statistical {Parameters} in {Pathological} {Text}',
+  {\em Journal of Quantitative Linguistics} {\bf 11}(1-2),~133--140.
+\newline\harvardurl{http://dx.doi.org/10.1080/09296170512331383685}
+
+\harvarditem[Tenenbaum et~al.]{Tenenbaum, Havlin, Stanley \harvardand\
+  Perc}{2012}{cool}
+Tenenbaum, J.~N., Havlin, S., Stanley, H.~E. \harvardand\ Perc, M.
+  \harvardyearleft 2012\harvardyearright , `Languages cool as they expand:
+  {Allometric} scaling and the decreasing need for new words', {\em Scientific
+  Reports} {\bf 2}.
+\newline\harvardurl{http://www.nature.com/srep/2012/121210/srep00943/full/srep00943.html}
+
+\harvarditem{Zipf}{1949}{Zipf}
+Zipf, G.~K.  \harvardyearleft 1949\harvardyearright , `Human behavior and the
+  principle of least effort.'.
+\newline\harvardurl{http://psycnet.apa.org/psycinfo/1950-00412-000}
+
+\end{thebibliography}

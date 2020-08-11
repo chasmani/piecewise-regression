@@ -1,3 +1,5 @@
 ngram_raw_data/*
 ngrams_by_year/*
 __pycache__/*
+pardo/FinalData/*
+pardo/OriginalData/Tables/*
