@@ -76,7 +76,23 @@ def calculate_zipf_from_file(language, filename):
 		csv_row = [language, year, "PDF Regression top 5000 types", alpha_pdf]
 		append_to_csv(csv_row, "results/zipf_results_by_year.csv")
 
+def calculate_all_languages():
+
+	for language_code in [
+		#"chi-sim", 
+		#"eng-gb",
+		#"eng-fiction",
+		"eng-all", 
+		"eng-us-all", 
+		"fre-all", 
+		"ger-all", 
+		"heb-all", 
+		"ita-all", 
+		"rus-all", 
+		"spa-all"]:
+		calculate_zipf(language_code)
+
 
 if __name__=="__main__":
-	calculate_zipf("eng-fiction")
-	calculate_zipf("eng-gb")
+
+	calculate_all_languages()

@@ -11,8 +11,11 @@ def extract_language_files_to_csvs_by_year(language_code="eng-gb"):
 
 	for zip_filename in sorted(this_language_zipped_files_ready):
 		print("Working . . . ", zip_filename)
+
 		with gzip.open("ngram_raw_data/"+zip_filename, mode="rt") as f:
+			
 			reader = csv.reader(f, delimiter="\t")
+			
 			for row in reader:
 				ngram = row[0]
 				year=row[1]
@@ -22,6 +25,9 @@ def extract_language_files_to_csvs_by_year(language_code="eng-gb"):
 				# Don't include words tagged with _ADJ, _NOUN etc 
 				if "_" not in ngram:
 					append_to_csv(row, "ngrams_by_year/{}-{}.csv".format(language_code, year))
+			
 
 if __name__=="__main__":
-	extract_language_files_to_csvs_by_year("eng-gb")
+	#for language_code in ["chi-sim", "eng-all", "eng-us-all", "fre-all", "ger-all", "heb-all", "ita-all", "rus-all", "spa-all"]:
+	for language_code in ["ita-all", "rus-all", "spa-all"]:	
+		extract_language_files_to_csvs_by_year(language_code)
