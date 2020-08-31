@@ -29,6 +29,10 @@ def get_probabilities_zeta_power_law(exponent, max_x):
 	return probs
 
 
+
+
+
+
 if __name__=="__main__":
 	p_1 = get_probabilities_power_law_finite_event_set(0.4, 6)
 	print(p_1)	

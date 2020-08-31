@@ -1,5 +1,6 @@
 
 from collections import Counter
+import csv
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -113,9 +114,9 @@ def lots_of_samples_with_individual_power_laws():
 
 	full_count = Counter()
 	exponent = 1.2
-	W = 200000
-	N = 100000
-	writer_count = 500
+	W = 100000
+	N = 50000
+	writer_count = 25
 
 	for writer in range(writer_count):
 
@@ -215,9 +216,88 @@ def volume_vs_frequency_rank_sim():
 	plt.show()
 
 
+def lots_of_samples_based_on_top_25_books_subplots():
+
+	W = 100000
+	input_csv = "results/gutenberg_abc_analysis.csv"
+	full_count = Counter()
+	plot_count = 1
+	plt.figure(figsize=(16,12))
+	with open(input_csv) as csvfile:
+		reader = csv.reader(csvfile, delimiter=';')
+		for row in reader:
+			alpha = float(row[1])
+			N = int(row[3])
+
+			
+			words, probs = get_writer_words_and_power_law_probs(alpha, W=W)
+			sample = np.random.choice(words, p=probs, size=N)
+			word_counts = Counter(sample)
+			
+			n = [v for k,v in word_counts.most_common()]
+
+			#full_count.update(sample)
+
+			plt.subplot(5, 5, plot_count)
+
+			book_name = row[0].replace(".txt","").replace("_"," ").title()
+
+			plt.scatter(range(1, len(n)+1), n, s=1, label=book_name)
+			plt.xscale("log")
+			plt.yscale("log")
+
+			plt.legend()
+
+			if plot_count == 11:
+				plt.ylabel("Frequency")
+
+			if plot_count == 23:
+				plt.xlabel("rank")
+
+			plot_count += 1
+
+	plt.savefig("images/top_25_books_rank_frequency_simulated.png")
+
+	plt.show()
+
+def lots_of_samples_based_on_top_25_books_collated():
+
+	W = 200000
+	input_csv = "results/gutenberg_abc_analysis.csv"
+	full_count = Counter()
+	plot_count = 1
+
+	with open(input_csv) as csvfile:
+		reader = csv.reader(csvfile, delimiter=';')
+		for row in reader:
+			alpha = float(row[1])
+			N = int(row[3])
+
+			
+			words, probs = get_writer_words_and_power_law_probs(alpha, W=W)
+			sample = np.random.choice(words, p=probs, size=N)
+			
 
 
+			full_count.update(sample)
+
+	n = [v for k,v in full_count.most_common()]
+
+			
+	plt.scatter(range(1, len(n)+1), n, s=2)
+	plt.xscale("log")
+	plt.yscale("log")
+
+	plt.legend()
+
+	plt.ylabel("frequency")
+
+	plt.xlabel("rank")
+
+	plt.savefig("images/top_25_books_collated_simulatied_rank_frequency.png")
+
+	plt.show()
 
 
 if __name__=="__main__":
-	volume_vs_frequency_rank_sim()
+	lots_of_samples_based_on_top_25_books_subplots()

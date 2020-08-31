@@ -3,3 +3,5 @@ ngrams_by_year/*
 __pycache__/*
 pardo/FinalData/*
 pardo/OriginalData/Tables/*
+gutenberg/*
+gutenberg_manual/*
