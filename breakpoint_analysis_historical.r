@@ -39,7 +39,7 @@ analyseYear <- function(languageCode, year, outputFilename) {
   out.lm<-lm(logfreq~logrank,data=myData)
   
   # Breakpoint regression analysis with 2 breakpoints
-  o2 <-segmented(out.lm, npsi=2, psi=c(9.5, 10)) 
+  o2 <-segmented(out.lm, npsi=2) 
   
   o2.breakpoint1 <- o2$psi["psi1.logrank", "Est."]
   o2.breakpoint2 <- o2$psi["psi2.logrank", "Est."]
@@ -69,11 +69,14 @@ csvHeaders <- data.frame("Analysis", "Langauge Code", "Year", "Breakpoint 1", "B
 write.table(csvHeaders, file=outputFilename, append = T, sep=';', row.names=F, col.names=F )
 
 languageCode <- "eng-gb"
-years <- 1800:2000
+years <- 1968:2000
 
 languages <- c("chi-sim", "eng-fiction",  "fre-all", "ger-all", "heb-all", "ita-all", "rus-all", "spa-all", "eng-us-all", "eng-all", "eng-gb")
 
-languages <- c("spa-all", "eng-us-all", "eng-all", "eng-gb", "rus-all", )
+languages <- c("eng-us-all", "eng-all", "eng-gb", "rus-all")
+
+
+analyseYear("eng-us-all", 1968, outputFilename)
 
 for (languageCode in languages){
   for (year in years){
