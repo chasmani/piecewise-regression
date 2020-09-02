@@ -2,6 +2,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
+import pandas as pd
+
+from general_utilities import append_to_csv
 
 def generate_breakpoint_data():
 
@@ -24,11 +27,11 @@ def generate_breakpoint_data():
 	"""
 
 
-def breakpoint_fit(zz, yy, current_breakpoint_1=10):
+def breakpoint_fit(xx, yy, current_breakpoint_1=10):
 
-	A = zz
-	B = (zz - current_breakpoint_1) * np.heaviside(zz- current_breakpoint_1, 1) 
-	C = np.heaviside(zz - current_breakpoint_1, 1)
+	A = xx
+	B = (xx - current_breakpoint_1) * np.heaviside(xx- current_breakpoint_1, 1) 
+	C = np.heaviside(xx - current_breakpoint_1, 1)
 	
 	Z = np.array([A, B , C]).T
 
@@ -47,11 +50,11 @@ def breakpoint_fit(zz, yy, current_breakpoint_1=10):
 def breakpoint_iterate():
 
 
-	zz, yy = generate_breakpoint_data()
+	xx, yy = generate_breakpoint_data()
 	current_breakpoint_1 = 1
 	for i in range(6):
 		print(i, current_breakpoint_1)
-		current_breakpoint_1, params = breakpoint_fit(zz, yy, current_breakpoint_1)
+		current_breakpoint_1, params = breakpoint_fit(xx, yy, current_breakpoint_1)
 
 
 	intercept = params[0]
@@ -59,10 +62,10 @@ def breakpoint_iterate():
 	beta_hat = params[2]
 	breakpoint_hat = current_breakpoint_1
 
-	yy_hats = intercept + alpha_hat*zz + beta_hat * np.maximum(zz - breakpoint_hat, 0)
+	yy_hats = intercept + alpha_hat*xx + beta_hat * np.maximum(xx - breakpoint_hat, 0)
 
-	plt.plot(zz, yy_hats, linewidth=2, color="purple", linestyle="dashed")
-	plt.scatter(zz, yy, s=4, color="green")
+	plt.plot(xx, yy_hats, linewidth=2, color="purple", linestyle="dashed")
+	plt.scatter(xx, yy, s=4, color="green")
 
 	plt.show()
 
@@ -92,14 +95,14 @@ def generate_double_breakpoint_data():
 
 
 
-def breakpoint_fit(zz, yy, current_breakpoint_1=8, current_breakpoint_2=10.5):
+def breakpoint_fit(xx, yy, current_breakpoint_1=8, current_breakpoint_2=10.5):
 
-	A = zz
-	U1 = (zz - current_breakpoint_1) * np.heaviside(zz- current_breakpoint_1, 1) 
-	V1 = np.heaviside(zz - current_breakpoint_1, 1)
+	A = xx
+	U1 = (xx - current_breakpoint_1) * np.heaviside(xx- current_breakpoint_1, 1) 
+	V1 = np.heaviside(xx - current_breakpoint_1, 1)
 
-	U2 = (zz - current_breakpoint_2) * np.heaviside(zz- current_breakpoint_2, 1)
-	V2 = np.heaviside(zz - current_breakpoint_2, 1)
+	U2 = (xx - current_breakpoint_2) * np.heaviside(xx- current_breakpoint_2, 1)
+	V2 = np.heaviside(xx - current_breakpoint_2, 1)
 
 	
 	Z = np.array([A, U1 , U2, V1, V2]).T
@@ -124,7 +127,7 @@ def breakpoint_fit(zz, yy, current_breakpoint_1=8, current_breakpoint_2=10.5):
 def double_breakpoint_iterate():
 
 
-	zz, yy = generate_double_breakpoint_data()
+	xx, yy = generate_double_breakpoint_data()
 	current_breakpoint_1 = 9
 	current_breakpoint_2 = 9.1
 
@@ -132,7 +135,7 @@ def double_breakpoint_iterate():
 
 
 	for i in range(6):
-		current_breakpoint_1, current_breakpoint_2, params = breakpoint_fit(zz, yy, current_breakpoint_1, current_breakpoint_2)
+		current_breakpoint_1, current_breakpoint_2, params = breakpoint_fit(xx, yy, current_breakpoint_1, current_breakpoint_2)
 		print(current_breakpoint_1, current_breakpoint_2)
 
 	intercept = params[0]
@@ -142,15 +145,136 @@ def double_breakpoint_iterate():
 	breakpoint_1_hat = current_breakpoint_1
 	breakpoint_2_hat = current_breakpoint_2
 
-	yy_hats = intercept + alpha_hat*zz + beta_1_hat * np.maximum(zz - breakpoint_1_hat, 0) + beta_2_hat * np.maximum(zz - breakpoint_2_hat, 0)
+	yy_hats = intercept + alpha_hat*xx + beta_1_hat * np.maximum(xx - breakpoint_1_hat, 0) + beta_2_hat * np.maximum(xx - breakpoint_2_hat, 0)
 
-	plt.plot(zz, yy_hats, linewidth=2, color="purple", linestyle="dashed")
-	plt.scatter(zz, yy, s=4, color="green")
+	plt.plot(xx, yy_hats, linewidth=2, color="purple", linestyle="dashed")
+	plt.scatter(xx, yy, s=4, color="green")
 
 	plt.show()
 	
+def double_breakpoint_analysis(xx, yy, current_breakpoint_1=9, current_breakpoint_2=10):
+
+	delta = 1
+
+	run_count = 0
+	while delta > 0.001 and run_count<10:
+		last_breakpoint_1, last_breakpoint_2 = current_breakpoint_1, current_breakpoint_2
+		current_breakpoint_1, current_breakpoint_2, params = breakpoint_fit(xx, yy, current_breakpoint_1, current_breakpoint_2)
+		delta = max(abs(current_breakpoint_1- last_breakpoint_1), abs(current_breakpoint_2 - last_breakpoint_2))
+		run_count += 1
+
+
+	return current_breakpoint_1, current_breakpoint_2, params
+
+def double_breakpoint_test(year, language):
+
+	input_filename = "ngrams_by_year/{}-{}.csv".format(language, year)
+	df = pd.read_csv(input_filename, sep=";", names=["word", "year", "match_count", "volume_count", "language"])
+
+	df = df[(df['match_count'] >20)]
+
+	# Sort df
+	df = df.sort_values(by="match_count", ascending=False)
+
+	df = df.reset_index()
+
+	df["rank"] = df.index + 1
+	df["logrank"] = np.log(df["rank"])
+	df["logcount"] = np.log(df["match_count"])
+
+	xx = df["logrank"].to_numpy()
+	yy = df["logcount"].to_numpy()
+
+	breakpoint_1, breakpoint_2, params = double_breakpoint_analysis(xx, yy, 9, 10)
+
+	intercept = params[0]
+	alpha_hat = params[1]
+	beta_1_hat = params[2]
+	beta_2_hat = params[3]
+	breakpoint_1_hat = breakpoint_1
+	breakpoint_2_hat = breakpoint_2
+
+	yy_hats = intercept + alpha_hat*xx + beta_1_hat * np.maximum(xx - breakpoint_1_hat, 0) + beta_2_hat * np.maximum(xx - breakpoint_2_hat, 0)
+
+	plt.plot(xx, yy_hats, linewidth=2, color="red", linestyle="dashed")
+	plt.axvline(breakpoint_1)
+	plt.axvline(breakpoint_2)
+	plt.scatter(xx, yy, s=2, color="lime")
 	
+	plt.xlabel("log(rank)")
+	plt.ylabel("log(count)")
+
+	plt.title("Double Breakpoint Analysis {} {}".format(year, language))
+
+	plt.savefig("images/double_breakpoint_python_{}-{}.png".format(language, year))
+
+	plt.show()
+
+LANGAUGE_CODES = [
+	"chi-sim", 
+	"eng-fiction",  
+	"fre-all", 
+	"ger-all", 
+	"heb-all", 
+	"ita-all", 
+	"rus-all", 
+	"spa-all", 
+	"eng-us-all", 
+	"eng-all",
+	"eng-gb"
+]
+
+def double_breakpoint_analysis_year_language(year, language):
+
+	input_filename = "ngrams_by_year/{}-{}.csv".format(language, year)
+	df = pd.read_csv(input_filename, sep=";", names=["word", "year", "match_count", "volume_count", "language"])
+
+	df = df[(df['match_count'] >20)]
+
+	# Sort df
+	df = df.sort_values(by="match_count", ascending=False)
+
+	df = df.reset_index()
+
+	df["rank"] = df.index + 1
+	df["logrank"] = np.log(df["rank"])
+	df["logcount"] = np.log(df["match_count"])
+
+	xx = df["logrank"].to_numpy()
+	yy = df["logcount"].to_numpy()
+
+	breakpoint_1, breakpoint_2, params = double_breakpoint_analysis(xx, yy, 9, 10)
 
 
 
-double_breakpoint_iterate()
+	intercept = params[0]
+	alpha_hat = params[1]
+	beta_1_hat = params[2]
+	beta_2_hat = params[3]
+	breakpoint_1_hat = breakpoint_1
+	breakpoint_2_hat = breakpoint_2
+
+	print(alpha_hat, breakpoint_1, breakpoint_2, params)
+
+	return [alpha_hat, breakpoint_1_hat, breakpoint_2_hat, intercept, beta_1_hat, beta_2_hat]
+
+
+def breakpoint_analysis_on_all():
+
+	output_filename = "results/double_breakpoint_python_historical.csv"
+
+	for language in LANGAUGE_CODES:
+		for year in range(1800, 2000):
+			try:
+				print("Working on {}-{}".format(language, year))
+				results = double_breakpoint_analysis_year_language(year, language)
+				csv_row = ["Breakpoint Analysis Python", year, language] + results
+				append_to_csv(csv_row, output_filename)
+			except Exception as e:
+				print(str(e))
+				csv_row = ["Breakpoint Analysis Python", year, language, "Error", str(e)]
+
+
+
+if __name__=="__main__":
+	breakpoint_analysis_on_all()

@@ -22,12 +22,11 @@ def plot_books():
 	print(files)
 	plot_count = 1
 	plt.figure(figsize=(16,12))
-	for file in files:
+	for file in files[1:2]:
 		print(file)
 		file_dir = "gutenberg_manual/" + file
 		bookname = file.replace("_", " ").title()
 		n = zipfanalysis.preprocessing.preprocessing.get_rank_frequency_from_text(file_dir)
-		print(n)
 
 		plt.subplot(5, 5, plot_count)
 
@@ -51,7 +50,7 @@ def plot_books():
 
 	#plt.tight_layout()
 
-	plt.savefig("images/top_25_books_rank_frequency.png")
+	#plt.savefig("images/top_25_books_rank_frequency.png")
 
 	plt.show()
 
