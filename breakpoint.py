@@ -108,8 +108,6 @@ def breakpoint_fit(zz, yy, current_breakpoint_1=8, current_breakpoint_2=10.5):
 
 	results = sm.OLS(endog=yy, exog=Z).fit()
 
-	print(results.params)
-
 	
 	beta_1_hat = results.params[2]
 	beta_2_hat = results.params[3]
@@ -127,17 +125,15 @@ def double_breakpoint_iterate():
 
 
 	zz, yy = generate_double_breakpoint_data()
-	current_breakpoint_1 = 1
-	current_breakpoint_2=15
+	current_breakpoint_1 = 9
+	current_breakpoint_2 = 9.1
 
-	
+
 
 
 	for i in range(6):
 		current_breakpoint_1, current_breakpoint_2, params = breakpoint_fit(zz, yy, current_breakpoint_1, current_breakpoint_2)
 		print(current_breakpoint_1, current_breakpoint_2)
-
-
 
 	intercept = params[0]
 	alpha_hat = params[1]
