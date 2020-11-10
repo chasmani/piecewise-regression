@@ -44,6 +44,8 @@ def plot_mean_unique_words():
 
 	print(df)
 
+	
+
 	for language in LANGAUGE_CODES:
 		df_l = df[(df['language'] == language)]
 

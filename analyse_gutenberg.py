@@ -25,7 +25,7 @@ def analyse_standardised_gutenberg():
 				csv_row = row + ["alpha_pdf", "total_words", "unique_words"]
 				append_to_csv(csv_row, output_file)
 
-			elif row_count < 100:
+			elif row_count > 0:
 				gut_id = row[0]
 				title = row[1]
 				author = row[2]

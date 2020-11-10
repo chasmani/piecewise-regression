@@ -209,6 +209,9 @@ BRITISH_WARS = [
 
 def plot_all_languages():
 
+
+
+
 	for language_code in [
 		"eng-gb",
 		"eng-fiction",
@@ -222,4 +225,4 @@ def plot_all_languages():
 		"spa-all"]:
 		plot_kernel_size_vs_exponent(min_year=1800, language_code=language_code) 
 
-plot_all_languages()
+plot_kernel_size_vs_exponent(min_year=1800, language_code="eng-fiction")
