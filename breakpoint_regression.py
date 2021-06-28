@@ -1,6 +1,7 @@
 
 import numpy as np
 import statsmodels.api as sm
+import matplotlib.pyplot as plt
 
 np.random.seed(0)
 
@@ -14,7 +15,7 @@ class Fit:
 		self.start_values = start_values
 
 		self.max_iterations = 10
-		self.tolerance=0.1
+		self.tolerance=0.1 # Maybe set this based on gaps between data
 
 		self.breakpoint_history = [start_values]
 		self.params_history = []
@@ -50,6 +51,32 @@ class Fit:
 		# Stop if the last change was small
 		# How to do this for multiple breakpoints
 
+	def plot_data(self):
+
+		plt.scatter(self.xx, self.yy)
+
+	def plot_fit(self):
+
+		final_params = self.params_history[-1]
+
+		print("Final params are ", final_params)
+
+		xx_plot = np.linspace(min(self.xx), max(self.xx), 100)
+
+		intercept_hat = final_params[0]
+		alpha_hat = final_params[1]
+
+		breakpoints = self.breakpoint_history[-1]
+		beta_hats = final_params[2:2+len(breakpoints)]
+
+		yy_plot = intercept_hat + alpha_hat*xx_plot
+
+		for bp_count in range(len(breakpoints)):
+			yy_plot += beta_hats[bp_count] * np.maximum(xx_plot - breakpoints[bp_count], 0)
+
+		plt.plot(xx_plot, yy_plot, color="red", linewidth=4)
+
+
 """
 The breakpoint fit function is seperate to the main class
 Easier for testing and re-use etc. 
@@ -62,7 +89,7 @@ def breakpoint_fit(xx, yy, current_breakpoints):
 	"""
 	Fit the linear approximation given the current breakpoint guesses
 	Return the next breakpoints and the params from the fit
-	The params are of the form [a, c, beta_hats, gamma_hats]
+	The params are of the form [c, a, beta_hats, gamma_hats]
 	"""
 
 	print(current_breakpoints)
@@ -155,8 +182,34 @@ def test_on_data_1():
 
 	print(bp_fit.breakpoint_history)
 
+	bp_fit.plot_data()
+	plt.show()
 
 
+def test_on_data_1b():
+
+	alpha = -4
+	beta_1 = -2
+	beta_2 = 4
+	intercept = 100
+	breakpoint_1 = 7
+	breakpoint_2 = 12
+
+	n_points = 200
+
+	xx = np.linspace(0, 20, n_points)
+
+	yy = intercept + alpha*xx + beta_1 * np.maximum(xx - breakpoint_1, 0) + beta_2 * np.maximum(xx-breakpoint_2, 0)  + np.random.normal(size=n_points)
+
+
+	bp_fit = Fit(xx, yy, n_breakpoints=2, start_values=[5, 10])
+
+
+	print(bp_fit.breakpoint_history)
+
+	bp_fit.plot_data()
+	bp_fit.plot_fit()
+	plt.show()
 
 
 
@@ -184,4 +237,4 @@ def test_on_data_2():
 
 	print(bp_fit.breakpoint_history)	
 
-test_on_data_1()
+test_on_data_1b()
