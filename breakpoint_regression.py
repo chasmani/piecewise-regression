@@ -51,30 +51,34 @@ class Fit:
 		# Stop if the last change was small
 		# How to do this for multiple breakpoints
 
-	def plot_data(self):
+	def plot_data(self, **kwargs):
+		"""
+		Plot the data as a scatter plot
+		Passes any kwargs to the matplotlib scatter function, e.g. color="red"
+		"""
+		plt.scatter(self.xx, self.yy, **kwargs)
 
-		plt.scatter(self.xx, self.yy)
-
-	def plot_fit(self):
-
+	def plot_fit(self, **kwargs):
+		"""
+		Plot the fitted model
+		Passes any kwargs to the matplotlib plot function, e.g. color="red"
+		"""
 		final_params = self.params_history[-1]
-
-		print("Final params are ", final_params)
-
-		xx_plot = np.linspace(min(self.xx), max(self.xx), 100)
-
+		breakpoints = self.breakpoint_history[-1]
+		
+		# Extract what we need from params etc
 		intercept_hat = final_params[0]
 		alpha_hat = final_params[1]
-
-		breakpoints = self.breakpoint_history[-1]
 		beta_hats = final_params[2:2+len(breakpoints)]
+		
+		xx_plot = np.linspace(min(self.xx), max(self.xx), 100)
 
+		# Build the fit plot segment by segment. Betas are defined as difference in gradient from previous section
 		yy_plot = intercept_hat + alpha_hat*xx_plot
-
 		for bp_count in range(len(breakpoints)):
 			yy_plot += beta_hats[bp_count] * np.maximum(xx_plot - breakpoints[bp_count], 0)
 
-		plt.plot(xx_plot, yy_plot, color="red", linewidth=4)
+		plt.plot(xx_plot, yy_plot, **kwargs)
 
 
 """
@@ -208,7 +212,7 @@ def test_on_data_1b():
 	print(bp_fit.breakpoint_history)
 
 	bp_fit.plot_data()
-	bp_fit.plot_fit()
+	bp_fit.plot_fit(color="red", linewidth=4)
 	plt.show()
 
 
