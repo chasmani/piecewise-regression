@@ -89,6 +89,18 @@ class Fit:
 		for bp in self.breakpoint_history[-1]:
 			plt.axvline(bp, **kwargs)
 
+	def plot_breakpoint_history(self, **kwargs):
+		"""
+		Plot the history of the breakpoints as they iterate
+		"""
+		breakpoint_histories = zip(*self.breakpoint_history)
+		print(breakpoint_histories)
+		count = 0
+		for bh in breakpoint_histories:
+			count += 1
+			plt.plot(range(1, len(bh)+1), bh, label="Breakpoint {}".format(count))
+			plt.xlabel("Iteration")
+			plt.ylabel("Breakpoint")
 
 
 
@@ -224,6 +236,11 @@ def test_on_data_1b():
 	bp_fit.plot_data()
 	bp_fit.plot_fit(color="red", linewidth=4)
 	bp_fit.plot_breakpoints()
+	plt.show()
+	plt.close()
+
+	bp_fit.plot_breakpoint_history()
+	plt.legend()
 	plt.show()
 
 
