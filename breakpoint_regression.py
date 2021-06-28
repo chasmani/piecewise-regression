@@ -93,12 +93,13 @@ class Fit:
 		"""
 		Plot the history of the breakpoints as they iterate
 		"""
+		# Change the format of the breakpoint histories to seperate lists for each breakpoint
 		breakpoint_histories = zip(*self.breakpoint_history)
-		print(breakpoint_histories)
+		# Plot a history for each breakpoint 
 		count = 0
 		for bh in breakpoint_histories:
 			count += 1
-			plt.plot(range(1, len(bh)+1), bh, label="Breakpoint {}".format(count))
+			plt.plot(range(1, len(bh)+1), bh, label="Breakpoint {}".format(count), **kwargs)
 			plt.xlabel("Iteration")
 			plt.ylabel("Breakpoint")
 
@@ -245,6 +246,44 @@ def test_on_data_1b():
 
 
 
+def test_on_data_1c():
+
+	alpha = -4
+	beta_1 = -2
+	beta_2 = 4
+	beta_3 = 1
+	intercept = 100
+	breakpoint_1 = 7
+	breakpoint_2 = 12
+	breakpoint_3 = 14
+
+	n_points = 200
+
+	xx = np.linspace(0, 20, n_points)
+
+	yy = intercept + alpha*xx 
+	yy += beta_1 * np.maximum(xx - breakpoint_1, 0) 
+	yy += beta_2 * np.maximum(xx - breakpoint_2, 0)  
+	yy += beta_3 * np.maximum(xx - breakpoint_3, 0)
+	yy += np.random.normal(size=n_points)
+
+
+	bp_fit = Fit(xx, yy, n_breakpoints=3, start_values=[5, 10,11])
+
+
+	print(bp_fit.breakpoint_history)
+
+	bp_fit.plot_data()
+	bp_fit.plot_fit(color="red", linewidth=4)
+	bp_fit.plot_breakpoints()
+	plt.show()
+	plt.close()
+
+	bp_fit.plot_breakpoint_history()
+	plt.legend()
+	plt.show()
+
+
 
 def test_on_data_2():
 
@@ -269,4 +308,4 @@ def test_on_data_2():
 
 	print(bp_fit.breakpoint_history)	
 
-test_on_data_1b()
+test_on_data_1c()
