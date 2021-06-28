@@ -23,33 +23,7 @@ def generate_double_breakpoint_data():
 
 	return xx, yy
 
-def breakpoint_fit(xx, yy, current_breakpoint_1=8, current_breakpoint_2=10.5):
 
-	A = xx
-	U1 = (xx - current_breakpoint_1) * np.heaviside(xx- current_breakpoint_1, 1) 
-	V1 = np.heaviside(xx - current_breakpoint_1, 1)
-
-	U2 = (xx - current_breakpoint_2) * np.heaviside(xx- current_breakpoint_2, 1)
-	V2 = np.heaviside(xx - current_breakpoint_2, 1)
-
-	
-	Z = np.array([A, U1 , U2, V1, V2]).T
-
-	Z = sm.add_constant(Z)
-
-	results = sm.OLS(endog=yy, exog=Z).fit()
-
-	
-	beta_1_hat = results.params[2]
-	beta_2_hat = results.params[3]
-	gamma_1_hat = results.params[4]
-	gamma_2_hat = results.params[5]
-	
-	next_breakpoint_1 = current_breakpoint_1 - gamma_1_hat/beta_1_hat
-	
-	next_breakpoint_2 = current_breakpoint_2 - gamma_2_hat/beta_2_hat
-	
-	return next_breakpoint_1, next_breakpoint_2, results.params
 	
 
 def double_breakpoint_iterate():
@@ -203,8 +177,59 @@ def breakpoint_analysis_on_all():
 				csv_row = ["Breakpoint Analysis Python", year, language, "Error", str(e)]
 
 
+ramp = lambda u: np.maximum( u, 0 )
+step = lambda u: ( u > 0 ).astype(float)
+
+
+def test_bp_2():
+
+	np.random.seed(0)
+
+	X = np.linspace( 0, 10, 27 )
+	Y = 0.2*X  - 0.3* ramp(X-2) + 0.3*ramp(X-6) + 0.05*np.random.randn(len(X))
+	
+	initialBreakpoints = [1, 7]
+
+	result = double_breakpoint_analysis(X, Y, 1, 7)
+	print(result)
+
+
+def breakpoint_fit(xx, yy, current_breakpoint_1=8, current_breakpoint_2=10.5):
+
+
+
+	A = xx
+	U1 = (xx - current_breakpoint_1) * np.heaviside(xx- current_breakpoint_1, 1) 
+	V1 = np.heaviside(xx - current_breakpoint_1, 1)
+
+	U2 = (xx - current_breakpoint_2) * np.heaviside(xx- current_breakpoint_2, 1)
+	V2 = np.heaviside(xx - current_breakpoint_2, 1)
+
+	
+	Z = np.array([A, U1 , U2, V1, V2]).T
+
+	Z = sm.add_constant(Z)
+
+	results = sm.OLS(endog=yy, exog=Z).fit()
+
+		
+
+
+	beta_1_hat = results.params[2]
+	beta_2_hat = results.params[3]
+	gamma_1_hat = results.params[4]
+	gamma_2_hat = results.params[5]
+	
+	next_breakpoint_1 = current_breakpoint_1 - gamma_1_hat/beta_1_hat
+	
+	next_breakpoint_2 = current_breakpoint_2 - gamma_2_hat/beta_2_hat
+	
+	return next_breakpoint_1, next_breakpoint_2, results.params
+
+
+
 
 
 
 if __name__=="__main__":
-	breakpoint_analysis_on_all()
+	test_bp_2()
