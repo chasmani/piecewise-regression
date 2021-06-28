@@ -63,6 +63,7 @@ class Fit:
 		Plot the fitted model
 		Passes any kwargs to the matplotlib plot function, e.g. color="red"
 		"""
+		# Get the final results from the fitted model variables
 		final_params = self.params_history[-1]
 		breakpoints = self.breakpoint_history[-1]
 		
@@ -80,15 +81,24 @@ class Fit:
 
 		plt.plot(xx_plot, yy_plot, **kwargs)
 
+	def plot_breakpoints(self, **kwargs):
+		"""
+		Plot the breakpoint locations
+		Passes kwargs to the matplotlib function, e.g. color="red"
+		"""
+		for bp in self.breakpoint_history[-1]:
+			plt.axvline(bp, **kwargs)
+
+
+
+
 
 """
 The breakpoint fit function is seperate to the main class
 Easier for testing and re-use etc. 
-Transofrms the data based on step functions
+Transforms the data based on step functions before fitting
 Fits based on Muggeo's method 
 """
-
-
 def breakpoint_fit(xx, yy, current_breakpoints):
 	"""
 	Fit the linear approximation given the current breakpoint guesses
@@ -213,6 +223,7 @@ def test_on_data_1b():
 
 	bp_fit.plot_data()
 	bp_fit.plot_fit(color="red", linewidth=4)
+	bp_fit.plot_breakpoints()
 	plt.show()
 
 
