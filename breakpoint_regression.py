@@ -126,13 +126,14 @@ def breakpoint_fit(xx, yy, current_breakpoints):
 	UU = [(xx - bp) * np.heaviside(xx- bp, 1) for bp in current_breakpoints]
 	VV = [np.heaviside(xx- bp, 1) for bp in current_breakpoints]
 
-	print(Z, UU, VV)
-
+	
 	Z = np.concatenate((Z, UU, VV))
 	Z = Z.T	
 	Z = sm.add_constant(Z, has_constant='add')
 
 	results = sm.OLS(endog=yy, exog=Z).fit()
+
+	cov = results.cov_params()
 	
 	# First two params are a and c in the line equation
 	# Beta hats are the next group of params, same length as the number of breakpoints
@@ -177,6 +178,8 @@ def breakpoint_fit_1_bp(xx, yy, current_breakpoints):
 
 	# Fit with SM OLS
 	results = sm.OLS(endog=yy, exog=Z).fit()
+
+	print("COV: ", results.cov_params())
 
 	# Extract the coefficient estimates and use to get the next breakpoint
 	beta_hat = results.params[2]
@@ -308,4 +311,4 @@ def test_on_data_2():
 
 	print(bp_fit.breakpoint_history)	
 
-test_on_data_1c()
+test_on_data_1b()
