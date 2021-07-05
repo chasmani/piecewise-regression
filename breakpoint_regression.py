@@ -1,6 +1,7 @@
 
 import numpy as np
 import statsmodels.api as sm
+import scipy.stats
 import matplotlib.pyplot as plt
 
 np.random.seed(0)
@@ -17,8 +18,17 @@ class Fit:
 		self.max_iterations = 10
 		self.tolerance=0.1 # Maybe set this based on gaps between data
 
+
 		self.breakpoint_history = [start_values]
+		# In the format [c, alpha, betas. gammas]
 		self.params_history = []
+		self.covariance_history = []
+
+		# All in the format [c, alphas, bps]
+		self.final_params = None
+		self.final_standard_errors = None
+		self.confidence_intervals = None
+
 		self.stop = False
 
 		self.fit()
@@ -38,9 +48,10 @@ class Fit:
 
 	def fit(self):
 		while not self.stop:
-			next_breakpoints, params = breakpoint_fit(self.xx, self.yy, self.breakpoint_history[-1]) 
+			next_breakpoints, params, cov = breakpoint_fit(self.xx, self.yy, self.breakpoint_history[-1]) 
 			self.breakpoint_history.append(next_breakpoints)
 			self.params_history.append(params)
+			self.covariance_history.append(cov)
 			self.stop_or_not()
 
 	def stop_or_not(self):
@@ -50,6 +61,120 @@ class Fit:
 			self.stop=True
 		# Stop if the last change was small
 		# How to do this for multiple breakpoints
+
+
+	def get_alpha_standard_errors(self):
+
+		# Covariance matrix is [c, alpha, ]
+
+		cov_matrix = self.covariance_history[-1]
+
+		# Alphas are calculated as the sum of alpha_0 and bets up to it 
+		# The var of each alpha is the sum of the covariance matrix up to it
+		# Removing the intercept column and row. 
+		# var(alpha_k) = var(alpha_1) + sum_{i=2}^k var(beta_j) + 2*sum_{i=1,j=2}^k *cov(alpha, betas))
+		# Som,ething like that. See accompanying paper. 
+		alpha_vars = []
+		for alpha_n in range(self.n_breakpoints +1):
+			alpha_cov_matrix = cov_matrix[1:alpha_n+2, 1:alpha_n+2]	
+			alpha_vars.append(np.sum(alpha_cov_matrix))
+
+		alpha_ses = np.sqrt(alpha_vars)	
+		return alpha_ses	
+
+
+	def get_bp_standard_errors(self):
+
+		# bp = gamma/beta + bp_0
+		# Variance of bp estimator found using ratio/delta method
+		# See paper for clarification
+
+		cov_matrix = self.covariance_history[-1]
+		params = self.params_history[-1]
+
+		print("COV: ", cov_matrix)
+
+		bp_vars = []
+
+		for bp_n in range(self.n_breakpoints):
+			beta_index = 2 + bp_n
+			gamma_index = 2 + self.n_breakpoints + bp_n
+
+			beta = params[beta_index]
+			gamma = params[gamma_index]
+			gamma_var = cov_matrix[gamma_index, gamma_index]
+			beta_var = cov_matrix[beta_index, beta_index]
+			gamma_beta_covar = cov_matrix[beta_index, gamma_index]
+
+			print(bp_n, beta_index, gamma_index, beta, gamma, beta_var, gamma_var, gamma_beta_covar)
+
+			bp_var = (gamma_var + beta_var * (gamma/beta)**2 + 2*(gamma/beta)*gamma_beta_covar)/(beta**2)
+			print("BP Var: ", bp_var)
+			bp_vars.append(bp_var)
+
+		bp_ses = np.sqrt(bp_vars)
+		return bp_ses
+
+	def calculate_final_params(self):
+
+		# [c, alphas, bps]
+		params = self.params_history[-1]
+		c = params[0]
+
+		alphas = []
+		for alpha_n in range(self.n_breakpoints + 1):
+			alpha = np.sum(params[1:alpha_n+2])
+			alphas.append(alpha)
+
+		print("Alphas :", alphas)
+
+		bps = self.breakpoint_history[-1]
+
+		self.final_params = np.array([c] + list(alphas) + list(bps))
+
+
+
+
+	def calculate_standard_errors(self):
+
+		# Covariance matrix is [c, alpha, ]
+
+		cov_matrix = self.covariance_history[-1]
+		c_var = cov_matrix[0][0]
+		c_se = np.sqrt(c_var)
+		print("Standard error in c: ", c_se)
+
+		alpha_ses = self.get_alpha_standard_errors()
+
+		bp_ses = self.get_bp_standard_errors()
+
+		print(c_se, alpha_ses, bp_ses)
+
+		self.final_standard_errors = np.array([c_se] + list(alpha_ses) + list(bp_ses))
+
+
+	def calculate_confidence_intervals(self):
+
+		
+		self.calculate_standard_errors()
+		self.calculate_final_params()
+		ses = self.final_standard_errors
+		params = self.final_params
+
+		dof = len(self.xx) - 2 - 2*self.n_breakpoints
+
+		t_const = scipy.stats.t.ppf(0.975, dof)
+
+		cis = tuple(zip(params - t_const*ses, params + t_const*ses))
+
+		print("CIS Are ", cis)
+
+		self.confidence_intervals = cis
+
+
+
+
+
 
 	def plot_data(self, **kwargs):
 		"""
@@ -64,6 +189,7 @@ class Fit:
 		Passes any kwargs to the matplotlib plot function, e.g. color="red"
 		"""
 		# Get the final results from the fitted model variables
+		# Params are in terms of [intercept, alpha, betas, gammas]
 		final_params = self.params_history[-1]
 		breakpoints = self.breakpoint_history[-1]
 		
@@ -103,6 +229,19 @@ class Fit:
 			plt.xlabel("Iteration")
 			plt.ylabel("Breakpoint")
 
+	def plot_breakpoint_cis(self, **kwargs):
+		"""
+		Plot the breakpoint cis as shaded regions
+		"""
+		self.calculate_confidence_intervals()
+		cis = self.confidence_intervals
+		print(cis)
+
+		for bp_n in range(self.n_breakpoints):
+			bp_ci = cis[2 + self.n_breakpoints + bp_n]
+			plt.axvspan(bp_ci[0], bp_ci[1], alpha=0.1)
+
+
 
 
 
@@ -134,6 +273,9 @@ def breakpoint_fit(xx, yy, current_breakpoints):
 	results = sm.OLS(endog=yy, exog=Z).fit()
 
 	cov = results.cov_params()
+	print("COV: ", cov)
+	print("Conf int: ", results.conf_int())
+	print("Summary: ", results.summary())
 	
 	# First two params are a and c in the line equation
 	# Beta hats are the next group of params, same length as the number of breakpoints
@@ -145,7 +287,7 @@ def breakpoint_fit(xx, yy, current_breakpoints):
 
 	print(next_breakpoints)
 
-	return next_breakpoints, results.params
+	return next_breakpoints, results.params, cov
 
 
 
@@ -209,11 +351,13 @@ def test_on_data_1():
 
 	bp_fit = Fit(xx, yy, n_breakpoints=1, start_values=[5])
 
+	bp_fit.get_standard_errors()
 
-	print(bp_fit.breakpoint_history)
 
-	bp_fit.plot_data()
-	plt.show()
+	#print(bp_fit.breakpoint_history)
+
+	#bp_fit.plot_data()
+	#plt.show()
 
 
 def test_on_data_1b():
@@ -235,16 +379,15 @@ def test_on_data_1b():
 	bp_fit = Fit(xx, yy, n_breakpoints=2, start_values=[5, 10])
 
 
-	print(bp_fit.breakpoint_history)
+	#bp_fit.calculate_confidence_intervals()
+
+
+	#print(bp_fit.breakpoint_history)
 
 	bp_fit.plot_data()
 	bp_fit.plot_fit(color="red", linewidth=4)
 	bp_fit.plot_breakpoints()
-	plt.show()
-	plt.close()
-
-	bp_fit.plot_breakpoint_history()
-	plt.legend()
+	bp_fit.plot_breakpoint_cis()
 	plt.show()
 
 
