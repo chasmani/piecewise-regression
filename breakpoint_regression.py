@@ -422,6 +422,8 @@ def test_on_data_1c():
 	bp_fit.plot_data()
 	bp_fit.plot_fit(color="red", linewidth=4)
 	bp_fit.plot_breakpoints()
+	bp_fit.plot_breakpoint_cis()
+
 	plt.show()
 	plt.close()
 
@@ -454,4 +456,4 @@ def test_on_data_2():
 
 	print(bp_fit.breakpoint_history)	
 
-test_on_data_1b()
+test_on_data_1c()
