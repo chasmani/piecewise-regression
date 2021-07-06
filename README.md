@@ -1,6 +1,6 @@
 # breakpoint-regression
 
-Breakpoint (aka segmented) regression in Python. Simultaneously find breakpoints and straightline segments between those breakpoints. Based on Muggeo (2003)
+Breakpoint (aka segmented) regression in Python. Simultaneously find breakpoints and straightline segments between those breakpoints. Based on Muggeo "Estimating regression models with unknown break-points" (2003)
 
 
 ## Installation
@@ -9,16 +9,17 @@ You can install breakpoint-regression from [PyPI](https://pypi.org/project/break
 
     pip install breakpoint-regression
 
-The package is supported on Python 3.X and above.
+The package is supported on Python 3.7 and above.
 
 ## How To Use
 
-The package requires some x and y data to fit. You also need to tell it how many breakpoints you want to fit, and starting guesses for those breakpoints. 
+The package requires some x and y data to fit. You also need to tell it how many breakpoints you want, and starting guesses for those breakpoints. 
 
 The package includes tools for summarising the fitted model and plotting.
 
 	import breakpoint_regression
 	import matplotlib.pyplot as plt
+	import numpy as np
 
 	# Generate some test data with 1 breakpoint
 	alpha_1 = -4

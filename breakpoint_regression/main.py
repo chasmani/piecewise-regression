@@ -4,7 +4,6 @@ import statsmodels.api as sm
 import scipy.stats
 import matplotlib.pyplot as plt
 
-np.random.seed(0)
 
 class Fit:
 
@@ -171,11 +170,6 @@ class Fit:
 
 		self.confidence_intervals = cis
 
-
-
-
-
-
 	def plot_data(self, **kwargs):
 		"""
 		Plot the data as a scatter plot
@@ -241,8 +235,8 @@ class Fit:
 			bp_ci = cis[2 + self.n_breakpoints + bp_n]
 			plt.axvspan(bp_ci[0], bp_ci[1], alpha=0.1)
 
-
-
+	def summary(self):
+		print("Coming soon")
 
 
 """
@@ -257,7 +251,6 @@ def breakpoint_fit(xx, yy, current_breakpoints):
 	Return the next breakpoints and the params from the fit
 	The params are of the form [c, a, beta_hats, gamma_hats]
 	"""
-
 	print(current_breakpoints)
 
 	Z = np.array([xx])
@@ -288,12 +281,6 @@ def breakpoint_fit(xx, yy, current_breakpoints):
 	print(next_breakpoints)
 
 	return next_breakpoints, results.params, cov
-
-
-
-
-
-
 
 
 def breakpoint_fit_1_bp(xx, yy, current_breakpoints):
@@ -346,7 +333,7 @@ def test_on_data_1():
 	xx = np.linspace(0, 20, n_points)
 	yy = intercept + alpha*xx + beta_1 * np.maximum(xx - breakpoint_1, 0) + np.random.normal(size=n_points)
 
-	
+		
 
 	bp_fit = Fit(xx, yy, n_breakpoints=1, start_values=[5])
 
@@ -455,4 +442,7 @@ def test_on_data_2():
 
 	print(bp_fit.breakpoint_history)	
 
-test_on_data_1c()
+if __name__=="__main__":
+
+	np.random.seed(0)
+	test_on_data_1c()
