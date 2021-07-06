@@ -108,7 +108,7 @@ class Fit:
 
 			print(bp_n, beta_index, gamma_index, beta, gamma, beta_var, gamma_var, gamma_beta_covar)
 
-			bp_var = (gamma_var + beta_var * (gamma/beta)**2 + 2*(gamma/beta)*gamma_beta_covar)/(beta**2)
+			bp_var = (gamma_var + beta_var * (gamma/beta)**2 - 2*(gamma/beta)*gamma_beta_covar)/(beta**2)
 			print("BP Var: ", bp_var)
 			bp_vars.append(bp_var)
 
@@ -229,7 +229,7 @@ class Fit:
 			plt.xlabel("Iteration")
 			plt.ylabel("Breakpoint")
 
-	def plot_breakpoint_cis(self, **kwargs):
+	def plot_breakpoint_confidence_intervals(self, **kwargs):
 		"""
 		Plot the breakpoint cis as shaded regions
 		"""
@@ -344,7 +344,6 @@ def test_on_data_1():
 	n_points = 200
 
 	xx = np.linspace(0, 20, n_points)
-
 	yy = intercept + alpha*xx + beta_1 * np.maximum(xx - breakpoint_1, 0) + np.random.normal(size=n_points)
 
 	
