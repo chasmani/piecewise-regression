@@ -25,10 +25,25 @@ class Fit:
 		self.params_history = []
 		self.covariance_history = []
 
-		# All in the format [c, alphas, bps]
-		self.final_params = None
-		self.final_standard_errors = None
-		self.final_confidence_intervals = None
+		# Constant estimate
+		self.const_estimate = None
+		self.const_standard_error = None
+		self.const_confidence_interval = None
+
+		# Alphas are slopes of the line segments
+		self.alpha_estimates = None
+		self.alpha_standard_errors = None
+		self.alpha_confidence_intervals = None
+
+		# Betas are differences between slopes in line segments
+		self.beta_estimates = None
+		self.beta_standard_errors = None
+		self.beta_confidence_intervals = None
+
+		# Breakpoint estimates
+		self.breakpoint_estimates = None
+		self.breakpoint_standard_errors = None
+		self.breakpoint_confidence_intervals = None
 
 		# Davies p-value is approximately the probability of the data given there is no breakpoint
 		self.davies = None
@@ -60,11 +75,13 @@ class Fit:
 			self.stop_or_not()
 
 		# Get final values, stanrd errors and confidence intervals for variables of interest
-		# intercept, line segment gradients and breakpoints
-		self.final_params = self.calculate_final_params()
-		self.final_standard_errors = self.calculate_final_standard_errors()
-		self.final_confidence_intervals = self.calculate_final_confidence_intervals()
-		self.davies = self.davies_test()
+		# intercept, line segment gradients, gradient differences and breakpoints
+		self.calculate_all_estimates()
+		self.calculate_all_standard_errors()
+		self.calculate_all_confidence_intervals()
+		#self.final_standard_errors = self.calculate_final_standard_errors()
+		#self.final_confidence_intervals = self.calculate_final_confidence_intervals()
+		#self.davies = self.davies_test()
 
 	def stop_or_not(self):
 
@@ -73,6 +90,30 @@ class Fit:
 			self.stop=True
 		# Stop if the last change was small
 		# How to do this for multiple breakpoints
+
+	# Add breakpoint fit into main object
+	# Weird otherwise
+
+
+	def calculate_all_estimates(self):
+		"""
+		Save all params as object variables
+		"""
+		params = self.params_history[-1]
+		# Can most of the variables directly from the params etc
+		self.const_estimate = params[0]
+		self.beta_estimates = params[2:self.n_breakpoints+2]		
+		self.breakpoint_estimates = self.breakpoint_history[-1]
+
+		# The slopes need to eb calcaulted by adding up the betas and first alpha
+		alphas = []
+		for alpha_n in range(self.n_breakpoints + 1):
+			alpha = np.sum(params[1:alpha_n+2])
+			alphas.append(alpha)
+		self.alpha_estimates = alphas
+
+
+
 
 	def get_alpha_standard_errors(self):
 
@@ -121,59 +162,49 @@ class Fit:
 		bp_ses = np.sqrt(bp_vars)
 		return bp_ses
 
-	def calculate_final_params(self):
+	
+
+
+	def calculate_all_standard_errors(self):
 		"""
-		Final params are in terms of [c, alphas, bps]
+		Calcaulte standrd errors for all the variables of interest
 		"""
-		params = self.params_history[-1]
-		c = params[0]
-
-		alphas = []
-		for alpha_n in range(self.n_breakpoints + 1):
-			alpha = np.sum(params[1:alpha_n+2])
-			alphas.append(alpha)
-
-		bps = self.breakpoint_history[-1]
-
-		return np.array([c] + list(alphas) + list(bps))
-
-
-	def calculate_final_standard_errors(self):
-		"""
-		Final standard errors are for [x, alphas, bps]
-		"""
-		# Covariance matrix is [c, alpha, ]
+		# Covariance matrix is [c, alpha, betas, gammas]
+		# Constant variance is jsut the top left cell in covariance matrix
 		cov_matrix = self.covariance_history[-1]
 		c_var = cov_matrix[0][0]
-		c_se = np.sqrt(c_var)
-		print("Standard error in c: ", c_se)
+		self.const_standard_error = np.sqrt(c_var)
+		
+		# Beta variances are along the diagonal of the covariance matrix
+		cov_diagonal = np.diagonal(cov_matrix)
+		beta_vars = cov_diagonal[2:self.n_breakpoints+2]
+		self.beta_standard_errors = np.sqrt(beta_vars)
 
-		alpha_ses = self.get_alpha_standard_errors()
-
-		bp_ses = self.get_bp_standard_errors()
-
-		print(c_se, alpha_ses, bp_ses)
-
-		return np.array([c_se] + list(alpha_ses) + list(bp_ses))
+		self.alpha_standard_errors = self.get_alpha_standard_errors()
+		self.breakpoint_standard_errors = self.get_bp_standard_errors()
 
 
-	def calculate_final_confidence_intervals(self):
+	def calculate_all_confidence_intervals(self):
 		"""
 		Final confidence intervals are for [x, alphas, bps]
-		"""		
-		ses = self.final_standard_errors
-		params = self.final_params
-
+		"""	
+		# Calcualte the confidence intervals based on Student's t distribution
 		dof = len(self.xx) - 2 - 2*self.n_breakpoints
-
 		t_const = scipy.stats.t.ppf(0.975, dof)
 
-		cis = tuple(zip(params - t_const*ses, params + t_const*ses))
+		self.const_confidence_interval = (self.const_estimate - t_const*self.const_standard_error, 
+			self.const_estimate + t_const*self.const_standard_error)
 
-		print("CIS Are ", cis)
+		# For the params with maybe more than one value, use a zip to handle the list unpacking
+		self.alpha_confidence_intervals = tuple(zip(self.alpha_estimates - t_const*self.alpha_standard_errors, 
+			self.alpha_estimates + t_const*self.alpha_standard_errors))
 
-		return cis
+		self.beta_confidence_intervals = tuple(zip(self.beta_estimates - t_const*self.beta_standard_errors, 
+			self.beta_estimates + t_const*self.beta_standard_errors))
 
+		self.breakpoint_confidence_intervals = tuple(zip(self.breakpoint_estimates - t_const*self.breakpoint_standard_errors, 
+			self.breakpoint_estimates + t_const*self.breakpoint_standard_errors))
+	
 	def get_test_statistic(self, xx_davies, yy_davies, theta):
 		"""
 		Compute a test statistic for the Davies test for the p-value of existence of a breakpoint
@@ -314,9 +345,7 @@ class Fit:
 		"""
 		Plot the breakpoint cis as shaded regions
 		"""
-		cis = self.confidence_intervals
-		for bp_n in range(self.n_breakpoints):
-			bp_ci = cis[2 + self.n_breakpoints + bp_n]
+		for bp_ci in self.breakpoint_confidence_intervals:
 			plt.axvspan(bp_ci[0], bp_ci[1], alpha=0.1)
 
 
@@ -410,7 +439,7 @@ def breakpoint_fit_1_bp(xx, yy, current_breakpoints):
 def test_on_data_1():
 
 	alpha = -4
-	beta_1 = -0.2
+	beta_1 = -2
 	intercept = 100
 	breakpoint_1 = 7
 
@@ -452,15 +481,14 @@ def test_on_data_1b():
 	bp_fit = Fit(xx, yy, n_breakpoints=2, start_values=[5, 10])
 
 
-	#bp_fit.calculate_confidence_intervals()
 
 
-	#print(bp_fit.breakpoint_history)
+	print(bp_fit.breakpoint_history)
 
 	bp_fit.plot_data()
 	bp_fit.plot_fit(color="red", linewidth=4)
 	bp_fit.plot_breakpoints()
-	bp_fit.plot_breakpoint_cis()
+	bp_fit.plot_breakpoint_confidence_intervals()
 	plt.show()
 
 
@@ -534,4 +562,4 @@ def test_on_data_2():
 if __name__=="__main__":
 
 	np.random.seed(0)
-	test_on_data_1()
+	test_on_data_1b()
