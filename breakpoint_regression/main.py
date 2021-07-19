@@ -68,7 +68,7 @@ class Fit:
 	def fit(self):
 		# Run the breakpoint iterative procedure
 		while not self.stop:
-			next_breakpoints, params, cov = breakpoint_fit(self.xx, self.yy, self.breakpoint_history[-1]) 
+			next_breakpoints, params, cov = self.breakpoint_fit(self.xx, self.yy, self.breakpoint_history[-1]) 
 			self.breakpoint_history.append(next_breakpoints)
 			self.params_history.append(params)
 			self.covariance_history.append(cov)
@@ -91,8 +91,43 @@ class Fit:
 		# Stop if the last change was small
 		# How to do this for multiple breakpoints
 
-	# Add breakpoint fit into main object
-	# Weird otherwise
+	
+	def breakpoint_fit(self, xx, yy, current_breakpoints):
+		"""
+		Fit the linear approximation given the current breakpoint guesses
+		Return the next breakpoints and the params from the fit
+		The params are of the form [c, a, beta_hats, gamma_hats]
+		Keep this as a function without referencing self.xx etc, for easier testing
+		"""
+		Z = np.array([xx])
+		# Convert data based on breakpoints
+		UU = [(xx - bp) * np.heaviside(xx- bp, 1) for bp in current_breakpoints]
+		VV = [np.heaviside(xx- bp, 1) for bp in current_breakpoints]
+
+		
+		Z = np.concatenate((Z, UU, VV))
+		Z = Z.T	
+		Z = sm.add_constant(Z, has_constant='add')
+
+		results = sm.OLS(endog=yy, exog=Z).fit()
+
+		cov = results.cov_params()
+		print("COV: ", cov)
+		print("Conf int: ", results.conf_int())
+		print("Summary: ", results.summary())
+		
+		# First two params are a and c in the line equation
+		# Beta hats are the next group of params, same length as the number of breakpoints
+		beta_hats = results.params[2:2+len(current_breakpoints)]
+		# Gamma hats are the last group of params, same length as the number of breakpoints
+		gamma_hats = results.params[2+len(current_breakpoints):]
+		# The next breakpoints are calculated iteratively
+		next_breakpoints = current_breakpoints - gamma_hats/beta_hats
+
+		print(next_breakpoints)
+
+		return next_breakpoints, results.params, cov
+
 
 
 	def calculate_all_estimates(self):
@@ -360,42 +395,7 @@ Easier for testing and re-use etc.
 Transforms the data based on step functions before fitting
 Fits based on Muggeo's method 
 """
-def breakpoint_fit(xx, yy, current_breakpoints):
-	"""
-	Fit the linear approximation given the current breakpoint guesses
-	Return the next breakpoints and the params from the fit
-	The params are of the form [c, a, beta_hats, gamma_hats]
-	"""
-	print(current_breakpoints)
 
-	Z = np.array([xx])
-	# Convert data based on breakpoints
-	UU = [(xx - bp) * np.heaviside(xx- bp, 1) for bp in current_breakpoints]
-	VV = [np.heaviside(xx- bp, 1) for bp in current_breakpoints]
-
-	
-	Z = np.concatenate((Z, UU, VV))
-	Z = Z.T	
-	Z = sm.add_constant(Z, has_constant='add')
-
-	results = sm.OLS(endog=yy, exog=Z).fit()
-
-	cov = results.cov_params()
-	print("COV: ", cov)
-	print("Conf int: ", results.conf_int())
-	print("Summary: ", results.summary())
-	
-	# First two params are a and c in the line equation
-	# Beta hats are the next group of params, same length as the number of breakpoints
-	beta_hats = results.params[2:2+len(current_breakpoints)]
-	# Gamma hats are the last group of params, same length as the number of breakpoints
-	gamma_hats = results.params[2+len(current_breakpoints):]
-	# The next breakpoints are calculated iteratively
-	next_breakpoints = current_breakpoints - gamma_hats/beta_hats
-
-	print(next_breakpoints)
-
-	return next_breakpoints, results.params, cov
 
 
 def breakpoint_fit_1_bp(xx, yy, current_breakpoints):
