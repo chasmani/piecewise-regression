@@ -1,0 +1,6 @@
+To send a new version to the package manager:
+
+1. Make sure everything works
+2. Update the version number in setup.py
+3. 'python setup.py sdist bdist_wheel' - this creates a dist package in the dist/ folder
+4. 'twine upload dist/*'

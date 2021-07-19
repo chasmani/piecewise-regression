@@ -14,7 +14,7 @@ class Fit:
 		self.n_breakpoints = n_breakpoints
 		self.start_values = start_values
 
-		self.max_iterations = 10
+		self.max_iterations = 20
 		self.tolerance=0.1 # Maybe set this based on gaps between data
 
 
@@ -64,15 +64,13 @@ class Fit:
 
 	def get_alpha_standard_errors(self):
 
-		# Covariance matrix is [c, alpha, ]
-
 		cov_matrix = self.covariance_history[-1]
 
-		# Alphas are calculated as the sum of alpha_0 and bets up to it 
+		# Alphas are calculated as the sum of alpha_0 and betas up that part of the regression line 
 		# The var of each alpha is the sum of the covariance matrix up to it
 		# Removing the intercept column and row. 
-		# var(alpha_k) = var(alpha_1) + sum_{i=2}^k var(beta_j) + 2*sum_{i=1,j=2}^k *cov(alpha, betas))
-		# Som,ething like that. See accompanying paper. 
+		# var(alpha_k) = var(alpha_1) + sum var(beta_j) + 2*sum_{i=1,j=2}^k *cov(alpha, betas))
+		# var(alpha_k) = sum_{i, j} cov(alpha and betas)
 		alpha_vars = []
 		for alpha_n in range(self.n_breakpoints +1):
 			alpha_cov_matrix = cov_matrix[1:alpha_n+2, 1:alpha_n+2]	
@@ -86,15 +84,14 @@ class Fit:
 
 		# bp = gamma/beta + bp_0
 		# Variance of bp estimator found using ratio/delta method
-		# See paper for clarification
+		# See the accompanying paper for clarification
 
 		cov_matrix = self.covariance_history[-1]
 		params = self.params_history[-1]
 
-		print("COV: ", cov_matrix)
-
 		bp_vars = []
 
+		# For each breakpoint, calcaulte the variance of the estimator
 		for bp_n in range(self.n_breakpoints):
 			beta_index = 2 + bp_n
 			gamma_index = 2 + self.n_breakpoints + bp_n
@@ -105,18 +102,17 @@ class Fit:
 			beta_var = cov_matrix[beta_index, beta_index]
 			gamma_beta_covar = cov_matrix[beta_index, gamma_index]
 
-			print(bp_n, beta_index, gamma_index, beta, gamma, beta_var, gamma_var, gamma_beta_covar)
-
+			# Differs from Muggeo (2003) in the minus sign before the covar term - I think Muggeo had a mistake
 			bp_var = (gamma_var + beta_var * (gamma/beta)**2 - 2*(gamma/beta)*gamma_beta_covar)/(beta**2)
-			print("BP Var: ", bp_var)
 			bp_vars.append(bp_var)
 
 		bp_ses = np.sqrt(bp_vars)
 		return bp_ses
 
 	def calculate_final_params(self):
-
-		# [c, alphas, bps]
+		"""
+		Final params are in terms of [c, alphas, bps]
+		"""
 		params = self.params_history[-1]
 		c = params[0]
 
@@ -125,16 +121,15 @@ class Fit:
 			alpha = np.sum(params[1:alpha_n+2])
 			alphas.append(alpha)
 
-		print("Alphas :", alphas)
-
 		bps = self.breakpoint_history[-1]
 
 		self.final_params = np.array([c] + list(alphas) + list(bps))
 
 
-
-
-	def calculate_standard_errors(self):
+	def calculate_final_standard_errors(self):
+		"""
+		Final standard errors are for [x, alphas, bps]
+		"""
 
 		# Covariance matrix is [c, alpha, ]
 
@@ -152,10 +147,12 @@ class Fit:
 		self.final_standard_errors = np.array([c_se] + list(alpha_ses) + list(bp_ses))
 
 
-	def calculate_confidence_intervals(self):
-
+	def calculate_final_confidence_intervals(self):
+		"""
+		Final confidence intervals are for [x, alphas, bps]
+		"""
 		
-		self.calculate_standard_errors()
+		self.calculate_final_standard_errors()
 		self.calculate_final_params()
 		ses = self.final_standard_errors
 		params = self.final_params
@@ -227,7 +224,7 @@ class Fit:
 		"""
 		Plot the breakpoint cis as shaded regions
 		"""
-		self.calculate_confidence_intervals()
+		self.calculate_final_confidence_intervals()
 		cis = self.confidence_intervals
 		print(cis)
 
@@ -400,7 +397,7 @@ def test_on_data_1c():
 	yy += np.random.normal(size=n_points)
 
 
-	bp_fit = Fit(xx, yy, n_breakpoints=3, start_values=[5, 10,11])
+	bp_fit = Fit(xx, yy, n_breakpoints=4, start_values=[3,5, 10,11])
 
 
 	print(bp_fit.breakpoint_history)
@@ -408,7 +405,7 @@ def test_on_data_1c():
 	bp_fit.plot_data()
 	bp_fit.plot_fit(color="red", linewidth=4)
 	bp_fit.plot_breakpoints()
-	bp_fit.plot_breakpoint_cis()
+	bp_fit.plot_breakpoint_confidence_intervals()
 
 	plt.show()
 	plt.close()
