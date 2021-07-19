@@ -14,8 +14,8 @@ def test_it():
 
 	n_points = 200
 
-	xx = np.linspace(0, 20, n_points)
-	yy = intercept + alpha*xx + beta_1 * np.maximum(xx - breakpoint_1, 0) + np.random.normal(size=n_points)
+	xx_bp = np.linspace(0, 20, n_points)
+	yy_bp = intercept + alpha*xx_bp + beta_1 * np.maximum(xx_bp - breakpoint_1, 0) + np.random.normal(size=n_points)
 
 def test_null_basic_centered():
 
@@ -25,8 +25,8 @@ def test_null_basic_centered():
 	breakpoint_1 = 2
 	n_points = 200
 
-	xx = np.linspace(-9.5, 9.5, n_points)
-	yy = intercept + alpha*xx + beta_1 * np.maximum(xx - breakpoint_1, 0) + np.random.normal(size=n_points)
+	xx_bp = np.linspace(-9.5, 9.5, n_points)
+	yy_bp = intercept + alpha*xx_bp + beta_1 * np.maximum(xx_bp - breakpoint_1, 0) + np.random.normal(size=n_points)
 
 	L = -8
 	U = 8 
@@ -37,7 +37,7 @@ def test_null_basic_centered():
 	test_stats = []
 
 	for theta in thetas:
-		test_stat = get_test_statistic(xx, yy, theta)
+		test_stat = get_test_statistic(xx_bp, yy_bp, theta)
 		test_stats.append(test_stat)
 
 		# Two sided
@@ -57,9 +57,9 @@ def test_null_basic_centered():
 
 
 
-def get_test_statistic(xx, yy, theta):
+def get_test_statistic(xx_bp, yy_bp, theta):
 
-	n = len(xx)
+	n = len(xx_bp)
 
 	s_0 = 0
 	s_1 = 0
@@ -67,7 +67,7 @@ def get_test_statistic(xx, yy, theta):
 	s_3 = 0
 	s_4 = 0
 
-	for x in xx:
+	for x in xx_bp:
 		s_0 += x**2
 
 		if x > theta:
@@ -79,21 +79,21 @@ def get_test_statistic(xx, yy, theta):
 			s_4 += x - theta
 
 
-	a_hat = np.sum(yy)/n
-	b_hat = np.sum(xx*yy)/s_0
+	a_hat = np.sum(yy_bp)/n
+	b_hat = np.sum(xx_bp*yy_bp)/s_0
 
-	print(a_hat, b_hat)
+	#print(a_hat, b_hat)
 
-	print(s_0, s_1, s_2, s_3, s_4)
+	#print(s_0, s_1, s_2, s_3, s_4)
 
 	V = s_1*s_2/s_0 + s_3*s_4/n
 
-	print("V is ", V)
+	#print("V is ", V)
 
 	S = 0
 	for i in range(n):
-		if xx[i] > theta:
-			S += (yy[i] - a_hat - b_hat*xx[i])*(xx[i] - theta)
+		if xx_bp[i] > theta:
+			S += (yy_bp[i] - a_hat - b_hat*xx_bp[i])*(xx_bp[i] - theta)
 
 	S = S/(np.sqrt(np.abs(V)))
 
@@ -110,7 +110,12 @@ def check_p_values():
 	for seed in range(100):
 		np.random.seed(seed)
 
-		p = test_null()
+		xx_bp, yy_bp = generate_data()
+		L = np.percentile(xx_bp, 10)
+		U = np.percentile(xx_bp, 90)
+		theta = 0
+
+		p = davies_test_2_sided(xx_bp, yy_bp)
 		print(p)
 
 		if p<0.05:
@@ -132,58 +137,72 @@ def check_p_values():
 	#plt.scatter(thetas, test_stats)
 	#plt.show()
 
-def test_null():
+def generate_data():
 
 	intercept = 5
 	alpha = 1
 	beta_1 = 0
 	breakpoint_1 = 2
-	n_points = 20
+	n_points = 7
 
-	xx_1 = list(np.linspace(-9.5, 9.5, n_points))
-	xx_2 = list(np.linspace(0,9.5,n_points))
-	xx = np.array(xx_1 + xx_2)
-	#xx = np.array(xx_1)
+	xx_bp_1 = list(np.linspace(-9.5, 9.5, n_points))
+	xx_bp_2 = list(np.linspace(0,9.5,n_points))
+	xx_bp = np.array(xx_bp_1 + xx_bp_2)
+	#xx_bp = np.array(xx_bp_1)
 
-	yy = intercept + alpha*xx + beta_1 * np.maximum(xx - breakpoint_1, 0) + np.random.normal(size=len(xx))
+	yy_bp = intercept + alpha*xx_bp + beta_1 * np.maximum(xx_bp - breakpoint_1, 0) + np.random.normal(size=len(xx_bp))
 
-	#plt.scatter(xx, yy)
-	#plt.show()
-
-
-	# Shift xx to center
-	xx = xx - np.mean(xx)
-	#print(xx)
-
-	L = np.percentile(xx, 10)
-	U = np.percentile(xx, 90)
+	return xx_bp, yy_bp
 
 
-	print(L, U)
+def davies_test_2_sided(xx_bp, yy_bp):
+	"""
+	Significane test for the existence of a breakpoint
+	Null hypothesis is that there is no breakpoint, or that the change in gradient is zero
+	Alternative hypothesis is that there is a breakpoint, with a non-zero change in gradient
+	The change is gradietn is a function of the breakpoint position
+	The breakpoint posiition is a nuisannce parameter that only exists in the alternative hypothesis
+	Based on Davies (1987), "Hypothesis Testing when a nuisance parameter is present only under the alternative"
+	"""
 
+	# Centre the x values - makes no difference to existence of a breakpoint
+	# The Davies test has this as an assumption
+	xx_bp = xx_bp - np.mean(xx_bp)
+	
+	# Cut into the data a little bit to avoid errors caused by the constants being zero
+	# Go a bit wider (x1.11) on selecting the region to counteract this.
+	# You need a data region slightly bigger than the [L,U] region for this to work 
+	L = np.percentile(xx_bp, 10)
+	U = np.percentile(xx_bp, 90)
 
-	thetas = np.arange(L, U, 0.2)
+	# More thetas is better
+	thetas = np.linspace(L, U, 20)
 
+	# For each value of theta, compute a test statistic
 	test_stats = []
-
 	for theta in thetas:
-		test_stat = get_test_statistic(xx, yy, theta)
+		test_stat = get_test_statistic(xx_bp, yy_bp, theta)
 		test_stats.append(test_stat)
 
-		# Two sided
+	# Two sided test, M as defined by Davies
 	M = np.max(np.abs(test_stats))
 
-		# For one sided test - also don't multiply p by 2
+	# For one sided test - also don't multiply p by 2
 	#M = np.max(test_stats)
 
+	# Use formulas from Davies and Muggeo
 	V = 0 
 	for i in range(len(thetas)-1):
 		V += np.abs(test_stats[i+1]-test_stats[i])
 
 	p = norm.cdf(-M) + V * np.exp(-.5*M**2) * 1/(np.sqrt(8*math.pi))
+	# Two sided test, beta can be positive or negative
 	p = p*2
 
 	return p
+
+
+
 
 
 
