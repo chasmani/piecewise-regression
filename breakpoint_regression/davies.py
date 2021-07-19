@@ -70,7 +70,7 @@ def davies_test(xx, yy, k=10, alternative="two_sided"):
 		# Two sided test, M as defined by Davies
 		M = np.max(np.abs(test_stats))
 	elif alternative == "less":
-		M = np.min(test_stats)
+		M = np.abs(np.min(test_stats))
 	elif alternative == "greater":
 		M = np.max(test_stats)
 

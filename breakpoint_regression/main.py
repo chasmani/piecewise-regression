@@ -6,7 +6,7 @@ import statsmodels.api as sm
 import scipy.stats
 import matplotlib.pyplot as plt
 
-from davies import davies_test
+from .davies import davies_test
 
 class Fit:
 
