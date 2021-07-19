@@ -6,6 +6,7 @@ import statsmodels.api as sm
 import scipy.stats
 import matplotlib.pyplot as plt
 
+from davies import davies_test
 
 class Fit:
 
@@ -79,9 +80,7 @@ class Fit:
 		self.calculate_all_estimates()
 		self.calculate_all_standard_errors()
 		self.calculate_all_confidence_intervals()
-		#self.final_standard_errors = self.calculate_final_standard_errors()
-		#self.final_confidence_intervals = self.calculate_final_confidence_intervals()
-		#self.davies = self.davies_test()
+		self.davies = davies_test(self.xx, self.yy)
 
 	def stop_or_not(self):
 
@@ -240,7 +239,8 @@ class Fit:
 		self.breakpoint_confidence_intervals = tuple(zip(self.breakpoint_estimates - t_const*self.breakpoint_standard_errors, 
 			self.breakpoint_estimates + t_const*self.breakpoint_standard_errors))
 	
-	def get_test_statistic(self, xx_davies, yy_davies, theta):
+	@staticmethod
+	def get_test_statistic(xx_davies, yy_davies, theta):
 		"""
 		Compute a test statistic for the Davies test for the p-value of existence of a breakpoint
 		Based on Davies(1987)
@@ -275,7 +275,8 @@ class Fit:
 		S = S/(np.sqrt(np.abs(V)))
 		return S
 
-	def davies_test(self, k=10, alternative="two_sided"):
+	@staticmethod
+	def davies_test(xx, yy, k=10, alternative="two_sided"):
 		"""
 		Significance test for the existence of a breakpoint
 		Null hypothesis is that there is no breakpoint, or that the change in gradient is zero
@@ -286,8 +287,8 @@ class Fit:
 		"""
 		# Centre the x values - makes no difference to existence of a breakpoint
 		# The Davies test has this as an assumption
-		xx_davies = self.xx - np.mean(self.xx)
-		yy_davies = self.yy
+		xx_davies = xx - np.mean(xx)
+		yy_davies = yy
 		
 		# As in Muggeo's R package "segmented", cut from second to second to last data point
 		# Need more data in the xx than in [L,U] for the test to work 
@@ -299,7 +300,7 @@ class Fit:
 		# For each value of theta, compute a test statistic
 		test_stats = []
 		for theta in thetas:
-			test_stat = self.get_test_statistic(xx_davies, yy_davies, theta)
+			test_stat = get_test_statistic(xx_davies, yy_davies, theta)
 			test_stats.append(test_stat)
 		print(test_stats)
 		if alternative == "two_sided":
@@ -465,8 +466,8 @@ def test_on_data_1():
 def test_on_data_1b():
 
 	alpha = -4
-	beta_1 = -2
-	beta_2 = 4
+	beta_1 = -1
+	beta_2 = 1
 	intercept = 100
 	breakpoint_1 = 7
 	breakpoint_2 = 12
@@ -481,9 +482,9 @@ def test_on_data_1b():
 	bp_fit = Fit(xx, yy, n_breakpoints=2, start_values=[5, 10])
 
 
-
-
 	print(bp_fit.breakpoint_history)
+
+	print("Davies is ", bp_fit.davies)
 
 	bp_fit.plot_data()
 	bp_fit.plot_fit(color="red", linewidth=4)
