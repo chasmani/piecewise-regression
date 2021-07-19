@@ -17,61 +17,46 @@ def test_it():
 	xx = np.linspace(0, 20, n_points)
 	yy = intercept + alpha*xx + beta_1 * np.maximum(xx - breakpoint_1, 0) + np.random.normal(size=n_points)
 
-def test_null():
+def test_null_basic():
 
-	p_count_5 = 0 
-	p_count_1 = 0
+	
 
-	for seed in range(1000):
+	intercept = 5
+	alpha = 1
+	beta_1 = 0
+	breakpoint_1 = 2
+	n_points = 200
 
-		
+	xx = np.linspace(-9.5, 9.5, n_points)
+	yy = intercept + alpha*xx + beta_1 * np.maximum(xx - breakpoint_1, 0) + np.random.normal(size=n_points)
 
-		intercept = 5
-		alpha = 1
-		beta_1 = 0
-		breakpoint_1 = 2
-		n_points = 200
+	L = -8
+	U = 8 
 
-		xx = np.linspace(-9.5, 9.5, n_points)
-		yy = intercept + alpha*xx + beta_1 * np.maximum(xx - breakpoint_1, 0) + np.random.normal(size=n_points)
 
-		L = -8
-		U = 8 
+	thetas = np.arange(L, U, 0.2)
 
-		#plt.scatter(xx, yy)
-		#plt.show()
+	test_stats = []
 
-		thetas = np.arange(L, U, 0.2)
-
-		test_stats = []
-
-		for theta in thetas:
-			test_stat = get_test_statistic(xx, yy, theta)
-			test_stats.append(test_stat)
+	for theta in thetas:
+		test_stat = get_test_statistic(xx, yy, theta)
+		test_stats.append(test_stat)
 
 		# Two sided
-		M = np.max(np.abs(test_stats))
+	M = np.max(np.abs(test_stats))
 
 		# For one sided test - also don't multiply p by 2
-		M = np.max(test_stats)
+	#M = np.max(test_stats)
 
-		V = 0 
-		for i in range(len(thetas)-1):
-			V += np.abs(test_stats[i+1]-test_stats[i])
+	V = 0 
+	for i in range(len(thetas)-1):
+		V += np.abs(test_stats[i+1]-test_stats[i])
 
-		p = norm.cdf(-M) + V * np.exp(-.5*M**2) * 1/(np.sqrt(8*math.pi))
-		p = p*2
+	p = norm.cdf(-M) + V * np.exp(-.5*M**2) * 1/(np.sqrt(8*math.pi))
+	p = p*2
 
-		if p<0.05:
-			p_count_5 +=1
-		if p< 0.01:
-			p_count_1 +=1
+	return p
 
-	print(p_count_5, p_count_1)
-
-
-	#plt.scatter(thetas, test_stats)
-	#plt.show()
 
 
 def get_test_statistic(xx, yy, theta):
@@ -112,5 +97,31 @@ def get_test_statistic(xx, yy, theta):
 
 	return S
 
+def check_p_values():
 
-test_null()
+	p_count_5 = 0 
+	p_count_2 = 0
+	p_count_1 = 0
+
+	for seed in range(1000):
+		np.random.seed(seed)
+
+		p = test_null_basic()
+
+		if p<0.05:
+			p_count_5 +=1
+		if p<0.02:
+				p_count_2 += 1
+		if p<0.01:
+			p_count_1 +=1
+
+	print("P values for 5, 2, and 1 percent are ")
+	print(p_count_5/10, p_count_2/10, p_count_1/10)
+
+	#plt.scatter(thetas, test_stats)
+	#plt.show()
+
+
+
+
+check_p_values()
