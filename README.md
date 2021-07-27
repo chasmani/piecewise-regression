@@ -49,3 +49,13 @@ The package includes tools for summarising the fitted model and plotting.
 	# Plot the history of the breakpoints during the algorithm 
 	bp_fit.plot_breakpoint_history()
 	plt.show()
+
+## Testing
+
+From the main dierctory run 
+	
+	python3 -m "nose"
+
+Note: This requires nosetests, can be downloaded from apt with
+
+	sudo apt install python3-nose

@@ -6,19 +6,19 @@ import statsmodels.api as sm
 import scipy.stats
 import matplotlib.pyplot as plt
 
-from .davies import davies_test
+from davies import davies_test
 
 class Fit:
 
-	def __init__(self, xx, yy, n_breakpoints, start_values):
+	def __init__(self, xx, yy, n_breakpoints, start_values, max_iterations=30, tolerance=10**-5):
 
 		self.xx = xx
 		self.yy = yy
 		self.n_breakpoints = n_breakpoints
 		self.start_values = start_values
 
-		self.max_iterations = 20
-		self.tolerance=0.1 # Maybe set this based on gaps between data
+		self.max_iterations = max_iterations		
+		self.tolerance = tolerance
 
 
 		self.breakpoint_history = [start_values]
@@ -55,12 +55,39 @@ class Fit:
 
 
 	def _is_valid_xx(self, xx):
+		"""
+		Allowed types:
+			List of integers of floats
+			Numpy array of integers or floats
+		"""
+		# If its a list, convert it to a numpy array
+		if isinstance(xx, list):
+			xx = np.array(xx)
+
+		if isinstance(xx, np.ndarray):
+			pass
+
+
+		
+
+
 		return xx
 
 	def _is_valid_yy(self, yy):
 		return yy
 
 	def _is_valid_n_breakpoints(self, n_breakpoints):
+
+
+
+		# Breakpoints have to be within the range of the data
+		for bp in n_breakpoints:
+			if bp <= np.min(self.xx):
+				raise ValueError("Starting breakpoint {} is too big. Breakpoint values must be within the range of the data".format(bp))
+			if bp >= np.max(self.xx):
+				raise ValueError("Starting breakpoint {} is too small. Breakpoint values must be within the range of the data".format(bp))
+
+
 		return n_breakpoints
 
 	def _is_valid_start_values(self, start_values):
@@ -87,6 +114,16 @@ class Fit:
 		# Stop if maximum iterations reached
 		if len(self.breakpoint_history)>self.max_iterations:
 			self.stop=True
+
+		# Stop if tolerance reached - no change between this and last breakpoints
+		breakpoint_differences = self.breakpoint_history[-2] - self.breakpoint_history[-1]
+		print("breakpoint_differences are ", breakpoint_differences)
+		
+
+		print(np.max(np.abs(breakpoint_differences)))
+		if np.max(np.abs(breakpoint_differences)) <= self.tolerance:
+			self.stop=True
+
 		# Stop if the last change was small
 		# How to do this for multiple breakpoints
 
@@ -123,7 +160,13 @@ class Fit:
 		# The next breakpoints are calculated iteratively
 		next_breakpoints = current_breakpoints - gamma_hats/beta_hats
 
-		print(next_breakpoints)
+		print("Next bp are : ", next_breakpoints)
+
+		unique_sorted_xx = np.sort(np.unique(xx))
+
+		# Stop breakpoints going over the edge of the data
+		next_breakpoints = np.array([bp if bp < np.max(self.xx) else unique_sorted_xx[-2] for bp in next_breakpoints])
+		next_breakpoints = np.array([bp if bp > np.min(self.xx) else unique_sorted_xx[1] for bp in next_breakpoints])
 
 		return next_breakpoints, results.params, cov
 
@@ -485,6 +528,11 @@ def test_on_data_1b():
 	print(bp_fit.breakpoint_history)
 
 	print("Davies is ", bp_fit.davies)
+
+	bp_fit.plot_breakpoint_history()
+	plt.show()
+
+
 
 	bp_fit.plot_data()
 	bp_fit.plot_fit(color="red", linewidth=4)
