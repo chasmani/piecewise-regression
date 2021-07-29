@@ -452,25 +452,69 @@ class Fit:
 
 
 	def summary(self):
-		print("Coming soon")
-		header = "{:^50}\n".format("Breakpoint Regression Results")
+		header = "\n{:^70}\n".format("Breakpoint Regression Results")
 
-		line_length=60
+		line_length=85
 		double_line = "=" * line_length + "\n"
 		single_line = "-" * line_length + "\n"
 
+		# Overview
 		n_obs = len(self.xx)
 		dof = 2 + 2*self.n_breakpoints
-
 		no_obs_text = "{:<20} {:>20}\n".format("No. Observations", n_obs)
-		dof_text = "{:<20} {:>20}\n".format("Degress of Freedom", dof)
+		dof_text = "{:<20} {:>20}\n".format("Degrees of Freedom", dof)
 		r_2_text = "{:<20} {:>20.6f}\n".format("R Squared", self.r_squared)
 		adj_r_2_text = "{:<20} {:>20.6f}\n".format("Adjusted R Squared", self.adjusted_r_squared)
 
 		overview = double_line + no_obs_text + dof_text + r_2_text + adj_r_2_text + double_line
 
+		# Table of results
 
-		print(header + overview)
+		table_header_template = "{:<15} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10}\n"
+
+		table_header = table_header_template.format("", "Estimate", "Std Err", "t", "P>|t|", "[0.025", "0.975]")
+		#print ("{:<8} {:<15} {:<10}".format( name, age, perc))
+
+		table_row_template = "{:<15} {:>10.6} {:>10.6} {:>10.6} {:>10.6} {:>10.6} {:>10.6}\n"
+
+		table_contents = ""
+
+		const_row = table_row_template.format("const", self.const_estimate, self.const_standard_error, 
+			"t", "p_t", self.const_confidence_interval[0], self.const_confidence_interval[1])
+		table_contents += const_row
+
+		alpha_1_row = table_row_template.format("alpha1", self.alpha_estimates[0], self.alpha_standard_errors[0], 
+			"t", "p_t", self.alpha_confidence_intervals[0][0], self.alpha_confidence_intervals[0][1])
+		table_contents += alpha_1_row
+
+		for i in range(self.n_breakpoints):
+			beta_row = table_row_template.format("beta{}".format(i+1), self.beta_estimates[i], self.beta_standard_errors[i], 
+			"t", "p_t", self.beta_confidence_intervals[i][0], self.beta_confidence_intervals[i][1])
+			table_contents += beta_row
+
+		for i in range(self.n_breakpoints):
+			bp_row = table_row_template.format("breakpoint{}".format(i+1), self.breakpoint_estimates[i], self.breakpoint_standard_errors[i], 
+			"t", "p_t", self.breakpoint_confidence_intervals[i][0], self.breakpoint_confidence_intervals[i][1])
+			table_contents += bp_row
+
+		table_contents += single_line
+		for i in range(1,self.n_breakpoints+1):
+			alpha_row = table_row_template.format("alpha{}".format(i+1), self.alpha_estimates[i], self.alpha_standard_errors[i], 
+			"t", "p_t", self.alpha_confidence_intervals[i][0], self.alpha_confidence_intervals[i][1])
+			table_contents += alpha_row
+
+		table_contents += double_line
+
+
+		table = double_line + table_header + single_line + table_contents
+
+
+
+		print(header + overview + table)
+
+		print("NOTE: The model estimates betas, which are the changes in gradient between line segments. The estimated gradients of the segments (alphas) are calculated from alpha1 and betas.")
+
+
 
 
 
