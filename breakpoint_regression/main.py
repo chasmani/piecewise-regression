@@ -8,9 +8,12 @@ import matplotlib.pyplot as plt
 
 
 
-
-import breakpoint_regression.davies as davies 
-import breakpoint_regression.r_squared_calc as r_squared_calc
+try:
+	import breakpoint_regression.davies as davies 
+	import breakpoint_regression.r_squared_calc as r_squared_calc
+except:
+	import davies
+	import r_squared_calc
 
 
 class Fit:
@@ -450,6 +453,25 @@ class Fit:
 
 	def summary(self):
 		print("Coming soon")
+		header = "{:^50}\n".format("Breakpoint Regression Results")
+
+		line_length=60
+		double_line = "=" * line_length + "\n"
+		single_line = "-" * line_length + "\n"
+
+		n_obs = len(self.xx)
+		dof = 2 + 2*self.n_breakpoints
+
+		no_obs_text = "{:<20} {:>20}\n".format("No. Observations", n_obs)
+		dof_text = "{:<20} {:>20}\n".format("Degress of Freedom", dof)
+		r_2_text = "{:<20} {:>20.6f}\n".format("R Squared", self.r_squared)
+		adj_r_2_text = "{:<20} {:>20.6f}\n".format("Adjusted R Squared", self.adjusted_r_squared)
+
+		overview = double_line + no_obs_text + dof_text + r_2_text + adj_r_2_text + double_line
+
+
+		print(header + overview)
+
 
 
 """
@@ -543,8 +565,10 @@ def test_on_data_1b():
 
 	bp_fit = Fit(xx, yy, start_values=[5, 10])
 
+	bp_fit.summary()
+
 	bp_fit.plot_breakpoint_history()
-	plt.show()
+	#plt.show()
 
 
 
@@ -552,7 +576,7 @@ def test_on_data_1b():
 	bp_fit.plot_fit(color="red", linewidth=4)
 	bp_fit.plot_breakpoints()
 	bp_fit.plot_breakpoint_confidence_intervals()
-	plt.show()
+	#plt.show()
 
 
 
