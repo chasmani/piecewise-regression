@@ -8,7 +8,6 @@ from breakpoint_regression import Fit
 
 class TestValidation(unittest.TestCase):
 
-
     def test_with_invalid_data_types(self):
 
         xx = np.linspace(0,10)

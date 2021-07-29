@@ -6,7 +6,12 @@ import statsmodels.api as sm
 import scipy.stats
 import matplotlib.pyplot as plt
 
-from davies import davies_test
+
+
+
+import breakpoint_regression.davies as davies 
+import breakpoint_regression.r_squared_calc as r_squared_calc
+
 
 class Fit:
 
@@ -173,7 +178,7 @@ class Fit:
 		self.calculate_all_estimates()
 		self.calculate_all_standard_errors()
 		self.calculate_all_confidence_intervals()
-		self.davies = davies_test(self.xx, self.yy)
+		self.davies = davies.davies_test(self.xx, self.yy)
 		self.calculate_r_squared()
 
 	def stop_or_not(self):
@@ -312,8 +317,6 @@ class Fit:
 		bp_ses = np.sqrt(bp_vars)
 		return bp_ses
 
-	
-
 
 	def calculate_all_standard_errors(self):
 		"""
@@ -355,90 +358,6 @@ class Fit:
 		self.breakpoint_confidence_intervals = tuple(zip(self.breakpoint_estimates - t_const*self.breakpoint_standard_errors, 
 			self.breakpoint_estimates + t_const*self.breakpoint_standard_errors))
 	
-	@staticmethod
-	def get_test_statistic(xx_davies, yy_davies, theta):
-		"""
-		Compute a test statistic for the Davies test for the p-value of existence of a breakpoint
-		Based on Davies(1987)
-			"Hypothesis Testing when a nuisance parameter is present only under the alternative"
-		All the values worked out here are as named and described in that paper
-		"""
-		n = len(xx_davies)
-		s_0 = 0
-		s_1 = 0
-		s_2 = 0
-		s_3 = 0
-		s_4 = 0
-
-		for x in xx_davies:
-			s_0 += x**2
-
-			if x > theta:
-				s_1 += x*(x-theta)
-				s_3 += x - theta
-
-			elif x < theta:
-				s_2 += x*(x-theta)
-				s_4 += x - theta
-
-		a_hat = np.sum(yy_davies)/n
-		b_hat = np.sum(xx_davies*yy_davies)/s_0
-		V = s_1*s_2/s_0 + s_3*s_4/n
-		S = 0
-		for i in range(n):
-			if xx_davies[i] > theta:
-				S += (yy_davies[i] - a_hat - b_hat*xx_davies[i])*(xx_davies[i] - theta)
-		S = S/(np.sqrt(np.abs(V)))
-		return S
-
-	@staticmethod
-	def davies_test(xx, yy, k=10, alternative="two_sided"):
-		"""
-		Significance test for the existence of a breakpoint
-		Null hypothesis is that there is no breakpoint, or that the change in gradient is zero
-		Alternative hypothesis is that there is a breakpoint, with a non-zero change in gradient
-		The change is gradietn is a function of the breakpoint position
-		The breakpoint posiition is a nuisannce parameter that only exists in the alternative hypothesis
-		Based on Davies (1987), "Hypothesis Testing when a nuisance parameter is present only under the alternative"
-		"""
-		# Centre the x values - makes no difference to existence of a breakpoint
-		# The Davies test has this as an assumption
-		xx_davies = xx - np.mean(xx)
-		yy_davies = yy
-		
-		# As in Muggeo's R package "segmented", cut from second to second to last data point
-		# Need more data in the xx than in [L,U] for the test to work 
-		L = xx_davies[1]
-		U = xx_davies[-2]
-
-		# More thetas is better
-		thetas = np.linspace(L, U, k)
-		# For each value of theta, compute a test statistic
-		test_stats = []
-		for theta in thetas:
-			test_stat = get_test_statistic(xx_davies, yy_davies, theta)
-			test_stats.append(test_stat)
-
-		if alternative == "two_sided":
-			# Two sided test, M as defined by Davies
-			M = np.max(np.abs(test_stats))
-		elif alternative == "less":
-			M = np.min(test_stats)
-		elif alternative == "greater":
-			M = np.max(test_stats)
-
-
-		# Use formulas from Davies
-		V = 0 
-		for i in range(len(thetas)-1):
-			V += np.abs(test_stats[i+1]-test_stats[i])
-		p = scipy.stats.norm.cdf(-M) + V * np.exp(-.5*M**2) * 1/(np.sqrt(8*math.pi))
-		
-		if alternative == "two_sided":
-			return p*2
-		else:
-			return p
-
 	def get_predicted_yy(self):
 
 		final_params = self.params_history[-1]
@@ -453,31 +372,18 @@ class Fit:
 		yy_predicted = intercept_hat + alpha_hat*self.xx
 		for bp_count in range(len(breakpoints)):
 			yy_predicted += beta_hats[bp_count] * np.maximum(self.xx - breakpoints[bp_count], 0)
+		
+		print(list(self.yy), list(yy_predicted))
+
 		return yy_predicted
 
 	def calculate_r_squared(self):
 
-
-		n_data = len(self.xx)
+		yy_predicted = self.get_predicted_yy()
 		n_params = 2 * self.n_breakpoints + 2
 
-		### Get the 
-		yy_predicted = self.get_predicted_yy()
-		yy_mean = np.mean(self.yy)
-
-		# Calculate residual and total sum of squares
-		residual_sum_squares = 0
-		total_sum_squares = 0
-		for i in range(n_data):
-			residual_sum_squares += (self.yy[i] - yy_predicted[i])**2
-			total_sum_squares += (self.yy[i] - yy_mean)**2
-
-		# R Squares
-		self.r_squared = 1 - residual_sum_squares/total_sum_squares
-
-		# Adjusted R squared
-		self.adjusted_r_squared = 1 - (1-self.r_squared) * (n_data-1) /(n_data - n_params - 1)
-		print("R squareds: ", self.r_squared, self.adjusted_r_squared)
+		self.r_squared, self.adjusted_r_squared = r_squared_calc.get_r_squared(self.yy, yy_predicted, n_params)
+		print(self.r_squared, self.adjusted_r_squared)
 
 
 	def plot_data(self, **kwargs):
