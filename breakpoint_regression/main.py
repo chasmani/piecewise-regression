@@ -470,13 +470,15 @@ class Fit:
 
 		# Overview
 		n_obs = len(self.xx)
-		dof = 2 + 2*self.n_breakpoints
+		n_model_params = 2 + 2*self.n_breakpoints
+		dof = n_obs - n_model_params
 		no_obs_text = "{:<20} {:>20}\n".format("No. Observations", n_obs)
+		no_model_parameters_text = "{:<20} {:>20}\n".format("No. Model Parameters", n_model_params)
 		dof_text = "{:<20} {:>20}\n".format("Degrees of Freedom", dof)
 		r_2_text = "{:<20} {:>20.6f}\n".format("R Squared", self.r_squared)
 		adj_r_2_text = "{:<20} {:>20.6f}\n".format("Adjusted R Squared", self.adjusted_r_squared)
 
-		overview = double_line + no_obs_text + dof_text + r_2_text + adj_r_2_text + double_line
+		overview = double_line + no_obs_text + no_model_parameters_text + dof_text + r_2_text + adj_r_2_text + double_line
 
 		# Table of results
 
