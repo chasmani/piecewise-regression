@@ -41,25 +41,8 @@ class Fit:
 		self.params_history = []
 		self.covariance_history = []
 
-		# Constant estimate
-		self.const_estimate = None
-		self.const_standard_error = None
-		self.const_confidence_interval = None
-
-		# Alphas are slopes of the line segments
-		self.alpha_estimates = None
-		self.alpha_standard_errors = None
-		self.alpha_confidence_intervals = None
-
-		# Betas are differences between slopes in line segments
-		self.beta_estimates = None
-		self.beta_standard_errors = None
-		self.beta_confidence_intervals = None
-
-		# Breakpoint estimates
-		self.breakpoint_estimates = None
-		self.breakpoint_standard_errors = None
-		self.breakpoint_confidence_intervals = None
+		# All estimate data saved in dictionary
+		self.estimates = {}
 
 		# Davies p-value is approximately the probability of the data given there is no breakpoint
 		self.davies = None
@@ -181,6 +164,7 @@ class Fit:
 		self.calculate_all_estimates()
 		self.calculate_all_standard_errors()
 		self.calculate_all_confidence_intervals()
+		self.calculate_all_t_stats()
 		self.davies = davies.davies_test(self.xx, self.yy)
 		self.calculate_r_squared()
 
@@ -236,9 +220,6 @@ class Fit:
 		Z = sm.add_constant(Z, has_constant='add')
 
 		results = sm.OLS(endog=yy, exog=Z).fit()
-
-		print(results.summary())
-
 		cov = results.cov_params()
 	
 		# First two params are a and c in the line equation
@@ -256,21 +237,22 @@ class Fit:
 
 	def calculate_all_estimates(self):
 		"""
-		Save all params as object variables
+		Save all params as in estiamtes hash table
 		"""
+		# Save in estimates hash table
 		params = self.params_history[-1]
-		
-		# Can get most of the variables directly
-		self.const_estimate = params[0]
-		self.beta_estimates = params[2:self.n_breakpoints+2]		
-		self.breakpoint_estimates = self.breakpoint_history[-1]
-
-		# The slopes need to be calculated by adding up the betas and first alpha
-		alphas = []
-		for alpha_n in range(self.n_breakpoints + 1):
-			alpha = np.sum(params[1:alpha_n+2])
-			alphas.append(alpha)
-		self.alpha_estimates = alphas
+	
+		const_estimate = params[0]
+		beta_estimates = params[2:self.n_breakpoints+2]
+		breakpoint_estimates = self.breakpoint_history[-1]
+		self.estimates["const"] = {"estimate":const_estimate}
+		for bp_i in range(self.n_breakpoints):
+			self.estimates["beta{}".format(bp_i+1)] = {"estimate":beta_estimates[bp_i]}
+			self.estimates["breakpoint{}".format(bp_i+1)] = {"estimate":breakpoint_estimates[bp_i]}
+		# Also calculate alphas
+		for alpha_i in range(self.n_breakpoints + 1):
+			alpha_estimate = np.sum(params[1:alpha_i+2])
+			self.estimates["alpha{}".format(alpha_i+1)] = {"estimate":alpha_estimate}
 
 
 	def get_alpha_standard_errors(self):
@@ -321,46 +303,73 @@ class Fit:
 		return bp_ses
 
 
-	def calculate_all_standard_errors(self):
-		"""
-		Calcaulte standrd errors for all the variables of interest
-		"""
+	def get_const_standard_error(self):
 		# Covariance matrix is [c, alpha, betas, gammas]
 		# Constant variance is jsut the top left cell in covariance matrix
 		cov_matrix = self.covariance_history[-1]
 		c_var = cov_matrix[0][0]
-		self.const_standard_error = np.sqrt(c_var)
-		
+		return np.sqrt(c_var)
+
+	def get_beta_standard_errors(self):
+		# Covariance matrix is [c, alpha, betas, gammas]
 		# Beta variances are along the diagonal of the covariance matrix
+		cov_matrix = self.covariance_history[-1]
 		cov_diagonal = np.diagonal(cov_matrix)
 		beta_vars = cov_diagonal[2:self.n_breakpoints+2]
-		self.beta_standard_errors = np.sqrt(beta_vars)
+		return np.sqrt(beta_vars)
 
-		self.alpha_standard_errors = self.get_alpha_standard_errors()
-		self.breakpoint_standard_errors = self.get_bp_standard_errors()
+
+	def calculate_all_standard_errors(self):
+		"""
+		Calculate standrd errors for all the variables of interest
+		Save to the estimates dictionary
+		"""
+		const_ses = self.get_const_standard_error()
+		self.estimates["const"]["se"] = const_ses
+
+		beta_ses = self.get_beta_standard_errors()
+		bp_ses = self.get_bp_standard_errors()
+		for bp_i in range(self.n_breakpoints):
+			self.estimates["beta{}".format(bp_i+1)]["se"] = beta_ses[bp_i]
+			self.estimates["breakpoint{}".format(bp_i+1)]["se"] = bp_ses[bp_i]
+		alpha_ses = self.get_alpha_standard_errors()
+		for alpha_i in range(self.n_breakpoints + 1):
+			self.estimates["alpha{}".format(alpha_i+1)]["se"] = alpha_ses[alpha_i]
 
 
 	def calculate_all_confidence_intervals(self):
 		"""
-		Final confidence intervals are for [x, alphas, bps]
+		Confidence intervals based on t-distribution
 		"""	
-		# Calcualte the confidence intervals based on Student's t distribution
+		# Estimates
 		dof = len(self.xx) - 2 - 2*self.n_breakpoints
 		t_const = scipy.stats.t.ppf(0.975, dof)
 
-		self.const_confidence_interval = (self.const_estimate - t_const*self.const_standard_error, 
-			self.const_estimate + t_const*self.const_standard_error)
+		# Iterate over the estimate dictionary, add confidence intervals to all estaimtors 
+		for estimator_name, details in self.estimates.items():
+			confidence_interval = (details["estimate"] - t_const*details["se"], details["estimate"] + t_const*details["se"])
+			details["confidence_interval"] = confidence_interval
 
-		# For the params with maybe more than one value, use a zip to handle the list unpacking
-		self.alpha_confidence_intervals = tuple(zip(self.alpha_estimates - t_const*self.alpha_standard_errors, 
-			self.alpha_estimates + t_const*self.alpha_standard_errors))
+	def calculate_all_t_stats(self):
+		"""
+		Get t stats for all the estimators
+		"""
 
-		self.beta_confidence_intervals = tuple(zip(self.beta_estimates - t_const*self.beta_standard_errors, 
-			self.beta_estimates + t_const*self.beta_standard_errors))
+		dof = len(self.xx) - 2 - 2*self.n_breakpoints
+		for estimator_name, details in self.estimates.items():
+			# Breakpoint t stats don't make sense
+			# Don't exist in the null model - nuisance parameter
+			# H_0 isn't bp=0, it's that bp doesn't exist
+			if "breakpoint" in estimator_name:
+				details["t_stat"] = "-"
+				details["p_t"] = "-"
+			else:
+				t_stat = details["estimate"]/details["se"]
+				p_t = scipy.stats.t.sf(np.abs(t_stat), dof)*2
+				details["t_stat"] = t_stat
+				details["p_t"] = p_t		
 
-		self.breakpoint_confidence_intervals = tuple(zip(self.breakpoint_estimates - t_const*self.breakpoint_standard_errors, 
-			self.breakpoint_estimates + t_const*self.breakpoint_standard_errors))
-	
+
 	def get_predicted_yy(self):
 
 		final_params = self.params_history[-1]
@@ -387,7 +396,6 @@ class Fit:
 
 		self.r_squared, self.adjusted_r_squared = r_squared_calc.get_r_squared(self.yy, yy_predicted, n_params)
 		print(self.r_squared, self.adjusted_r_squared)
-
 
 	def plot_data(self, **kwargs):
 		"""
@@ -446,8 +454,10 @@ class Fit:
 		"""
 		Plot the breakpoint cis as shaded regions
 		"""
-		for bp_ci in self.breakpoint_confidence_intervals:
+		for bp_i in range(self.n_breakpoints):
+			bp_ci = self.estimates["breakpoint{}".format(bp_i+1)]["confidence_interval"]
 			plt.axvspan(bp_ci[0], bp_ci[1], alpha=0.1)
+
 
 
 
@@ -475,47 +485,44 @@ class Fit:
 		table_header = table_header_template.format("", "Estimate", "Std Err", "t", "P>|t|", "[0.025", "0.975]")
 		#print ("{:<8} {:<15} {:<10}".format( name, age, perc))
 
-		table_row_template = "{:<15} {:>10.6} {:>10.6} {:>10.6} {:>10.6} {:>10.6} {:>10.6}\n"
+		table_row_template = "{:<15} {:>10.6} {:>10.6} {:>10.3} {:>10.3} {:>10.6} {:>10.6}\n"
 
 		table_contents = ""
 
-		const_row = table_row_template.format("const", self.const_estimate, self.const_standard_error, 
-			"t", "p_t", self.const_confidence_interval[0], self.const_confidence_interval[1])
-		table_contents += const_row
+		beta_names = ["beta{}".format(i+1) for i in range(self.n_breakpoints)]
+		bp_names = ["breakpoint{}".format(i+1) for i in range(self.n_breakpoints)]
 
-		alpha_1_row = table_row_template.format("alpha1", self.alpha_estimates[0], self.alpha_standard_errors[0], 
-			"t", "p_t", self.alpha_confidence_intervals[0][0], self.alpha_confidence_intervals[0][1])
-		table_contents += alpha_1_row
+		model_estimator_names = ["const", "alpha1"] + beta_names + bp_names
 
-		for i in range(self.n_breakpoints):
-			beta_row = table_row_template.format("beta{}".format(i+1), self.beta_estimates[i], self.beta_standard_errors[i], 
-			"t", "p_t", self.beta_confidence_intervals[i][0], self.beta_confidence_intervals[i][1])
-			table_contents += beta_row
-
-		for i in range(self.n_breakpoints):
-			bp_row = table_row_template.format("breakpoint{}".format(i+1), self.breakpoint_estimates[i], self.breakpoint_standard_errors[i], 
-			"t", "p_t", self.breakpoint_confidence_intervals[i][0], self.breakpoint_confidence_intervals[i][1])
-			table_contents += bp_row
+		for est_name in model_estimator_names:
+			estimator_row = table_row_template.format(est_name, self.estimates[est_name]["estimate"], self.estimates[est_name]["se"], 
+			self.estimates[est_name]["t_stat"], self.estimates[est_name]["p_t"], 
+			self.estimates[est_name]["confidence_interval"][0], self.estimates[est_name]["confidence_interval"][1])
+			table_contents += estimator_row
 
 		table_contents += single_line
-		for i in range(1,self.n_breakpoints+1):
-			alpha_row = table_row_template.format("alpha{}".format(i+1), self.alpha_estimates[i], self.alpha_standard_errors[i], 
-			"t", "p_t", self.alpha_confidence_intervals[i][0], self.alpha_confidence_intervals[i][1])
-			table_contents += alpha_row
+
+		table_contents += "alphas(gradients of segments) are estimated from betas(change in gradient)\n"
+
+		alpha_names = ["alpha{}".format(alpha_i) for alpha_i in range(1, self.n_breakpoints+1)]
+
+		table_contents += single_line
+
+		for est_name in alpha_names:
+			estimator_row = table_row_template.format(est_name, self.estimates[est_name]["estimate"], self.estimates[est_name]["se"], 
+			self.estimates[est_name]["t_stat"], self.estimates[est_name]["p_t"], 
+			self.estimates[est_name]["confidence_interval"][0], self.estimates[est_name]["confidence_interval"][1])
+			table_contents += estimator_row
+
 
 		table_contents += double_line
 
-
 		table = double_line + table_header + single_line + table_contents
-
-
 
 		print(header + overview + table)
 
-		print("NOTE: The model estimates betas, which are the changes in gradient between line segments. The estimated gradients of the segments (alphas) are calculated from alpha1 and betas.")
-
-
-
+		print("Alternative hypothesis for breakpoints is not that they equal 0 but that they don't exist - t-stat has no meaning")
+		print("Davies test for existence of at least one breakpoint: p-value is {:.3f}\n".format(self.davies))
 
 
 """
@@ -612,7 +619,7 @@ def test_on_data_1b():
 	bp_fit.summary()
 
 	bp_fit.plot_breakpoint_history()
-	#plt.show()
+	plt.show()
 
 
 
@@ -620,7 +627,7 @@ def test_on_data_1b():
 	bp_fit.plot_fit(color="red", linewidth=4)
 	bp_fit.plot_breakpoints()
 	bp_fit.plot_breakpoint_confidence_intervals()
-	#plt.show()
+	plt.show()
 
 
 
