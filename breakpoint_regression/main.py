@@ -21,16 +21,16 @@ class Fit:
 	def __init__(self, xx, yy, start_values, max_iterations=30, tolerance=10**-5,
 		min_distance_between_breakpoints=0.02, min_distance_to_edge=0.02, verbose=True):
 
-		self.xx = self._validate_xx(xx)
-		self.yy = self._validate_yy(yy)
+		self.xx = self._validate_list_of_numbers(xx, "xx", min_length=3)
+		self.yy = self._validate_list_of_numbers(yy, "yy", min_length=3)
 
-		self.max_iterations = max_iterations	
-		self.tolerance = tolerance
+		self.max_iterations = self._validate_integer(max_iterations, "max_iterations")	
+		self.tolerance = self._validate_number(tolerance, "tolerance")
 		# In terms of proportion of the data range
-		self.min_distance_between_breakpoints = min_distance_between_breakpoints
+		self.min_distance_between_breakpoints = self._validate_number(min_distance_between_breakpoints, "min_distance_between_breakpoints")
 		# In terms of quantiles
-		self.min_distance_to_edge = min_distance_to_edge
-		self.verbose = verbose
+		self.min_distance_to_edge = self._validate_number(min_distance_to_edge, "min_distance_to_edge")
+		self.verbose = self._validate_boolean(verbose, "verbose")
 
 		self.start_values = self._validate_breakpoint_values(start_values, is_start_values=True)
 
@@ -59,27 +59,52 @@ class Fit:
 		self.fit()
 
 
-	def _validate_xx(self, xx):
+	def _validate_boolean(self, var, var_name):
+		if isinstance(var, bool):
+			return var
+		else:
+			raise ValueError("{} must be a Boolean: True or False".format(var_name))
+
+
+	def _validate_integer(self, var, var_name):
+		if isinstance(var, int):
+			return var
+		else:
+			raise ValueError("{} must be an Integer".format(var_name))
+
+	def _validate_number(self, var, var_name):
+		if isinstance(var, float) or isinstance(var, int):
+			return var
+		else:
+			raise ValueError("{} must be a Float".format(var_name))
+
+	def _validate_list_of_numbers(self, var, var_name, min_length):
 		"""
 		Allowed types:
 			List of integers of floats
 			Numpy array of integers or floats
 		"""
+		value_error_text = "{} must be a list of numbers with minimum length {}".format(var_name, min_length)
 		# If its a list, convert it to a numpy array
-		if isinstance(xx, list):
-			xx = np.array(xx)
+		if isinstance(var, list):
+			var = np.array(var)
 
-		if isinstance(xx, np.ndarray):
-			pass
+		# If its not a numpy array at this point, raise a value error		
+		if not isinstance(var, np.ndarray):
+			raise ValueError(value_error_text)
 
-		return xx
+		# Check the array has numebrs in it
+		if not np.issubdtype(var.dtype, np.number):
+			raise ValueError(value_error_text)
 
-	def _validate_yy(self, yy):
-		return yy
+		if len(var) < min_length:
+			raise ValueError(value_error_text)
 
+		return var
 
 	def _validate_breakpoint_values(self, breakpoint_values, is_start_values=False):
 
+		breakpoint_values = self._validate_list_of_numbers(breakpoint_values, "start_values", 1)
 		breakpoint_values = self._validate_breakpoint_values_within_range(breakpoint_values, is_start_values=is_start_values)
 		breakpoint_values = self._validate_breakpoint_values_far_apart(breakpoint_values, is_start_values=is_start_values)
 		return breakpoint_values
@@ -221,6 +246,8 @@ class Fit:
 
 		results = sm.OLS(endog=yy, exog=Z).fit()
 		cov = results.cov_params()
+
+		print(results.summary())
 	
 		# First two params are a and c in the line equation
 		# Beta hats are the next group of params, same length as the number of breakpoints
@@ -464,7 +491,7 @@ class Fit:
 	def summary(self):
 		header = "\n{:^70}\n".format("Breakpoint Regression Results")
 
-		line_length=85
+		line_length=100
 		double_line = "=" * line_length + "\n"
 		single_line = "-" * line_length + "\n"
 
@@ -482,12 +509,12 @@ class Fit:
 
 		# Table of results
 
-		table_header_template = "{:<15} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10}\n"
+		table_header_template = "{:<15} {:>12} {:>12} {:>12} {:>12} {:>12} {:>12}\n"
 
 		table_header = table_header_template.format("", "Estimate", "Std Err", "t", "P>|t|", "[0.025", "0.975]")
 		#print ("{:<8} {:<15} {:<10}".format( name, age, perc))
 
-		table_row_template = "{:<15} {:>10.6} {:>10.6} {:>10.3} {:>10.3} {:>10.6} {:>10.6}\n"
+		table_row_template = "{:<15} {:>12.6} {:>12.3} {:>12.5} {:>12.3} {:>12.5} {:>12.5}\n"
 
 		table_contents = ""
 
@@ -504,9 +531,9 @@ class Fit:
 
 		table_contents += single_line
 
-		table_contents += "alphas(gradients of segments) are estimated from betas(change in gradient)\n"
+		table_contents += "These alphas(gradients of segments) are estimated from betas(change in gradient)\n"
 
-		alpha_names = ["alpha{}".format(alpha_i) for alpha_i in range(1, self.n_breakpoints+1)]
+		alpha_names = ["alpha{}".format(alpha_i+1) for alpha_i in range(1, self.n_breakpoints+1)]
 
 		table_contents += single_line
 
@@ -527,14 +554,16 @@ class Fit:
 		print("Davies test for existence of at least one breakpoint: p-value is {:.3f}\n".format(self.davies))
 
 
+
+
+
+
 """
 The breakpoint fit function is seperate to the main class
 Easier for testing and re-use etc. 
 Transforms the data based on step functions before fitting
 Fits based on Muggeo's method 
 """
-
-
 
 def breakpoint_fit_1_bp(xx, yy, current_breakpoints):
 
@@ -560,6 +589,8 @@ def breakpoint_fit_1_bp(xx, yy, current_breakpoints):
 
 	# Fit with SM OLS
 	results = sm.OLS(endog=yy, exog=Z).fit()
+
+	print(results.summary())
 
 	print("COV: ", results.cov_params())
 
