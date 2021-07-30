@@ -65,7 +65,6 @@ def davies_test(xx, yy, k=10, alternative="two_sided"):
 	for theta in thetas:
 		test_stat = get_test_statistic(xx_davies, yy_davies, theta)
 		test_stats.append(test_stat)
-	print(test_stats)
 	if alternative == "two_sided":
 		# Two sided test, M as defined by Davies
 		M = np.max(np.abs(test_stats))
@@ -74,17 +73,12 @@ def davies_test(xx, yy, k=10, alternative="two_sided"):
 	elif alternative == "greater":
 		M = np.max(test_stats)
 
-	print("M is ", M)
-
 	# Use formulas from Davies
 	V = 0 
 	for i in range(len(thetas)-1):
 		V += np.abs(test_stats[i+1]-test_stats[i])
 
-	print("V is ", V)
 	p = scipy.stats.norm.cdf(-M) + V * np.exp(-.5*M**2) * 1/(np.sqrt(8*math.pi))
-	
-	print("p is ", p)
 
 	if alternative == "two_sided":
 		return p*2

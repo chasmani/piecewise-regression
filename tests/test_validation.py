@@ -47,7 +47,5 @@ class TestValidation(unittest.TestCase):
         self.assertRaises(TypeError, Fit, yy, start_values=[3])
 
 
-        
-
 if __name__ == '__main__':
     unittest.main()

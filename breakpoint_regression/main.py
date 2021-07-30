@@ -122,6 +122,8 @@ class Fit:
 			value_error_text = """
 				During the algorithm, the breakpoint values became invalid. 
 				This suggests that the algorithm is not converging on good breakpoints. 
+				This could be because the data does not have as many breakpoints as guessed.
+				Or the initial guesses could be poor. 
 				"""
 
 		value_error_text = value_error_text + """
@@ -135,7 +137,9 @@ class Fit:
 		# Breakpoints have to be within the range of the data, plus or minus some distance
 		for bp in breakpoints:
 			if bp <= min_allowed_bp or bp >= max_allowed_bp:
+				value_error_text += "The breakpoint iterations were {}".format(self.breakpoint_history + breakpoints)
 				raise ValueError(value_error_text)
+				
 
 		return breakpoints
 
@@ -162,6 +166,7 @@ class Fit:
 		# If the breakpoints are too close together, stop the algorithm and raise an error
 		min_distance = np.diff(np.sort(breakpoints))
 		if min_distance <= self.min_distance_between_breakpoints * np.ptp(self.xx):
+			value_error_text += "The breakpoint iterations were {}".format(self.breakpoint_history + breakpoints)
 			raise ValueError(value_error_text)
 
 		return breakpoints
@@ -247,7 +252,6 @@ class Fit:
 		results = sm.OLS(endog=yy, exog=Z).fit()
 		cov = results.cov_params()
 
-		print(results.summary())
 	
 		# First two params are a and c in the line equation
 		# Beta hats are the next group of params, same length as the number of breakpoints
@@ -412,8 +416,6 @@ class Fit:
 		for bp_count in range(len(breakpoints)):
 			yy_predicted += beta_hats[bp_count] * np.maximum(self.xx - breakpoints[bp_count], 0)
 		
-		print(list(self.yy), list(yy_predicted))
-
 		return yy_predicted
 
 	def calculate_r_squared(self):
@@ -422,7 +424,6 @@ class Fit:
 		n_params = 2 * self.n_breakpoints + 2
 
 		self.r_squared, self.adjusted_r_squared = r_squared_calc.get_r_squared(self.yy, yy_predicted, n_params)
-		print(self.r_squared, self.adjusted_r_squared)
 
 	def plot_data(self, **kwargs):
 		"""

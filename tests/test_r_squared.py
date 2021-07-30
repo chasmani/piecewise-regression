@@ -35,11 +35,6 @@ class TestRSquared(unittest.TestCase):
         # Value calculated from sklearn's r2_score function
         r_2_from_sklearn = 0.9990626123719015
         self.assertEqual(r_2_from_sklearn, r_2)
-    
-
-
-
-
 
 
 
