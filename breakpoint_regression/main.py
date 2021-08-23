@@ -19,7 +19,7 @@ except:
 class Fit:
 
 	def __init__(self, xx, yy, start_values, max_iterations=30, tolerance=10**-5,
-		min_distance_between_breakpoints=0.02, min_distance_to_edge=0.02, verbose=True):
+		min_distance_between_breakpoints=0.01, min_distance_to_edge=0.02, verbose=True):
 
 		self.xx = self._validate_list_of_numbers(xx, "xx", min_length=3)
 		self.yy = self._validate_list_of_numbers(yy, "yy", min_length=3)
@@ -163,9 +163,20 @@ class Fit:
 			The initial guesses should not be too close together, or too close to the edge of the data. 
 			"""
 
+
 		# If the breakpoints are too close together, stop the algorithm and raise an error
 		min_distance = np.diff(np.sort(breakpoints))
-		if min_distance <= self.min_distance_between_breakpoints * np.ptp(self.xx):
+		print(min_distance)
+		print(self.min_distance_between_breakpoints)
+		print(np.ptp(self.xx))
+
+
+		min_distance_allowed = self.min_distance_between_breakpoints * np.ptp(self.xx)
+		print(min_distance_allowed)
+
+		# numpy ptp gives the range of the data, so we are checking here the breakpoints are too close, relative to the range
+		# If any of the breakpoints are within this close distance, stop the algorithm
+		if (min_distance <= min_distance_allowed).any():
 			value_error_text += "The breakpoint iterations were {}".format(self.breakpoint_history + breakpoints)
 			raise ValueError(value_error_text)
 
@@ -225,10 +236,6 @@ class Fit:
 					print("Algorithm is iterating between breakpoint values. Stopping.")
 					print("Final breakpoints are ", self.breakpoint_history[-1])
 
-
-		# Stop if the last change was small
-		# How to do this for multiple breakpoints
-
 	
 	def breakpoint_fit(self, xx, yy, current_breakpoints):
 		"""
@@ -237,7 +244,6 @@ class Fit:
 		The params are of the form [c, a, beta_hats, gamma_hats]
 		Keep this as a function without referencing self.xx etc, for easier testing
 		"""
-
 
 		Z = np.array([xx])
 		# Convert data based on breakpoints
@@ -486,7 +492,14 @@ class Fit:
 			bp_ci = self.estimates["breakpoint{}".format(bp_i+1)]["confidence_interval"]
 			plt.axvspan(bp_ci[0], bp_ci[1], alpha=0.1)
 
-
+	def plot(self, **kwargs):
+		"""
+		Plot the data, fit, breakpoint poisitons and breakpoint confidence intervals
+		"""
+		self.plot_data()
+		self.plot_fit()
+		self.plot_breakpoints()
+		self.plot_breakpoint_confidence_intervals()
 
 
 	def summary(self):
@@ -552,8 +565,11 @@ class Fit:
 		print(header + overview + table)
 
 		print("Alternative hypothesis for breakpoints is not that they equal 0 but that they don't exist - t-stat has no meaning")
-		print("Davies test for existence of at least one breakpoint: p-value is {:.3f}\n".format(self.davies))
-
+		
+		if self.davies < 0.05:
+			print("Davies test for existence of at least one breakpoint: Null hypothesis of no breakpoint can be ruled out at significance of p<0.05 (p-value is {:.3f})\n".format(self.davies))
+		else:
+			print("Davies test for existence of at least one breakpoint. Null hypothesis of no breakpoint cannot be ruled out at significance of p<0.05 (p-value is {:.3f})\n".format(self.davies))
 
 
 
@@ -620,7 +636,7 @@ def test_on_data_1():
 
 		
 
-	bp_fit = Fit(xx, yy, n_breakpoints=1, start_values=[5])
+	bp_fit = Fit(xx, yy, start_values=[5])
 
 
 	print("p-value is ", bp_fit.davies)
@@ -687,7 +703,7 @@ def test_on_data_1c():
 	yy += np.random.normal(size=n_points)
 
 
-	bp_fit = Fit(xx, yy, n_breakpoints=4, start_values=[3,5, 10,11])
+	bp_fit = Fit(xx, yy, start_values=[5, 10, 15])
 
 	bp_fit.plot_data()
 	bp_fit.plot_fit(color="red", linewidth=4)
@@ -731,4 +747,4 @@ def test_on_data_2():
 if __name__=="__main__":
 
 	np.random.seed(0)
-	test_on_data_1b()
+	test_on_data_1c()
