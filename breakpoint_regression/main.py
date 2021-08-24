@@ -281,6 +281,7 @@ class Fit:
 		self.n_breakpoints = len(start_values)		
 
 		self.fit_history = []
+		self.best_fit = None
 
 		self.converged = False
 		self.stop = False
@@ -291,6 +292,7 @@ class Fit:
 			print("Input data seems okay")		
 
 		self.fit()
+
 
 
 	def _validate_boolean(self, var, var_name):
@@ -384,6 +386,8 @@ class Fit:
 			else:
 				current_breakpoints = self.fit_history[-1]["next_breakpoints"]
 
+			print(current_breakpoints)
+
 
 			IteratedFit = NextBreakpoints(self.xx, self.yy, current_breakpoints)
 			
@@ -391,11 +395,17 @@ class Fit:
 			self.fit_history.append(next_fit_details)
 
 			print(next_fit_details["next_breakpoints"])
+			print(next_fit_details["residual_sum_squares"])
 
 			self.stop_or_not()
 
+		# Select the best fit from the fit history by finding the smallest rss
+		self.best_fit = min(self.fit_history, key=lambda x:x['residual_sum_squares'])
+
 		# Get final davies result
 		self.davies = davies.davies_test(self.xx, self.yy)
+
+		# Set the 
 		
 	def stop_or_not(self):
 
@@ -410,7 +420,6 @@ class Fit:
 			if self.verbose:
 				print("Breakpoints have become too close together. Stopping")
 			self.stop = True
-
 
 		# Stop if maximum iterations reached
 		if len(self.fit_history)>self.max_iterations:
@@ -436,7 +445,6 @@ class Fit:
 				self.stop = True
 				self.converged = True
 
-
 	def plot_data(self, **kwargs):
 		"""
 		Plot the data as a scatter plot
@@ -449,10 +457,13 @@ class Fit:
 		Plot the fitted model
 		Passes any kwargs to the matplotlib plot function, e.g. color="red"
 		"""
+		if not self.converged:
+			print("Algorithm didn't converge. Plotting best fit anyway.")
+
 		# Get the final results from the fitted model variables
 		# Params are in terms of [intercept, alpha, betas, gammas]
-		final_params = self.params_history[-1]
-		breakpoints = self.breakpoint_history[-1]
+		final_params = self.best_fit["raw_params"]
+		breakpoints = self.best_fit["next_breakpoints"]
 		
 		# Extract what we need from params etc
 		intercept_hat = final_params[0]
@@ -473,30 +484,54 @@ class Fit:
 		Plot the breakpoint locations
 		Passes kwargs to the matplotlib function, e.g. color="red"
 		"""
-		for bp in self.breakpoint_history[-1]:
+		if not self.converged:
+			print("Algorithm didn't converge. Plotting best fit anyway.")
+
+		for bp in self.best_fit["next_breakpoints"]:
 			plt.axvline(bp, **kwargs)
+
+	def plot_breakpoint_confidence_intervals(self, **kwargs):
+		"""
+		Plot the breakpoint cis as shaded regions
+		"""
+		if not self.converged:
+			print("Algorithm didn't converge. Plotting breakpoint confidence intervals anyway")
+		
+		estimates = self.best_fit["estimates"]			
+		for bp_i in range(self.n_breakpoints):
+			bp_ci = estimates["breakpoint{}".format(bp_i+1)]["confidence_interval"]
+			plt.axvspan(bp_ci[0], bp_ci[1], alpha=0.1)
 
 	def plot_breakpoint_history(self, **kwargs):
 		"""
 		Plot the history of the breakpoints as they iterate
 		"""
 		# Change the format of the breakpoint histories to seperate lists for each breakpoint
-		breakpoint_histories = zip(*self.breakpoint_history)
+
+		breakpoint_history = [self.start_values]
+
+		for fit_details in self.fit_history:
+			breakpoint_history.append(fit_details["next_breakpoints"])
+
+		breakpoint_history_series = zip(*breakpoint_history)
 		# Plot a history for each breakpoint 
 		count = 0
-		for bh in breakpoint_histories:
+		for bh in breakpoint_history_series:
 			count += 1
-			plt.plot(range(1, len(bh)+1), bh, label="Breakpoint {}".format(count), **kwargs)
+			plt.plot(range(0, len(bh)), bh, label="Breakpoint {}".format(count), **kwargs)
 			plt.xlabel("Iteration")
 			plt.ylabel("Breakpoint")
 
-	def plot_breakpoint_confidence_intervals(self, **kwargs):
-		"""
-		Plot the breakpoint cis as shaded regions
-		"""
-		for bp_i in range(self.n_breakpoints):
-			bp_ci = self.estimates["breakpoint{}".format(bp_i+1)]["confidence_interval"]
-			plt.axvspan(bp_ci[0], bp_ci[1], alpha=0.1)
+	def plot_rss_history(self, **kwargs):
+
+		rss_history = []
+		for fit_details in self.fit_history:
+			rss_history.append(fit_details["residual_sum_squares"])
+
+		plt.plot(range(1, len(rss_history) +1), rss_history, **kwargs)
+		plt.xlabel("Iteration")
+		plt.ylabel("Residual Sum of Squares")
+
 
 	def plot(self, **kwargs):
 		"""
@@ -713,7 +748,7 @@ def test_on_data_1c():
 
 	bp_fit = Fit(xx, yy, start_values=[5, 10, 16])
 
-	"""
+	
 	bp_fit.plot_data()
 	bp_fit.plot_fit(color="red", linewidth=4)
 	bp_fit.plot_breakpoints()
@@ -729,8 +764,13 @@ def test_on_data_1c():
 	bp_fit.plot_breakpoint_history()
 	plt.legend()
 	plt.show()
+	plt.close()
 
-	"""
+	bp_fit.plot_rss_history()
+	plt.show()
+
+
+	
 
 def test_on_data_2():
 
