@@ -56,4 +56,6 @@ def plot_basic_example():
     
     plt.show()
 
-plot_basic_example()
+
+if __name__=="__main__":
+    plot_basic_example()
