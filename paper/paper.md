@@ -25,7 +25,7 @@ Piecewise regression (also known as segmented regression, broken-line regression
 
 # Statement of need
 
-A common research problem is to find when some trend changes, modelled as a straight line relationship with a change in gradient at some breakpoint. One approach would be numerical minimisation of the sum of squared errors via a grid search for the breakpoint position(s). Muggeo [@muggeo2003estimating] derived a method that is superior to grid search in that it is computationally more efficient and allows for more robust statistical analysis. There are many R packages that implement this method including the segemented R package written by Muggeo himself [@muggeo2008segmented]. However, at the time of writing there are not comparable resources in Python. 
+A common problem is to fit a linear regression model that includes some change(s) in gradient. One approach would be numerical minimisation of the sum of squared errors via a grid search for the breakpoint position(s). Muggeo [@muggeo2003estimating] derived a method that is superior to grid search in that it is computationally more efficient and allows for more robust statistical analysis. There are many R packages that implement this method including the segmented R package written by Muggeo himself [@muggeo2008segmented]. However, at the time of writing there are not comparable resources in Python. 
 
 # Examples
 
@@ -39,16 +39,16 @@ An example fit is shown in \autoref{fig:example}.
 It is not necessary to know the underlying mathematics to use the package. We follow here the derivation by Muggeo [@muggeo2003estimating]. The general form of the model with one breakpoint is
 
 \begin{equation}
-    y = \alpha x + c + \beta (x-\psi) H(x-\psi) \,,
+    y = \alpha x + c + \beta (x-\psi) H(x-\psi) + \zeta \,,
 \end{equation}
 
-where we are trying to fit the gradient of the first segment, $\alpha$, the intercept of the first segment, $c$, the change in gradient from the first to second segments, $\beta$, and the breakpoint position, $\psi$. $H$ is the Heaviside step function. This cannot be solved directly through linear regression as the relationship is non-linear. We can take a linear approximation by a Taylor expansion around some initial guess for the break-point, $\psi^{(0)}$, 
+where given some data, $x$, $y$, we are trying to estimate the gradient of the first segment, $\alpha$, the intercept of the first segment, $c$, the change in gradient from the first to second segments, $\beta$, and the breakpoint position, $\psi$. $H$ is the Heaviside step function and \zeta is a noise term. This cannot be solved directly through linear regression as the relationship is non-linear. We can take a linear approximation by a Taylor expansion around some initial guess for the break-point, $\psi^{(0)}$, 
 
 \begin{equation}
     y \approx \alpha x + c + \beta (x - \psi^{(0)}) H (x - \psi^{(0)}) - \beta (\psi - \psi^{(0)}) H(x - \psi^{(0)}) \,.
 \end{equation}
 
-This is a linear relationship and we can find a new breakpoint estimate, $\psi^{(1)}$, through linear regression. We iterate in this way until the breakpoint estimate converges, at which point we stop the algorithm. The same method can be used with multiple breakpoints, taking a multivarite Taylor expansion around initial guesses for the breakpoints. 
+This is a linear relationship and we can find a new breakpoint estimate, $\psi^{(1)}$, through linear regression. We iterate in this way until the breakpoint estimate converges, at which point we stop the algorithm. The same method is used with multiple breakpoints, taking a multivarite Taylor expansion around initial guesses for the breakpoints.
 
 
 # Acknowledgements

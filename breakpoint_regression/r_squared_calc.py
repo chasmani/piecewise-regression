@@ -21,4 +21,4 @@ def get_r_squared(yy, ff, n_params):
 	# Adjusted R squared
 	adjusted_r_squared = 1 - (1-r_squared) * (n_data-1) /(n_data - n_params - 1)
 	
-	return r_squared, adjusted_r_squared
+	return residual_sum_squares, total_sum_squares, r_squared, adjusted_r_squared

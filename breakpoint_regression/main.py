@@ -16,228 +16,47 @@ except:
 	import r_squared_calc
 
 
-class Fit:
+class NextBreakpoints:
+	"""
+	One iteration of Muggeo's segmented regression algorithm
+	Gets the next breakpoints. 
+	Also gets interesting statistics etc
+	"""
 
-	def __init__(self, xx, yy, start_values, max_iterations=30, tolerance=10**-5,
-		min_distance_between_breakpoints=0.01, min_distance_to_edge=0.02, verbose=True):
+	def __init__(self, xx, yy, current_breakpoints):
 
-		self.xx = self._validate_list_of_numbers(xx, "xx", min_length=3)
-		self.yy = self._validate_list_of_numbers(yy, "yy", min_length=3)
+		self.xx = xx
+		self.yy = yy
+		self.current_breakpoints = current_breakpoints
+		self.n_breakpoints = len(current_breakpoints)
 
-		self.max_iterations = self._validate_integer(max_iterations, "max_iterations")	
-		self.tolerance = self._validate_number(tolerance, "tolerance")
-		# In terms of proportion of the data range
-		self.min_distance_between_breakpoints = self._validate_number(min_distance_between_breakpoints, "min_distance_between_breakpoints")
-		# In terms of quantiles
-		self.min_distance_to_edge = self._validate_number(min_distance_to_edge, "min_distance_to_edge")
-		self.verbose = self._validate_boolean(verbose, "verbose")
+		self.next_breakpoints = None
+		self.raw_params = None
+		self.covariance_matrix = None
 
-		self.start_values = self._validate_breakpoint_values(start_values, is_start_values=True)
-
-		self.n_breakpoints = len(start_values)		
-
-		self.breakpoint_history = [start_values]
-		# In the format [c, alpha, betas. gammas]
-		self.params_history = []
-		self.covariance_history = []
+		self.breakpoint_fit()
 
 		# All estimate data saved in dictionary
 		self.estimates = {}
 
-		# Davies p-value is approximately the probability of the data given there is no breakpoint
-		self.davies = None
-
-		# R squared
-		self.r_squared = None
-		self.adjusted_r_squared = None
-
-		self.stop = False
-
-		if self.verbose:
-			print("Input data seems okay")
-
-		self.fit()
-
-
-	def _validate_boolean(self, var, var_name):
-		if isinstance(var, bool):
-			return var
-		else:
-			raise ValueError("{} must be a Boolean: True or False".format(var_name))
-
-
-	def _validate_integer(self, var, var_name):
-		if isinstance(var, int):
-			return var
-		else:
-			raise ValueError("{} must be an Integer".format(var_name))
-
-	def _validate_number(self, var, var_name):
-		if isinstance(var, float) or isinstance(var, int):
-			return var
-		else:
-			raise ValueError("{} must be a Float".format(var_name))
-
-	def _validate_list_of_numbers(self, var, var_name, min_length):
-		"""
-		Allowed types:
-			List of integers of floats
-			Numpy array of integers or floats
-		"""
-		value_error_text = "{} must be a list of numbers with minimum length {}".format(var_name, min_length)
-		# If its a list, convert it to a numpy array
-		if isinstance(var, list):
-			var = np.array(var)
-
-		# If its not a numpy array at this point, raise a value error		
-		if not isinstance(var, np.ndarray):
-			raise ValueError(value_error_text)
-
-		# Check the array has numebrs in it
-		if not np.issubdtype(var.dtype, np.number):
-			raise ValueError(value_error_text)
-
-		if len(var) < min_length:
-			raise ValueError(value_error_text)
-
-		return var
-
-	def _validate_breakpoint_values(self, breakpoint_values, is_start_values=False):
-
-		breakpoint_values = self._validate_list_of_numbers(breakpoint_values, "start_values", 1)
-		breakpoint_values = self._validate_breakpoint_values_within_range(breakpoint_values, is_start_values=is_start_values)
-		breakpoint_values = self._validate_breakpoint_values_far_apart(breakpoint_values, is_start_values=is_start_values)
-		return breakpoint_values
-
-	def _validate_breakpoint_values_within_range(self, breakpoints, is_start_values=False):
-
-		min_allowed_bp = np.quantile(self.xx, self.min_distance_to_edge)
-		max_allowed_bp = np.quantile(self.xx, 1-self.min_distance_to_edge)
-
-		if is_start_values:
-			value_error_text = """
-				Invalid start guesses for the breakpoints
-				"""
-		else:
-			value_error_text = """
-				During the algorithm, the breakpoint values became invalid. 
-				This suggests that the algorithm is not converging on good breakpoints. 
-				This could be because the data does not have as many breakpoints as guessed.
-				Or the initial guesses could be poor. 
-				"""
-
-		value_error_text = value_error_text + """
-			Breakpoint values are outside the allowed range of {} to {}.
-			The allowed range can be changed using min_distance_to_edge, 
-			min_distance_to_edge is the allowed distance to the edge in terms of quantiles of x.
-			Try changing the initial breakpoint guesses, or use less breakpoints.
-			The initial guesses should not be too close together, or too close to the edge of the data. 
-			""".format(min_allowed_bp, max_allowed_bp)
-
-		# Breakpoints have to be within the range of the data, plus or minus some distance
-		for bp in breakpoints:
-			if bp <= min_allowed_bp or bp >= max_allowed_bp:
-				value_error_text += "The breakpoint iterations were {}".format(self.breakpoint_history + breakpoints)
-				raise ValueError(value_error_text)
-				
-
-		return breakpoints
-
-	def _validate_breakpoint_values_far_apart(self, breakpoints, is_start_values=False):
-
-		if is_start_values:
-			value_error_text = """
-				Invalid start guesses for the breakpoints
-				"""
-		else:
-			value_error_text = """
-				During the algorithm, the breakpoint values became invalid. 
-				This suggests that the algorithm is not converging on good breakpoints. 
-				"""
-
-		value_error_text = value_error_text + """
-			Breakpoint values are too close together.
-			The allowed distance can be changed using min_distance_between_breakpoints
-			min_distance_between_breakpoints is the allowed distance in terms of a proportion of the range of x.
-			Try changing the initial breakpoint guesses, or use less breakpoints.
-			The initial guesses should not be too close together, or too close to the edge of the data. 
-			"""
-
-
-		# If the breakpoints are too close together, stop the algorithm and raise an error
-		min_distance = np.diff(np.sort(breakpoints))
-		print(min_distance)
-		print(self.min_distance_between_breakpoints)
-		print(np.ptp(self.xx))
-
-
-		min_distance_allowed = self.min_distance_between_breakpoints * np.ptp(self.xx)
-		print(min_distance_allowed)
-
-		# numpy ptp gives the range of the data, so we are checking here the breakpoints are too close, relative to the range
-		# If any of the breakpoints are within this close distance, stop the algorithm
-		if (min_distance <= min_distance_allowed).any():
-			value_error_text += "The breakpoint iterations were {}".format(self.breakpoint_history + breakpoints)
-			raise ValueError(value_error_text)
-
-		return breakpoints
-
-
-	def fit(self):
-		# Run the breakpoint iterative procedure
-		if self.verbose:
-			print("Running algorithm . . . ")
-		while not self.stop:
-			next_breakpoints, params, cov = self.breakpoint_fit(self.xx, self.yy, self.breakpoint_history[-1]) 
-			if self.verbose:
-				print("Current breakpoints are {}".format(next_breakpoints))
-			# Check new breakpoints are valid
-			next_breakpoints = self._validate_breakpoint_values(next_breakpoints)
-
-			# Save everything
-			self.breakpoint_history.append(next_breakpoints)
-			self.params_history.append(params)
-			self.covariance_history.append(cov)
-			self.stop_or_not()
-
-		# Get final values, stanrd errors and confidence intervals for variables of interest
-		# intercept, line segment gradients, gradient differences and breakpoints
+		# Don't really need to do this at this point. But it is very quick and nice to have the record of these as we go 
 		self.calculate_all_estimates()
 		self.calculate_all_standard_errors()
 		self.calculate_all_confidence_intervals()
 		self.calculate_all_t_stats()
-		self.davies = davies.davies_test(self.xx, self.yy)
+
+		# R squared etc
+		self.residual_sum_squares = None 
+		self.total_sum_squares = None
+		self.r_squared = None
+		self.adjusted_r_squared = None
+		self.bic = None
+
 		self.calculate_r_squared()
+		self.calculate_bayesian_information_criterion()
 
-	def stop_or_not(self):
 
-		# Stop if maximum iterations reached
-		if len(self.breakpoint_history)>self.max_iterations:
-			if self.verbose:
-				print("Max iterations reached. Stopping.")
-			self.stop=True
-
-		# Stop if tolerance reached - small change between this and last breakpoints
-		breakpoint_differences = self.breakpoint_history[-2] - self.breakpoint_history[-1]
-		if np.max(np.abs(breakpoint_differences)) <= self.tolerance:
-			if self.verbose:
-				print("Algorithm has converged on breakpoint values. Stopping.")
-			self.stop=True
-
-		# Stop if the algorithm is iterating back to previous values, within tolerance
-		if len(self.breakpoint_history) > 2:
-			breakpoint_two_step_differences = self.breakpoint_history[-3] - self.breakpoint_history[-1]
-			if np.max(np.abs(breakpoint_two_step_differences)) <= self.tolerance:
-				# Take an average of the last two values
-				breakpoints = (self.breakpoint_history[-2] + self.breakpoint_history[-1])/2
-				self.breakpoint_history.append(breakpoints)
-				self.stop=True
-				if self.verbose:
-					print("Algorithm is iterating between breakpoint values. Stopping.")
-					print("Final breakpoints are ", self.breakpoint_history[-1])
-
-	
-	def breakpoint_fit(self, xx, yy, current_breakpoints):
+	def breakpoint_fit(self):
 		"""
 		Fit the linear approximation given the current breakpoint guesses
 		Return the next breakpoints and the params from the fit
@@ -245,43 +64,42 @@ class Fit:
 		Keep this as a function without referencing self.xx etc, for easier testing
 		"""
 
-		Z = np.array([xx])
+		Z = np.array([self.xx])
 		# Convert data based on breakpoints
-		UU = [(xx - bp) * np.heaviside(xx- bp, 1) for bp in current_breakpoints]
-		VV = [np.heaviside(xx- bp, 1) for bp in current_breakpoints]
+		UU = [(self.xx - bp) * np.heaviside(self.xx - bp, 1) for bp in self.current_breakpoints]
+		VV = [np.heaviside(self.xx- bp, 1) for bp in self.current_breakpoints]
 
 		
 		Z = np.concatenate((Z, UU, VV))
 		Z = Z.T	
 		Z = sm.add_constant(Z, has_constant='add')
 
-		results = sm.OLS(endog=yy, exog=Z).fit()
-		cov = results.cov_params()
+		results = sm.OLS(endog=self.yy, exog=Z).fit()
 
-	
+		self.raw_params = results.params
+		self.covariance_matrix = results.cov_params()
+
 		# First two params are a and c in the line equation
 		# Beta hats are the next group of params, same length as the number of breakpoints
-		beta_hats = results.params[2:2+len(current_breakpoints)]
+		beta_hats = results.params[2:2+len(self.current_breakpoints)]
 		# Gamma hats are the last group of params, same length as the number of breakpoints
-		gamma_hats = results.params[2+len(current_breakpoints):]
+		gamma_hats = results.params[2+len(self.current_breakpoints):]
 		# The next breakpoints are calculated iteratively
-		next_breakpoints = current_breakpoints - gamma_hats/beta_hats
+		self.next_breakpoints = self.current_breakpoints - gamma_hats/beta_hats
 
-		unique_sorted_xx = np.sort(np.unique(xx))
-
-		return next_breakpoints, results.params, cov
 
 
 	def calculate_all_estimates(self):
 		"""
-		Save all params as in estiamtes hash table
+		Save all params as in estimates hash table
 		"""
 		# Save in estimates hash table
-		params = self.params_history[-1]
+		params = self.raw_params
 	
 		const_estimate = params[0]
 		beta_estimates = params[2:self.n_breakpoints+2]
-		breakpoint_estimates = self.breakpoint_history[-1]
+		breakpoint_estimates = self.next_breakpoints
+		
 		self.estimates["const"] = {"estimate":const_estimate}
 		for bp_i in range(self.n_breakpoints):
 			self.estimates["beta{}".format(bp_i+1)] = {"estimate":beta_estimates[bp_i]}
@@ -294,7 +112,7 @@ class Fit:
 
 	def get_alpha_standard_errors(self):
 
-		cov_matrix = self.covariance_history[-1]
+		cov_matrix = self.covariance_matrix
 
 		# Alphas are calculated as the sum of alpha_0 and betas up that part of the regression line 
 		# The var of each alpha is the sum of the covariance matrix up to it
@@ -316,8 +134,8 @@ class Fit:
 		# Variance of bp estimator found using ratio/delta method
 		# See the accompanying paper for clarification
 
-		cov_matrix = self.covariance_history[-1]
-		params = self.params_history[-1]
+		cov_matrix = self.covariance_matrix
+		params = self.raw_params
 
 		bp_vars = []
 
@@ -343,14 +161,14 @@ class Fit:
 	def get_const_standard_error(self):
 		# Covariance matrix is [c, alpha, betas, gammas]
 		# Constant variance is jsut the top left cell in covariance matrix
-		cov_matrix = self.covariance_history[-1]
+		cov_matrix = self.covariance_matrix
 		c_var = cov_matrix[0][0]
 		return np.sqrt(c_var)
 
 	def get_beta_standard_errors(self):
 		# Covariance matrix is [c, alpha, betas, gammas]
 		# Beta variances are along the diagonal of the covariance matrix
-		cov_matrix = self.covariance_history[-1]
+		cov_matrix = self.covariance_matrix
 		cov_diagonal = np.diagonal(cov_matrix)
 		beta_vars = cov_diagonal[2:self.n_breakpoints+2]
 		return np.sqrt(beta_vars)
@@ -409,12 +227,12 @@ class Fit:
 
 	def get_predicted_yy(self):
 
-		final_params = self.params_history[-1]
-		breakpoints = self.breakpoint_history[-1]
+		params = self.raw_params
+		breakpoints = self.next_breakpoints
 		# Extract what we need from params etc
-		intercept_hat = final_params[0]
-		alpha_hat = final_params[1]
-		beta_hats = final_params[2:2+len(breakpoints)]
+		intercept_hat = params[0]
+		alpha_hat = params[1]
+		beta_hats = params[2:2+len(breakpoints)]
 
 		yy_predicted = []
 
@@ -429,7 +247,195 @@ class Fit:
 		yy_predicted = self.get_predicted_yy()
 		n_params = 2 * self.n_breakpoints + 2
 
-		self.r_squared, self.adjusted_r_squared = r_squared_calc.get_r_squared(self.yy, yy_predicted, n_params)
+		self.residual_sum_squares, self.total_sum_squares, self.r_squared, self.adjusted_r_squared = r_squared_calc.get_r_squared(self.yy, yy_predicted, n_params)
+
+	def calculate_bayesian_information_criterion(self):
+		"""
+		Assuming normal noise
+		"""
+		n = len(self.xx) # No. data points
+		k =  2 + 2*self.n_breakpoints # No. model parameters
+		rss = self.residual_sum_squares
+		self.bic = n * np.log(rss/n) + k * np.log(n)
+
+		
+
+
+class Fit:
+
+	def __init__(self, xx, yy, start_values, max_iterations=30, tolerance=10**-5,
+		min_distance_between_breakpoints=0.01, min_distance_to_edge=0.02, verbose=True):
+
+		self.xx = self._validate_list_of_numbers(xx, "xx", min_length=3)
+		self.yy = self._validate_list_of_numbers(yy, "yy", min_length=3)
+
+		self.max_iterations = self._validate_integer(max_iterations, "max_iterations")	
+		self.tolerance = self._validate_number(tolerance, "tolerance")
+		# In terms of proportion of the data range
+		self.min_distance_between_breakpoints = self._validate_number(min_distance_between_breakpoints, "min_distance_between_breakpoints")
+		# In terms of quantiles
+		self.min_distance_to_edge = self._validate_number(min_distance_to_edge, "min_distance_to_edge")
+		self.verbose = self._validate_boolean(verbose, "verbose")
+
+		self.start_values = self._validate_start_values(start_values)
+		self.n_breakpoints = len(start_values)		
+
+		self.fit_history = []
+
+		self.converged = False
+		self.stop = False
+
+		self.davies = None
+
+		if self.verbose:
+			print("Input data seems okay")		
+
+		self.fit()
+
+
+	def _validate_boolean(self, var, var_name):
+		if isinstance(var, bool):
+			return var
+		else:
+			raise ValueError("{} must be a Boolean: True or False".format(var_name))
+
+
+	def _validate_integer(self, var, var_name):
+		if isinstance(var, int):
+			return var
+		else:
+			raise ValueError("{} must be an Integer".format(var_name))
+
+	def _validate_number(self, var, var_name):
+		if isinstance(var, float) or isinstance(var, int):
+			return var
+		else:
+			raise ValueError("{} must be a Float".format(var_name))
+
+	def _validate_list_of_numbers(self, var, var_name, min_length):
+		"""
+		Allowed types:
+			List of integers of floats
+			Numpy array of integers or floats
+		"""
+		value_error_text = "{} must be a list of numbers with minimum length {}".format(var_name, min_length)
+		# If its a list, convert it to a numpy array
+		if isinstance(var, list):
+			var = np.array(var)
+
+		# If its not a numpy array at this point, raise a value error		
+		if not isinstance(var, np.ndarray):
+			raise ValueError(value_error_text)
+
+		# Check the array has numebrs in it
+		if not np.issubdtype(var.dtype, np.number):
+			raise ValueError(value_error_text)
+
+		if len(var) < min_length:
+			raise ValueError(value_error_text)
+
+		return var
+
+
+	def _validate_start_values(self, start_values):
+
+		start_values = self._validate_list_of_numbers(start_values, "start_values", min_length=1)
+
+		if not self._are_breakpoint_values_within_range(start_values):
+			raise ValueError("Start values are not within allowed range")
+		if not self._are_breakpoint_values_far_apart(start_values):
+			raise ValueError("Start values are too close together")
+		
+		return start_values
+
+
+	def _are_breakpoint_values_within_range(self, breakpoints):
+
+		min_allowed_bp = np.quantile(self.xx, self.min_distance_to_edge)
+		max_allowed_bp = np.quantile(self.xx, 1-self.min_distance_to_edge)
+
+		for bp in breakpoints:
+			if bp <= min_allowed_bp or bp >= max_allowed_bp:
+				return False				
+		return True
+
+	def _are_breakpoint_values_far_apart(self, breakpoints):
+
+		min_distance = np.diff(np.sort(breakpoints))
+
+		# numpy ptp gives the range of the data, closeness realtive to the range
+		min_distance_allowed = self.min_distance_between_breakpoints * np.ptp(self.xx)
+
+		if (min_distance <= min_distance_allowed).any():
+			return False
+		return True
+
+
+	def fit(self):
+		# Run the breakpoint iterative procedure
+		if self.verbose:
+			print("Running algorithm . . . ")
+		while not self.stop:
+			# Do the fit
+
+
+			if len(self.fit_history) == 0:
+				current_breakpoints = self.start_values
+			else:
+				current_breakpoints = self.fit_history[-1]["next_breakpoints"]
+
+
+			IteratedFit = NextBreakpoints(self.xx, self.yy, current_breakpoints)
+			
+			next_fit_details = vars(IteratedFit)
+			self.fit_history.append(next_fit_details)
+
+			print(next_fit_details["next_breakpoints"])
+
+			self.stop_or_not()
+
+		# Get final davies result
+		self.davies = davies.davies_test(self.xx, self.yy)
+		
+	def stop_or_not(self):
+
+		# Stop if the breakpoints are out of range
+		if not self._are_breakpoint_values_within_range(self.fit_history[-1]["next_breakpoints"]):
+			if self.verbose:
+				print("Breakpoints have diverged out of the data range. Stopping")
+			self.stop = True
+		
+		# Stop if the breakpoints are too close together
+		if not self._are_breakpoint_values_far_apart(self.fit_history[-1]["next_breakpoints"]):
+			if self.verbose:
+				print("Breakpoints have become too close together. Stopping")
+			self.stop = True
+
+
+		# Stop if maximum iterations reached
+		if len(self.fit_history)>self.max_iterations:
+			if self.verbose:
+				print("Max iterations reached. Stopping.")
+			self.stop = True
+
+		# Stop if tolerance reached - small change between this and last breakpoints
+		if len(self.fit_history) > 1:
+			breakpoint_differences = self.fit_history[-2]["next_breakpoints"] - self.fit_history[-1]["next_breakpoints"]
+			if np.max(np.abs(breakpoint_differences)) <= self.tolerance:
+				if self.verbose:
+					print("Algorithm has converged on breakpoint values. Stopping.")
+				self.stop = True
+				self.converged = True
+
+		# Stop if the algorithm is iterating back to previous values, within tolerance
+		if len(self.fit_history) > 2:
+			breakpoint_two_step_differences = self.fit_history[-3]["next_breakpoints"] - self.fit_history[-1]["next_breakpoints"]
+			if np.max(np.abs(breakpoint_two_step_differences)) <= self.tolerance:
+				if self.verbose:
+					print("Algorithm is iterating between breakpoint values. Stopping.")
+				self.stop = True
+				self.converged = True
+
 
 	def plot_data(self, **kwargs):
 		"""
@@ -516,10 +522,12 @@ class Fit:
 		no_obs_text = "{:<20} {:>20}\n".format("No. Observations", n_obs)
 		no_model_parameters_text = "{:<20} {:>20}\n".format("No. Model Parameters", n_model_params)
 		dof_text = "{:<20} {:>20}\n".format("Degrees of Freedom", dof)
+		rss_text = "{:<20} {:>20.6}\n".format("Res. Sum of Squares", self.residual_sum_squares)
+		tss_text = "{:<20} {:>20.6}\n".format("Total Sum of Squares", self.total_sum_squares)
 		r_2_text = "{:<20} {:>20.6f}\n".format("R Squared", self.r_squared)
 		adj_r_2_text = "{:<20} {:>20.6f}\n".format("Adjusted R Squared", self.adjusted_r_squared)
 
-		overview = double_line + no_obs_text + no_model_parameters_text + dof_text + r_2_text + adj_r_2_text + double_line
+		overview = double_line + no_obs_text + no_model_parameters_text + dof_text + rss_text + tss_text + r_2_text + adj_r_2_text + double_line
 
 		# Table of results
 
@@ -689,7 +697,7 @@ def test_on_data_1c():
 	beta_3 = 1
 	intercept = 100
 	breakpoint_1 = 7
-	breakpoint_2 = 12
+	breakpoint_2 = 13
 	breakpoint_3 = 14
 
 	n_points = 200
@@ -703,13 +711,16 @@ def test_on_data_1c():
 	yy += np.random.normal(size=n_points)
 
 
-	bp_fit = Fit(xx, yy, start_values=[5, 10, 15])
+	bp_fit = Fit(xx, yy, start_values=[5, 10, 16])
 
+	"""
 	bp_fit.plot_data()
 	bp_fit.plot_fit(color="red", linewidth=4)
 	bp_fit.plot_breakpoints()
 	bp_fit.plot_breakpoint_confidence_intervals()
 
+
+	print("The fit data: ", bp_fit.__dict__)
 
 
 	plt.show()
@@ -719,7 +730,7 @@ def test_on_data_1c():
 	plt.legend()
 	plt.show()
 
-
+	"""
 
 def test_on_data_2():
 
