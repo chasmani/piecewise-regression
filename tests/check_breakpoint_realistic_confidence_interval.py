@@ -7,7 +7,7 @@ import math
 import os, sys
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 
-from breakpoint_regression import Fit
+from piecewise_regression import Fit
 
 def check_p_values():
 
@@ -25,7 +25,7 @@ def check_p_values():
 
         bp_fit = Fit(xx_bp, yy_bp, [5], verbose=False)
 
-        bp_ci = bp_fit.estimates["breakpoint1"]["confidence_interval"]
+        bp_ci = bp_fit.best_fit["estimates"]["breakpoint1"]["confidence_interval"]
         if bp_ci[0] <= actual_bp and bp_ci[1]>= actual_bp:
             p_count += 1  
 

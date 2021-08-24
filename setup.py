@@ -9,12 +9,12 @@ README = (HERE / "README.md").read_text()
 
 # This call to setup() does all the work
 setuptools.setup(
-    name="breakpoint-regression",
+    name="piecewise-regression",
     version="0.1.1",
-    description="Breakpoint (segmented) regression in python",
+    description="piecewise (segmented) regression in python",
     long_description=README,
     long_description_content_type="text/markdown",
-    url="https://github.com/chasmani/breakpoint-regression",
+    url="https://github.com/chasmani/piecewise-regression",
     author="Charlie Pilgrim",
     author_email="pilgrimcharlie2@gmail.com",
     license="MIT",

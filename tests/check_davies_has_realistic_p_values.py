@@ -7,7 +7,7 @@ import math
 import os, sys
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 
-from breakpoint_regression.davies import davies_test
+from piecewise_regression.davies import davies_test
 
 def check_p_values():
 

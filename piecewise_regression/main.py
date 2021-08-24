@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 
 
 try:
-	import breakpoint_regression.davies as davies 
-	import breakpoint_regression.r_squared_calc as r_squared_calc
+	import piecewise_regression.davies as davies 
+	import piecewise_regression.r_squared_calc as r_squared_calc
 except:
 	import davies
 	import r_squared_calc
@@ -379,23 +379,15 @@ class Fit:
 			print("Running algorithm . . . ")
 		while not self.stop:
 			# Do the fit
-
-
 			if len(self.fit_history) == 0:
 				current_breakpoints = self.start_values
 			else:
 				current_breakpoints = self.fit_history[-1]["next_breakpoints"]
 
-			print(current_breakpoints)
-
-
 			IteratedFit = NextBreakpoints(self.xx, self.yy, current_breakpoints)
 			
 			next_fit_details = vars(IteratedFit)
 			self.fit_history.append(next_fit_details)
-
-			print(next_fit_details["next_breakpoints"])
-			print(next_fit_details["residual_sum_squares"])
 
 			self.stop_or_not()
 
@@ -542,77 +534,77 @@ class Fit:
 		self.plot_breakpoints()
 		self.plot_breakpoint_confidence_intervals()
 
-
 	def summary(self):
-		header = "\n{:^70}\n".format("Breakpoint Regression Results")
+		if self.converged:
+			header = "\n{:^70}\n".format("Breakpoint Regression Results")
 
-		line_length=100
-		double_line = "=" * line_length + "\n"
-		single_line = "-" * line_length + "\n"
+			line_length=100
+			double_line = "=" * line_length + "\n"
+			single_line = "-" * line_length + "\n"
 
-		# Overview
-		n_obs = len(self.xx)
-		n_model_params = 2 + 2*self.n_breakpoints
-		dof = n_obs - n_model_params
-		no_obs_text = "{:<20} {:>20}\n".format("No. Observations", n_obs)
-		no_model_parameters_text = "{:<20} {:>20}\n".format("No. Model Parameters", n_model_params)
-		dof_text = "{:<20} {:>20}\n".format("Degrees of Freedom", dof)
-		rss_text = "{:<20} {:>20.6}\n".format("Res. Sum of Squares", self.residual_sum_squares)
-		tss_text = "{:<20} {:>20.6}\n".format("Total Sum of Squares", self.total_sum_squares)
-		r_2_text = "{:<20} {:>20.6f}\n".format("R Squared", self.r_squared)
-		adj_r_2_text = "{:<20} {:>20.6f}\n".format("Adjusted R Squared", self.adjusted_r_squared)
+			# Overview
+			n_obs = len(self.xx)
+			n_model_params = 2 + 2*self.n_breakpoints
+			dof = n_obs - n_model_params
+			no_obs_text = "{:<20} {:>20}\n".format("No. Observations", n_obs)
+			no_model_parameters_text = "{:<20} {:>20}\n".format("No. Model Parameters", n_model_params)
+			dof_text = "{:<20} {:>20}\n".format("Degrees of Freedom", dof)
+			rss_text = "{:<20} {:>20.6}\n".format("Res. Sum of Squares", self.best_fit["residual_sum_squares"])
+			tss_text = "{:<20} {:>20.6}\n".format("Total Sum of Squares", self.best_fit["total_sum_squares"])
+			r_2_text = "{:<20} {:>20.6f}\n".format("R Squared", self.best_fit["r_squared"])
+			adj_r_2_text = "{:<20} {:>20.6f}\n".format("Adjusted R Squared", self.best_fit["adjusted_r_squared"])
 
-		overview = double_line + no_obs_text + no_model_parameters_text + dof_text + rss_text + tss_text + r_2_text + adj_r_2_text + double_line
+			overview = double_line + no_obs_text + no_model_parameters_text + dof_text + rss_text + tss_text + r_2_text + adj_r_2_text + double_line
 
-		# Table of results
+			# Table of results
 
-		table_header_template = "{:<15} {:>12} {:>12} {:>12} {:>12} {:>12} {:>12}\n"
+			table_header_template = "{:<15} {:>12} {:>12} {:>12} {:>12} {:>12} {:>12}\n"
 
-		table_header = table_header_template.format("", "Estimate", "Std Err", "t", "P>|t|", "[0.025", "0.975]")
-		#print ("{:<8} {:<15} {:<10}".format( name, age, perc))
+			table_header = table_header_template.format("", "Estimate", "Std Err", "t", "P>|t|", "[0.025", "0.975]")
+			#print ("{:<8} {:<15} {:<10}".format( name, age, perc))
 
-		table_row_template = "{:<15} {:>12.6} {:>12.3} {:>12.5} {:>12.3} {:>12.5} {:>12.5}\n"
+			table_row_template = "{:<15} {:>12.6} {:>12.3} {:>12.5} {:>12.3} {:>12.5} {:>12.5}\n"
 
-		table_contents = ""
+			table_contents = ""
 
-		beta_names = ["beta{}".format(i+1) for i in range(self.n_breakpoints)]
-		bp_names = ["breakpoint{}".format(i+1) for i in range(self.n_breakpoints)]
+			beta_names = ["beta{}".format(i+1) for i in range(self.n_breakpoints)]
+			bp_names = ["breakpoint{}".format(i+1) for i in range(self.n_breakpoints)]
 
-		model_estimator_names = ["const", "alpha1"] + beta_names + bp_names
+			model_estimator_names = ["const", "alpha1"] + beta_names + bp_names
 
-		for est_name in model_estimator_names:
-			estimator_row = table_row_template.format(est_name, self.estimates[est_name]["estimate"], self.estimates[est_name]["se"], 
-			self.estimates[est_name]["t_stat"], self.estimates[est_name]["p_t"], 
-			self.estimates[est_name]["confidence_interval"][0], self.estimates[est_name]["confidence_interval"][1])
-			table_contents += estimator_row
+			for est_name in model_estimator_names:
+				estimator_row = table_row_template.format(est_name, self.best_fit["estimates"][est_name]["estimate"], self.best_fit["estimates"][est_name]["se"], 
+				self.best_fit["estimates"][est_name]["t_stat"], self.best_fit["estimates"][est_name]["p_t"], 
+				self.best_fit["estimates"][est_name]["confidence_interval"][0], self.best_fit["estimates"][est_name]["confidence_interval"][1])
+				table_contents += estimator_row
 
-		table_contents += single_line
+			table_contents += single_line
 
-		table_contents += "These alphas(gradients of segments) are estimated from betas(change in gradient)\n"
+			table_contents += "These alphas(gradients of segments) are estimated from betas(change in gradient)\n"
 
-		alpha_names = ["alpha{}".format(alpha_i+1) for alpha_i in range(1, self.n_breakpoints+1)]
+			alpha_names = ["alpha{}".format(alpha_i+1) for alpha_i in range(1, self.n_breakpoints+1)]
 
-		table_contents += single_line
+			table_contents += single_line
 
-		for est_name in alpha_names:
-			estimator_row = table_row_template.format(est_name, self.estimates[est_name]["estimate"], self.estimates[est_name]["se"], 
-			self.estimates[est_name]["t_stat"], self.estimates[est_name]["p_t"], 
-			self.estimates[est_name]["confidence_interval"][0], self.estimates[est_name]["confidence_interval"][1])
-			table_contents += estimator_row
+			for est_name in alpha_names:
+				estimator_row = table_row_template.format(est_name, self.best_fit["estimates"][est_name]["estimate"], self.best_fit["estimates"][est_name]["se"], 
+				self.best_fit["estimates"][est_name]["t_stat"], self.best_fit["estimates"][est_name]["p_t"], 
+				self.best_fit["estimates"][est_name]["confidence_interval"][0], self.best_fit["estimates"][est_name]["confidence_interval"][1])
+				table_contents += estimator_row
 
 
-		table_contents += double_line
+			table_contents += double_line
 
-		table = double_line + table_header + single_line + table_contents
+			table = double_line + table_header + single_line + table_contents
 
-		print(header + overview + table)
+			print(header + overview + table)
 
-		print("Alternative hypothesis for breakpoints is not that they equal 0 but that they don't exist - t-stat has no meaning")
-		
-		if self.davies < 0.05:
-			print("Davies test for existence of at least one breakpoint: Null hypothesis of no breakpoint can be ruled out at significance of p<0.05 (p-value is {:.3f})\n".format(self.davies))
-		else:
-			print("Davies test for existence of at least one breakpoint. Null hypothesis of no breakpoint cannot be ruled out at significance of p<0.05 (p-value is {:.3f})\n".format(self.davies))
+			print("Alternative hypothesis for breakpoints is not that they equal 0 but that they don't exist - t-stat has no meaning")
+			
+			if self.davies < 0.05:
+				print("Davies test for existence of at least one breakpoint: Null hypothesis of no breakpoint can be ruled out at significance of p<0.05 (p-value is {:.3f})\n".format(self.davies))
+			else:
+				print("Davies test for existence of at least one breakpoint. Null hypothesis of no breakpoint cannot be ruled out at significance of p<0.05 (p-value is {:.3f})\n".format(self.davies))
 
 
 
@@ -637,8 +629,6 @@ def breakpoint_fit_1_bp(xx, yy, current_breakpoints):
 	print("A:" , A)
 
 	print("B: " , B)
-
-
 
 	Z = np.array([A, B , C]).T
 
@@ -748,6 +738,9 @@ def test_on_data_1c():
 
 	bp_fit = Fit(xx, yy, start_values=[5, 10, 16])
 
+	bp_fit.summary()
+
+	"""
 	
 	bp_fit.plot_data()
 	bp_fit.plot_fit(color="red", linewidth=4)
@@ -770,7 +763,7 @@ def test_on_data_1c():
 	plt.show()
 
 
-	
+	"""
 
 def test_on_data_2():
 

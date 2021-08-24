@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import unittest
 
-from breakpoint_regression import Fit
+from piecewise_regression import Fit
 
 class TestValidation(unittest.TestCase):
 

@@ -17,7 +17,7 @@ The package requires some x and y data to fit. You also need to tell it how many
 
 The package includes tools for summarising the fitted model and plotting.
 
-	import breakpoint_regression
+	import piecewise_regression
 	import matplotlib.pyplot as plt
 	import numpy as np
 
@@ -32,7 +32,7 @@ The package includes tools for summarising the fitted model and plotting.
 	yy = intercept + alpha_1*xx + (alpha_2-alpha_1) * np.maximum(xx - breakpoint_1, 0) + np.random.normal(size=n_points)
 
 	# Given some data, fit the model
-	bp_fit = breakpoint_regression.Fit(xx, yy, n_breakpoints=1, start_values=[5])
+	bp_fit = piecewise_regression.Fit(xx, yy, n_breakpoints=1, start_values=[5])
 
 	# Print a summary of the fit
 	bp_fit.summary()

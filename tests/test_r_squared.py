@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import unittest
 
-import breakpoint_regression.r_squared_calc as r_squared_calc
+import piecewise_regression.r_squared_calc as r_squared_calc
 
 class TestRSquared(unittest.TestCase):
 

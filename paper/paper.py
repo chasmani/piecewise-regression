@@ -6,7 +6,7 @@ import math
 import os, sys
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 
-from breakpoint_regression import Fit
+from piecewise_regression import Fit
 
 def plot_basic_example():
     """
