@@ -50,6 +50,7 @@ def check_p_values():
 
 	print("The empirical fractions should be slghtly less than the expected p values")
 
+
 def check_p_values_less():
 
 	p_count_20 = 0
@@ -89,17 +90,16 @@ def check_p_values_less():
 	print("fraction less than \t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}".format(p_count_20/sample_size, p_count_5/sample_size,
 		p_count_2/sample_size,p_count_1/sample_size))
 
-	print("The empirical fractions should be slghtly less than the expected p values")
-
+	print("The empirical fractions should be slightly less than the expected p values")
 
 
 def generate_data():
 
 	intercept = 5
 	alpha = 1
-	beta_1 = 0
+	beta_1 = 2
 	breakpoint_1 = 2
-	n_points = 7
+	n_points = 20
 
 	xx_bp_1 = list(np.linspace(-9.5, 9.5, n_points))
 	xx_bp_2 = list(np.linspace(0,9.5,n_points))
@@ -112,4 +112,4 @@ def generate_data():
 
 
 if __name__=="__main__":
-	check_p_values_less()
+	print(generate_data())

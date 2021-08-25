@@ -7,7 +7,7 @@ import math
 import os, sys
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 
-from piecewise_regression import Fit
+from piecewise_regression.main import Fit
 
 def check_p_values():
 

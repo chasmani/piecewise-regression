@@ -6,8 +6,6 @@ import statsmodels.api as sm
 import scipy.stats
 import matplotlib.pyplot as plt
 
-
-
 try:
 	import piecewise_regression.davies as davies 
 	import piecewise_regression.r_squared_calc as r_squared_calc
@@ -66,6 +64,7 @@ class NextBreakpoints:
 
 		Z = np.array([self.xx])
 		# Convert data based on breakpoints
+
 		UU = [(self.xx - bp) * np.heaviside(self.xx - bp, 1) for bp in self.current_breakpoints]
 		VV = [np.heaviside(self.xx- bp, 1) for bp in self.current_breakpoints]
 
@@ -261,7 +260,7 @@ class NextBreakpoints:
 		
 
 
-class Fit:
+class Muggeo:
 
 	def __init__(self, xx, yy, start_values, max_iterations=30, tolerance=10**-5,
 		min_distance_between_breakpoints=0.01, min_distance_to_edge=0.02, verbose=True):
@@ -293,14 +292,11 @@ class Fit:
 
 		self.fit()
 
-
-
 	def _validate_boolean(self, var, var_name):
 		if isinstance(var, bool):
 			return var
 		else:
 			raise ValueError("{} must be a Boolean: True or False".format(var_name))
-
 
 	def _validate_integer(self, var, var_name):
 		if isinstance(var, int):
@@ -622,5 +618,17 @@ class Fit:
 				print("Davies test for existence of at least one breakpoint. Null hypothesis of no breakpoint cannot be ruled out at significance of p<0.05 (p-value is {:.3f})\n".format(self.davies))
 
 
+class BootstrapRestarting:
 
+	pass
 
+class ModelSection:
+
+	pass
+
+class Fit:
+	"""
+	Set up the fit etc
+
+	"""
+	pass
