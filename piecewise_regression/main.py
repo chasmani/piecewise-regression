@@ -88,8 +88,6 @@ class NextBreakpoints:
 		# The next breakpoints are calculated iteratively
 		self.next_breakpoints = self.current_breakpoints - gamma_hats/beta_hats
 
-
-
 	def calculate_all_estimates(self):
 		"""
 		Save all params as in estimates hash table
@@ -261,6 +259,11 @@ class NextBreakpoints:
 
 
 class Muggeo:
+	"""
+	Muggeo's iterative segmented regression method
+	Raises an error if input variables are the wrong type
+	"""
+
 
 	def __init__(self, xx, yy, start_values, max_iterations=30, tolerance=10**-5,
 		min_distance_between_breakpoints=0.01, min_distance_to_edge=0.02, verbose=True):
@@ -284,11 +287,13 @@ class Muggeo:
 
 		self.converged = False
 		self.stop = False
+		# Note records the rason why the algorithm stopped
+		self.stop_reason = None
 
 		self.davies = None
 
 		if self.verbose:
-			print("Input data seems okay")		
+			print("Muggeo input data seems okay")		
 
 		self.fit()
 
@@ -298,10 +303,11 @@ class Muggeo:
 		start_values = validate_list_of_numbers(start_values, "start_values", min_length=1)
 
 		if not self._are_breakpoint_values_within_range(start_values):
-			raise ValueError("Start values are not within allowed range")
+			self.stop = True
+			self.stop_reason = "Algorithm was stopped because breakpoint start_values were not within allowed range"
 		if not self._are_breakpoint_values_far_apart(start_values):
-			raise ValueError("Start values are too close together")
-		
+			self.stop = True
+			self.stop_reason = "Algorithm was stopped as breakpoint start_values were too close together"
 		return start_values
 
 
@@ -330,7 +336,7 @@ class Muggeo:
 	def fit(self):
 		# Run the breakpoint iterative procedure
 		if self.verbose:
-			print("Running algorithm . . . ")
+			print("Running Muggeo's iterative algorithm . . . ")
 		while not self.stop:
 			# Do the fit
 			if len(self.fit_history) == 0:
@@ -352,28 +358,24 @@ class Muggeo:
 
 		# Stop if the breakpoints are out of range
 		if not self._are_breakpoint_values_within_range(self.fit_history[-1].next_breakpoints):
-			if self.verbose:
-				print("Breakpoints have diverged out of the data range. Stopping")
+			self.stop_reason = "Algorithm was stopped as breakpoints diverged out of the data range"
 			self.stop = True
 		
 		# Stop if the breakpoints are too close together
 		if not self._are_breakpoint_values_far_apart(self.fit_history[-1].next_breakpoints):
-			if self.verbose:
-				print("Breakpoints have become too close together. Stopping")
+			self.stop_reason = "Algorithm was stopped as breakpoints became too close together"
 			self.stop = True
 
 		# Stop if maximum iterations reached
 		if len(self.fit_history)>self.max_iterations:
-			if self.verbose:
-				print("Max iterations reached. Stopping.")
+			self.stop_reason = "Algorithm was stopped as maximum iterations reached"
 			self.stop = True
 
 		# Stop if tolerance reached - small change between this and last breakpoints
 		if len(self.fit_history) > 1:
 			breakpoint_differences = self.fit_history[-2].next_breakpoints - self.fit_history[-1].next_breakpoints
 			if np.max(np.abs(breakpoint_differences)) <= self.tolerance:
-				if self.verbose:
-					print("Algorithm has converged on breakpoint values. Stopping.")
+				self.stop_reason = "Algorithm converged on breakpoint values"
 				self.stop = True
 				self.converged = True
 
@@ -381,8 +383,7 @@ class Muggeo:
 		if len(self.fit_history) > 2:
 			breakpoint_two_step_differences = self.fit_history[-3].next_breakpoints - self.fit_history[-1].next_breakpoints
 			if np.max(np.abs(breakpoint_two_step_differences)) <= self.tolerance:
-				if self.verbose:
-					print("Algorithm is iterating between breakpoint values. Stopping.")
+				self.stop_reason = "Algorithm converged on breakpoint values"
 				self.stop = True
 				self.converged = True
 
@@ -624,10 +625,12 @@ class BootstrapRestarting:
 			start_bps = np.random.uniform(low=min_allowed_bp, high=max_allowed_bp, size=self.n_breakpoints)
 
 		muggeo_fit = Muggeo(self.xx, self.yy, start_bps)
+		self.bootstrap_history.append(muggeo_fit)
 		if muggeo_fit.converged:
 			self.best_muggeo = muggeo_fit
 
 		# Iterate bootstraps
+		count = 1
 		while not self.stop:
 			
 			# Best breakpoints are either from best muggeo so far, start values or random
@@ -649,23 +652,19 @@ class BootstrapRestarting:
 
 			# Do a new fit with the new breakpoint values 
 			next_muggeo = Muggeo(self.xx, self.yy, bootstrap_bps)
+			self.bootstrap_history.append(next_muggeo)
 
 			# If we get a converged answer, see if this new fit is the best or not
 			if next_muggeo.converged:
-				# If there is already a best_muggei, see if this one is better
+				# If there is already a best_muggeo, see if this one is better
 				if self.best_muggeo:
 					if next_muggeo.best_fit.residual_sum_squares < self.best_muggeo.best_fit.residual_sum_squares:
 						self.best_muggeo = next_muggeo
+						print("New best fit with rss ", next_muggeo.best_fit.residual_sum_squares)
 				else:
 					self.best_muggeo = next_muggeo
 
-			self.bootstrap_history.append(next_muggeo)
-
 			self.stop_or_not_bootstrap()
-
-
-		print(muggeo_fit.summary())
-
 
 
 	def bootstrap_data(self, xx, yy):
@@ -685,17 +684,52 @@ class BootstrapRestarting:
 	def stop_or_not_bootstrap(self):
 
 		# Stop if maximum iterations reached
-		if len(self.bootstrap_history)>self.n_boot:
+		if len(self.bootstrap_history)>=self.n_boot:
 			if self.verbose:
 				print("Max bootstrap iterations reached. Stopping.")
 			self.stop = True
 
 
-
-
 class ModelSection:
 
-	pass
+	def __init__(self, xx, yy, max_breakpoints, n_boot=10, start_values=None, max_iterations=30, tolerance=10**-5,
+		min_distance_between_breakpoints=0.01, min_distance_to_edge=0.02, verbose=True):
+
+		self.xx = validate_list_of_numbers(xx, "xx", min_length=3)
+		self.yy = validate_list_of_numbers(yy, "yy", min_length=3)
+
+		self.max_iterations = validate_integer(max_iterations, "max_iterations")	
+		self.tolerance = validate_number(tolerance, "tolerance")
+		# In terms of proportion of the data range
+		self.min_distance_between_breakpoints = validate_number(min_distance_between_breakpoints, "min_distance_between_breakpoints")
+		# In terms of quantiles
+		self.min_distance_to_edge = validate_number(min_distance_to_edge, "min_distance_to_edge")
+		self.verbose = validate_boolean(verbose, "verbose")
+
+		self.n_boot = validate_integer(n_boot, "n_boot")
+
+		self.max_breakpoints = validate_integer(max_breakpoints, "max_breakpoints")
+
+		self.models = []
+		
+		self.stop = False
+
+		self.model_selection()
+
+	def model_selection(self):
+
+		for k in range(1, self.max_breakpoints+1):
+			bootstrapped_fit = BootstrapRestarting(self.xx, self.yy, n_breakpoints=k)
+			self.models.append(bootstrapped_fit)
+			
+			if not bootstrapped_fit.best_muggeo:
+				break
+
+		for model in self.models:
+			print(model.best_muggeo.next_breakpoints, model.best_muggeo.best_fit.bic, model.best_muggeo.best_fit.residual_sum_squares)
+
+
+	
 
 class Fit:
 	"""
@@ -720,4 +754,4 @@ if __name__=="__main__":
 	yy = intercept + alpha*xx + beta_1 * np.maximum(xx - breakpoint_1, 0) + np.random.normal(size=n_points)
 
 	
-	fit = BootstrapRestarting(xx, yy, n_breakpoints=1)
+	fit = ModelSection(xx, yy, max_breakpoints=10)
