@@ -86,6 +86,9 @@ class NextBreakpoints:
 		# Gamma hats are the last group of params, same length as the number of breakpoints
 		gamma_hats = results.params[2+len(self.current_breakpoints):]
 		# The next breakpoints are calculated iteratively
+		print(self.current_breakpoints)
+		print(self.xx)
+		print(beta_hats)
 		self.next_breakpoints = self.current_breakpoints - gamma_hats/beta_hats
 
 	def calculate_all_estimates(self):
@@ -263,10 +266,10 @@ class Muggeo:
 	Muggeo's iterative segmented regression method
 	Raises an error if input variables are the wrong type
 	"""
-
-
 	def __init__(self, xx, yy, start_values, max_iterations=30, tolerance=10**-5,
 		min_distance_between_breakpoints=0.01, min_distance_to_edge=0.02, verbose=True):
+
+		print("Instatiating Muggeo . . . ")
 
 		self.xx = validate_list_of_numbers(xx, "xx", min_length=3)
 		self.yy = validate_list_of_numbers(yy, "yy", min_length=3)
@@ -279,6 +282,8 @@ class Muggeo:
 		self.min_distance_to_edge = validate_number(min_distance_to_edge, "min_distance_to_edge")
 		self.verbose = validate_boolean(verbose, "verbose")
 
+		self.stop = False
+
 		self.start_values = self._validate_start_values(start_values)
 		self.n_breakpoints = len(start_values)
 
@@ -286,14 +291,11 @@ class Muggeo:
 		self.best_fit = None
 
 		self.converged = False
-		self.stop = False
+		
 		# Note records the rason why the algorithm stopped
 		self.stop_reason = None
 
 		self.davies = None
-
-		if self.verbose:
-			print("Muggeo input data seems okay")		
 
 		self.fit()
 
@@ -303,6 +305,7 @@ class Muggeo:
 		start_values = validate_list_of_numbers(start_values, "start_values", min_length=1)
 
 		if not self._are_breakpoint_values_within_range(start_values):
+			print("Stopping here")
 			self.stop = True
 			self.stop_reason = "Algorithm was stopped because breakpoint start_values were not within allowed range"
 		if not self._are_breakpoint_values_far_apart(start_values):
@@ -316,8 +319,11 @@ class Muggeo:
 		min_allowed_bp = np.quantile(self.xx, self.min_distance_to_edge)
 		max_allowed_bp = np.quantile(self.xx, 1-self.min_distance_to_edge)
 
+		print("Testing breakpoints ", breakpoints)
+
 		for bp in breakpoints:
 			if bp <= min_allowed_bp or bp >= max_allowed_bp:
+				print("Stop")
 				return False				
 		return True
 
@@ -337,6 +343,7 @@ class Muggeo:
 		# Run the breakpoint iterative procedure
 		if self.verbose:
 			print("Running Muggeo's iterative algorithm . . . ")
+			print(self.stop)
 		while not self.stop:
 			# Do the fit
 			if len(self.fit_history) == 0:
@@ -350,16 +357,19 @@ class Muggeo:
 			
 			self.stop_or_not()
 
-		# Select the best fit from the fit history by finding the smallest rss
-		self.best_fit = min(self.fit_history, key=lambda x:x.residual_sum_squares)
+		# Select the best fit from the fit history by finding the smallest rss, if it exists
+		if len(self.fit_history) > 0:
+			self.best_fit = min(self.fit_history, key=lambda x:x.residual_sum_squares)
 
 
 	def stop_or_not(self):
 
 		# Stop if the breakpoints are out of range
+		print(self.fit_history[-1].next_breakpoints)
 		if not self._are_breakpoint_values_within_range(self.fit_history[-1].next_breakpoints):
 			self.stop_reason = "Algorithm was stopped as breakpoints diverged out of the data range"
 			self.stop = True
+			print("Stopped")
 		
 		# Stop if the breakpoints are too close together
 		if not self._are_breakpoint_values_far_apart(self.fit_history[-1].next_breakpoints):
@@ -583,6 +593,8 @@ class BootstrapRestarting:
 		min_distance_between_breakpoints=0.01, min_distance_to_edge=0.02, verbose=True,
 		n_boot=10):
 
+		print("Insantiating BootstrapRestarting . . . ")
+
 		self.xx = validate_list_of_numbers(xx, "xx", min_length=3)
 		self.yy = validate_list_of_numbers(yy, "yy", min_length=3)
 
@@ -632,7 +644,8 @@ class BootstrapRestarting:
 		# Iterate bootstraps
 		count = 1
 		while not self.stop:
-			
+
+			print("Looping restarting . . ")
 			# Best breakpoints are either from best muggeo so far, start values or random
 			if self.best_muggeo:
 				best_bps = self.best_muggeo.best_fit.next_breakpoints
@@ -648,7 +661,12 @@ class BootstrapRestarting:
 			# Get some new breakpoint values from a bootstrapped fit
 			xx_boot, yy_boot = self.bootstrap_data(self.xx, self.yy)
 			bootstrap_fit = Muggeo(xx_boot, yy_boot, best_bps)
-			bootstrap_bps = bootstrap_fit.best_fit.next_breakpoints
+			if bootstrap_fit.converged:
+				bootstrap_bps = bootstrap_fit.best_fit.next_breakpoints
+			else:
+				# Give it something - even though this is already tested
+				# prefer this to using breaks
+				bootstrap_bps = best_bps
 
 			# Do a new fit with the new breakpoint values 
 			next_muggeo = Muggeo(self.xx, self.yy, bootstrap_bps)
@@ -656,6 +674,7 @@ class BootstrapRestarting:
 
 			# If we get a converged answer, see if this new fit is the best or not
 			if next_muggeo.converged:
+				print("Converged")
 				# If there is already a best_muggeo, see if this one is better
 				if self.best_muggeo:
 					if next_muggeo.best_fit.residual_sum_squares < self.best_muggeo.best_fit.residual_sum_squares:
@@ -691,6 +710,9 @@ class BootstrapRestarting:
 
 
 class ModelSection:
+	"""
+	Experimental - uses simple BIC base don simple linear model. Need to check if this applies to breakpoint regression or not
+	"""
 
 	def __init__(self, xx, yy, max_breakpoints, n_boot=10, start_values=None, max_iterations=30, tolerance=10**-5,
 		min_distance_between_breakpoints=0.01, min_distance_to_edge=0.02, verbose=True):
@@ -722,11 +744,13 @@ class ModelSection:
 			bootstrapped_fit = BootstrapRestarting(self.xx, self.yy, n_breakpoints=k)
 			self.models.append(bootstrapped_fit)
 			
-			if not bootstrapped_fit.best_muggeo:
-				break
+			#if not bootstrapped_fit.best_muggeo:
+			#	break
 
 		for model in self.models:
-			print(model.best_muggeo.next_breakpoints, model.best_muggeo.best_fit.bic, model.best_muggeo.best_fit.residual_sum_squares)
+			print(model.best_muggeo)
+
+			#print(model.best_muggeo.next_breakpoints, model.best_muggeo.best_fit.bic, model.best_muggeo.best_fit.residual_sum_squares)
 
 
 	
@@ -743,6 +767,9 @@ class Fit:
 
 
 if __name__=="__main__":
+
+	#np.random.seed(2)
+	np.random.seed(2)
 	alpha = -4
 	beta_1 = -2
 	intercept = 100
