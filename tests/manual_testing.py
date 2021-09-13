@@ -57,10 +57,8 @@ def test_on_data_1b():
 
 	bp_fit.summary()
 
-	bp_fit.plot_breakpoint_history()
+	bp_fit.plot_best_muggeo_breakpoint_history()
 	plt.show()
-
-
 
 	bp_fit.plot_data()
 	bp_fit.plot_fit(color="red", linewidth=4)
@@ -110,13 +108,16 @@ def test_on_data_1c():
 	plt.show()
 	plt.close()
 
-	bp_fit.plot_breakpoint_history()
+	bp_fit.plot_best_muggeo_breakpoint_history()
 	plt.legend()
 	plt.show()
 	plt.close()
 
-	bp_fit.plot_rss_history()
+	bp_fit.plot_bootstrap_restarting_history()
+	plt.legend()
 	plt.show()
+	plt.close()
+
 
 
 
@@ -125,4 +126,4 @@ def test_on_data_1c():
 if __name__=="__main__":
 
 	np.random.seed(0)
-	test_on_data_1c()
+	test_on_data_1b()

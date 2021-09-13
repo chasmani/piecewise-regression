@@ -97,7 +97,7 @@ def generate_data():
 
 	intercept = 5
 	alpha = 1
-	beta_1 = 2
+	beta_1 = 0
 	breakpoint_1 = 2
 	n_points = 20
 
@@ -112,4 +112,5 @@ def generate_data():
 
 
 if __name__=="__main__":
-	print(generate_data())
+	check_p_values()
+	check_p_values_less()

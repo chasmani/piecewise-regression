@@ -4,6 +4,9 @@ import pandas as pd
 import numpy as np
 import unittest
 
+import os, sys
+sys.path.insert(1, os.path.join(sys.path[0], '..'))
+
 from piecewise_regression import Fit
 
 class TestValidation(unittest.TestCase):
@@ -29,7 +32,7 @@ class TestValidation(unittest.TestCase):
                 self.assertRaises(ValueError, Fit, **new_kwargs)
 
         for test_variable in ["max_iterations", "tolerance", "min_distance_between_breakpoints", "min_distance_to_edge"]:
-            for invalid_value in [None, "hi", [1,1,1,1,1], []]:
+            for invalid_value in [None, "hi", [1,1,1,1,1], [], 0, -3]:
                                 
                 new_kwargs = copy.deepcopy(KWARGS)
                 new_kwargs[test_variable] = invalid_value
@@ -42,9 +45,17 @@ class TestValidation(unittest.TestCase):
         xx = np.linspace(0,10)
         yy = np.linspace(0,10)
 
-        self.assertRaises(TypeError, Fit, xx, yy)
+        self.assertRaises(ValueError, Fit, xx, yy)
         self.assertRaises(TypeError, Fit, xx, start_values=[3])
         self.assertRaises(TypeError, Fit, yy, start_values=[3])
+
+
+    def test_with_start_values_too_wide(self):
+
+        xx = np.linspace(0,10)
+        yy = np.linspace(0,10)
+
+        self.assertRaises(ValueError, Fit, xx, yy, start_values=[22])
 
 
 if __name__ == '__main__':
