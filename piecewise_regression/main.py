@@ -22,12 +22,12 @@ class NextBreakpoints:
 	Gets the next breakpoints. 
 	Also gets interesting statistics etc
 	"""
-
 	def __init__(self, xx, yy, current_breakpoints):
 
-		self.xx = validate_list_of_numbers(xx, "xx", min_length=3)
-		self.yy = validate_list_of_numbers(yy, "yy", min_length=3)
-		self.current_breakpoints = validate_list_of_numbers(current_breakpoints, "current_breakpoints", min_length=1)
+		# Data validation done at a higher level
+		self.xx = xx
+		self.yy = yy
+		self.current_breakpoints = current_breakpoints
 		self.n_breakpoints = len(current_breakpoints)
 
 		self.next_breakpoints = None
@@ -86,9 +86,8 @@ class NextBreakpoints:
 		# Gamma hats are the last group of params, same length as the number of breakpoints
 		gamma_hats = results.params[2+len(self.current_breakpoints):]
 		# The next breakpoints are calculated iteratively
-		print(self.current_breakpoints)
-		print(self.xx)
-		print(beta_hats)
+		print("Current breakpoints ", self.current_breakpoints)
+		print("Beta hats: ", beta_hats)
 		self.next_breakpoints = self.current_breakpoints - gamma_hats/beta_hats
 
 	def calculate_all_estimates(self):
@@ -217,7 +216,7 @@ class NextBreakpoints:
 			# Breakpoint t stats don't make sense
 			# Don't exist in the null model - nuisance parameter
 			# H_0 isn't bp=0, it's that bp doesn't exist
-			if "breakpoint" in estimator_name:
+			if "breakpoint" in estimator_name or "beta" in estimator_name:
 				details["t_stat"] = "-"
 				details["p_t"] = "-"
 			else:
@@ -266,77 +265,30 @@ class Muggeo:
 	Muggeo's iterative segmented regression method
 	Raises an error if input variables are the wrong type
 	"""
-	def __init__(self, xx, yy, start_values, max_iterations=30, tolerance=10**-5,
-		min_distance_between_breakpoints=0.01, min_distance_to_edge=0.02, verbose=True):
+	def __init__(self, xx, yy, start_values, max_iterations=30, tolerance=10**-5, verbose=True):
 
-		print("Instatiating Muggeo . . . ")
+		print("Instantiating Muggeo . . . ")
 
-		self.xx = validate_list_of_numbers(xx, "xx", min_length=3)
-		self.yy = validate_list_of_numbers(yy, "yy", min_length=3)
+		# validation is done at a higher level
+		self.xx = xx
+		self.yy = yy
+		self.start_values = start_values
+		self.max_iterations = max_iterations	
+		self.tolerance = tolerance
+		self.verbose = verbose
 
-		self.max_iterations = validate_integer(max_iterations, "max_iterations")	
-		self.tolerance = validate_number(tolerance, "tolerance")
-		# In terms of proportion of the data range
-		self.min_distance_between_breakpoints = validate_number(min_distance_between_breakpoints, "min_distance_between_breakpoints")
-		# In terms of quantiles
-		self.min_distance_to_edge = validate_number(min_distance_to_edge, "min_distance_to_edge")
-		self.verbose = validate_boolean(verbose, "verbose")
 
 		self.stop = False
 
-		self.start_values = self._validate_start_values(start_values)
 		self.n_breakpoints = len(start_values)
-
 		self.fit_history = []
 		self.best_fit = None
-
 		self.converged = False
 		
-		# Note records the rason why the algorithm stopped
+		# Records the reason why the algorithm stopped
 		self.stop_reason = None
 
-		self.davies = None
-
 		self.fit()
-
-
-	def _validate_start_values(self, start_values):
-
-		start_values = validate_list_of_numbers(start_values, "start_values", min_length=1)
-
-		if not self._are_breakpoint_values_within_range(start_values):
-			print("Stopping here")
-			self.stop = True
-			self.stop_reason = "Algorithm was stopped because breakpoint start_values were not within allowed range"
-		if not self._are_breakpoint_values_far_apart(start_values):
-			self.stop = True
-			self.stop_reason = "Algorithm was stopped as breakpoint start_values were too close together"
-		return start_values
-
-
-	def _are_breakpoint_values_within_range(self, breakpoints):
-
-		min_allowed_bp = np.quantile(self.xx, self.min_distance_to_edge)
-		max_allowed_bp = np.quantile(self.xx, 1-self.min_distance_to_edge)
-
-		print("Testing breakpoints ", breakpoints)
-
-		for bp in breakpoints:
-			if bp <= min_allowed_bp or bp >= max_allowed_bp:
-				print("Stop")
-				return False				
-		return True
-
-	def _are_breakpoint_values_far_apart(self, breakpoints):
-
-		min_distance = np.diff(np.sort(breakpoints))
-
-		# numpy ptp gives the range of the data, closeness realtive to the range
-		min_distance_allowed = self.min_distance_between_breakpoints * np.ptp(self.xx)
-
-		if (min_distance <= min_distance_allowed).any():
-			return False
-		return True
 
 
 	def fit(self):
@@ -350,12 +302,13 @@ class Muggeo:
 				current_breakpoints = self.start_values
 			else:
 				current_breakpoints = self.fit_history[-1].next_breakpoints
-
-			IteratedFit = NextBreakpoints(self.xx, self.yy, current_breakpoints)
-			
-			self.fit_history.append(IteratedFit)
-			
-			self.stop_or_not()
+			try:
+				IteratedFit = NextBreakpoints(self.xx, self.yy, current_breakpoints)
+				self.fit_history.append(IteratedFit)
+				self.stop_or_not()
+			except Exception as e:
+				self.stop=True
+				self.stop_reason = "Error encountered: " + str(e)
 
 		# Select the best fit from the fit history by finding the smallest rss, if it exists
 		if len(self.fit_history) > 0:
@@ -366,15 +319,6 @@ class Muggeo:
 
 		# Stop if the breakpoints are out of range
 		print(self.fit_history[-1].next_breakpoints)
-		if not self._are_breakpoint_values_within_range(self.fit_history[-1].next_breakpoints):
-			self.stop_reason = "Algorithm was stopped as breakpoints diverged out of the data range"
-			self.stop = True
-			print("Stopped")
-		
-		# Stop if the breakpoints are too close together
-		if not self._are_breakpoint_values_far_apart(self.fit_history[-1].next_breakpoints):
-			self.stop_reason = "Algorithm was stopped as breakpoints became too close together"
-			self.stop = True
 
 		# Stop if maximum iterations reached
 		if len(self.fit_history)>self.max_iterations:
@@ -397,6 +341,171 @@ class Muggeo:
 				self.stop = True
 				self.converged = True
 
+
+
+class Fit:
+	"""
+	Set up the fit etc
+	"""
+	def __init__(self, xx, yy,
+		n_breakpoints=None, start_values=None, n_boot=10, verbose=True, 
+		max_iterations=30, tolerance=10**-5,
+		min_distance_between_breakpoints=0.01, min_distance_to_edge=0.02,
+		):
+
+		self.xx = validate_list_of_numbers(xx, "xx", min_length=3)
+		self.yy = validate_list_of_numbers(yy, "yy", min_length=3)
+
+		self.n_boot = validate_integer(n_boot, "n_boot")
+		self.verbose = validate_boolean(verbose, "verbose")
+		self.max_iterations = validate_integer(max_iterations, "max_iterations")
+		self.tolerance = validate_number(tolerance, "tolerance")
+		self.min_distance_between_breakpoints = validate_number(min_distance_between_breakpoints, "min_distance_between_breakpoints")
+		self.min_distance_to_edge = validate_number(min_distance_to_edge, "min_distance_to_edge")
+
+		if n_breakpoints == None:
+			self.n_breakpoints = None
+		else:
+			self.n_breakpoints = validate_integer(n_breakpoints, "n_breakpoints")
+
+		if start_values == None:
+			self.start_values = start_values
+		else:
+			self.start_values = validate_list_of_numbers(start_values, "start_values")
+
+		if n_breakpoints == None and start_values == None:
+			raise ValueError("The Fit algorithm requires either the start_values or n_breakpoints")
+
+		self.bootstrap_history = []
+		self.best_muggeo = None
+		self.stop = False
+
+		self.bootstrap_restarting()
+
+		self.davies = davies.davies_test(self.xx, self.yy)
+
+
+	def _validate_start_values(self, start_values):
+
+
+		start_values = validate_list_of_numbers(start_values, "start_values", min_length=1)
+
+		if not self._are_breakpoint_values_within_range(start_values):
+			self.stop = True
+			raise ValueError("start_values are not within allowed range. Try changing min_distance_to_edge")
+			
+		if not self._are_breakpoint_values_far_apart(start_values):
+			self.stop = True
+			raise ValueError("start_values are too close together. Try changing min_distance_between_breakpoints")
+		return start_values
+
+
+	def _are_breakpoint_values_within_range(self, breakpoints):
+
+		min_allowed_bp = np.quantile(self.xx, self.min_distance_to_edge)
+		max_allowed_bp = np.quantile(self.xx, 1-self.min_distance_to_edge)
+
+		for bp in breakpoints:
+			if bp <= min_allowed_bp or bp >= max_allowed_bp:
+				return False				
+		return True
+
+	def _are_breakpoint_values_far_apart(self, breakpoints):
+
+		min_distance = np.diff(np.sort(breakpoints))
+
+		# numpy ptp gives the range of the data, closeness realtive to the range
+		min_distance_allowed = self.min_distance_between_breakpoints * np.ptp(self.xx)
+
+		if (min_distance <= min_distance_allowed).any():
+			return False
+		return True
+
+	def _generate_valid_breakpoints(self):
+
+		# Get breakpoints within allowed range
+		min_allowed_bp = np.quantile(self.xx, self.min_distance_to_edge)
+		max_allowed_bp = np.quantile(self.xx, 1-self.min_distance_to_edge)
+		start_values = np.random.uniform(low=min(self.xx), high=max(self.xx), size=self.n_breakpoints)
+
+		# Get breakpoints not too close together
+		gen_count = 0
+		while not self._are_breakpoint_values_far_apart(start_values) and not self._are_breakpoint_values_within_range(start_values):
+			start_values = np.random.uniform(low=min(self.xx), high=max(self.xx), size=self.n_breakpoints)
+			gen_count += 1
+			# Stop the genreation after 50 attempts. Almost certainly this will be because the disatnce between breakpoints is too small
+			if gen_count == 100:
+				raise ValueError("Unable to generate random breakpoints that are far enough apart. Change min_distance_between_breakpoints")
+		return start_values
+
+	def bootstrap_restarting(self):
+		
+
+		if not self.start_values:
+			if self.verbose:
+				print("No start_values given, randomly generating . . . ")
+			self.start_values = self._generate_valid_breakpoints()
+
+		muggeo_fit = Muggeo(xx=self.xx, yy=self.yy, start_values=self.start_values, 
+			max_iterations=self.max_iterations, tolerance = self.tolerance, verbose=self.verbose)
+
+		self.bootstrap_history.append(muggeo_fit)
+
+		# Start off with the "best_muggeo" even if it didn't converge
+		self.best_muggeo = muggeo_fit
+
+		# Iterate bootstraps
+		for i in range(self.n_boot):
+
+			print("Looping restarting . . ")
+			# Best breakpoints are either from best converged muggeo so far, or start values
+			if self.best_muggeo.converged:
+				best_bps = self.best_muggeo.best_fit.next_breakpoints
+			else:
+				best_bps = self.start_values
+				
+			# Get some new breakpoint values from a bootstrapped fit
+			xx_boot, yy_boot = self.bootstrap_data(self.xx, self.yy)
+			bootstrap_fit = Muggeo(xx_boot, yy_boot, start_values=best_bps, 
+				max_iterations=self.max_iterations, tolerance = self.tolerance, verbose=self.verbose)
+			if bootstrap_fit.converged:
+				bootstrap_bps = bootstrap_fit.best_fit.next_breakpoints
+			else:
+				# Give it something - even though this is already tested
+				# prefer this to using breaks
+				bootstrap_bps = best_bps
+
+			# Do a new fit with the new breakpoint values 
+			next_muggeo = Muggeo(self.xx, self.yy, start_values=bootstrap_bps, 
+				max_iterations=self.max_iterations, tolerance = self.tolerance, verbose=self.verbose)
+			self.bootstrap_history.append(next_muggeo)
+
+			# If we get a converged answer, see if this new fit is the best or not
+			if next_muggeo.converged:
+				print("Converged")
+				# If there is already a converged best_muggeo, see if this one is better
+				if self.best_muggeo.converged:
+					if next_muggeo.best_fit.residual_sum_squares < self.best_muggeo.best_fit.residual_sum_squares:
+						self.best_muggeo = next_muggeo
+						print("New best fit with rss ", next_muggeo.best_fit.residual_sum_squares)
+				else:
+					self.best_muggeo = next_muggeo
+
+
+	def bootstrap_data(self, xx, yy):
+		"""
+		Non parametric bootstrap, randomly sample data points with replacement
+		Return bootstrapped data of same length as oriignal data
+		"""
+		n = len(xx)
+		# Get bootstrap samples as array index locations
+		boot_indices = np.random.choice(n, size=n, replace=True)
+
+		xx_boot = xx[boot_indices]
+		yy_boot = yy[boot_indices]
+		return xx_boot, yy_boot
+
+
 	def plot_data(self, **kwargs):
 		"""
 		Plot the data as a scatter plot
@@ -404,23 +513,18 @@ class Muggeo:
 		"""
 		plt.scatter(self.xx, self.yy, **kwargs)
 
-	def plot_fit(self, fit_data="best", **kwargs):
+	def plot_fit(self, **kwargs):
 		"""
 		Plot the fitted model
 		Passes any kwargs to the matplotlib plot function, e.g. color="red"
 		"""
-		if not self.converged:
-			print("Algorithm didn't converge. Plotting best fit anyway.")
+		if not self.best_muggeo.converged:
+			print("Algorithm didn't converge. Plotting best fit anyway (not very meaningful)")
 
 		# Get the final results from the fitted model variables
 		# Params are in terms of [intercept, alpha, betas, gammas]
-		
-		if fit_data == "best":
-			final_params = self.best_fit["raw_params"]
-			breakpoints = self.best_fit["next_breakpoints"]
-		else:
-			final_params = fit_data["raw_params"]
-			breakpoints = fit_data["next_breakpoints"]
+		final_params = self.best_muggeo.best_fit.raw_params
+		breakpoints = self.best_muggeo.best_fit.next_breakpoints
 		
 		# Extract what we need from params etc
 		intercept_hat = final_params[0]
@@ -436,38 +540,32 @@ class Muggeo:
 
 		plt.plot(xx_plot, yy_plot, **kwargs)
 
-	def plot_breakpoints(self, fit_data="best", **kwargs):
+	def plot_breakpoints(self, **kwargs):
 		"""
 		Plot the breakpoint locations
 		Passes kwargs to the matplotlib function, e.g. color="red"
 		"""
-		if not self.converged:
-			print("Algorithm didn't converge. Plotting best fit anyway.")
+		if not self.best_muggeo.converged:
+			print("Algorithm didn't converge. No meaningful breakpoint estimates to plot")
+		else:
+			breakpoints = self.best_muggeo.best_fit.next_breakpoints			
+			
+			for bp in breakpoints:
+				plt.axvline(bp, **kwargs)
 
-		if fit_data == "best":
-			breakpoints = self.best_fit["next_breakpoints"]			
-		else: 
-			breakpoints = fit_data["next_breakpoints"]
-
-		for bp in breakpoints:
-			plt.axvline(bp, **kwargs)
-
-	def plot_breakpoint_confidence_intervals(self, fit_data="best", **kwargs):
+	def plot_breakpoint_confidence_intervals(self, **kwargs):
 		"""
 		Plot the breakpoint cis as shaded regions
 		"""
 	
-		if not self.converged:
-			print("Algorithm didn't converge. Plotting breakpoint confidence intervals anyway")
-		
-		if fit_data == "best":
-			estimates = estimates			
-		else: 
-			estimates = fit_data["estimates"]
-
-		for bp_i in range(self.n_breakpoints):
-			bp_ci = estimates["breakpoint{}".format(bp_i+1)]["confidence_interval"]
-			plt.axvspan(bp_ci[0], bp_ci[1], alpha=0.1)
+		if not self.best_muggeo.converged:
+			print("Algorithm didn't converge. No meaningful breakpoint estimates to plot")
+		else:			
+			estimates = self.best_muggeo.best_fit.estimates			
+			
+			for bp_i in range(self.best_muggeo.n_breakpoints):
+				bp_ci = estimates["breakpoint{}".format(bp_i+1)]["confidence_interval"]
+				plt.axvspan(bp_ci[0], bp_ci[1], alpha=0.1)
 
 	def plot_breakpoint_history(self, **kwargs):
 		"""
@@ -475,10 +573,13 @@ class Muggeo:
 		"""
 		# Change the format of the breakpoint histories to seperate lists for each breakpoint
 
-		breakpoint_history = [self.start_values]
+		if not self.best_muggeo.converged:
+			print("Algorithm didn't converge.")
 
-		for fit_details in self.fit_history:
-			breakpoint_history.append(fit_details["next_breakpoints"])
+		breakpoint_history = [self.best_muggeo.start_values]
+
+		for fit_details in self.best_muggeo.fit_history:
+			breakpoint_history.append(fit_details.next_breakpoints)
 
 		breakpoint_history_series = zip(*breakpoint_history)
 		# Plot a history for each breakpoint 
@@ -489,20 +590,9 @@ class Muggeo:
 			plt.xlabel("Iteration")
 			plt.ylabel("Breakpoint")
 
-	def plot_rss_history(self, **kwargs):
-
-		rss_history = []
-		for fit_details in self.fit_history:
-			rss_history.append(fit_details["residual_sum_squares"])
-
-		plt.plot(range(1, len(rss_history) +1), rss_history, **kwargs)
-		plt.xlabel("Iteration")
-		plt.ylabel("Residual Sum of Squares")
-
-
-	def plot(self, **kwargs):
+	def plot(self):
 		"""
-		Plot the data, fit, breakpoint poisitons and breakpoint confidence intervals
+		Plot the data, fit, breakpoint positions and breakpoint confidence intervals
 		"""
 		self.plot_data()
 		self.plot_fit()
@@ -510,260 +600,80 @@ class Muggeo:
 		self.plot_breakpoint_confidence_intervals()
 
 	def summary(self):
-		if self.converged:
-			header = "\n{:^70}\n".format("Breakpoint Regression Results")
 
-			line_length=100
-			double_line = "=" * line_length + "\n"
-			single_line = "-" * line_length + "\n"
 
-			# Overview
-			n_obs = len(self.xx)
-			n_model_params = 2 + 2*self.n_breakpoints
-			dof = n_obs - n_model_params
-			no_obs_text = "{:<20} {:>20}\n".format("No. Observations", n_obs)
-			no_model_parameters_text = "{:<20} {:>20}\n".format("No. Model Parameters", n_model_params)
-			dof_text = "{:<20} {:>20}\n".format("Degrees of Freedom", dof)
-			rss_text = "{:<20} {:>20.6}\n".format("Res. Sum of Squares", self.best_fit.residual_sum_squares)
-			tss_text = "{:<20} {:>20.6}\n".format("Total Sum of Squares", self.best_fit.total_sum_squares)
-			r_2_text = "{:<20} {:>20.6f}\n".format("R Squared", self.best_fit.r_squared)
-			adj_r_2_text = "{:<20} {:>20.6f}\n".format("Adjusted R Squared", self.best_fit.adjusted_r_squared)
+		header = "\n{:^70}\n".format("Breakpoint Regression Results")
 
-			overview = double_line + no_obs_text + no_model_parameters_text + dof_text + rss_text + tss_text + r_2_text + adj_r_2_text + double_line
+		line_length=100
+		double_line = "=" * line_length + "\n"
+		single_line = "-" * line_length + "\n"
 
-			# Table of results
+		# Overview
+		n_obs = len(self.xx)
+		n_model_params = 2 + 2*self.n_breakpoints
+		dof = n_obs - n_model_params
+		no_obs_text = "{:<20} {:>20}\n".format("No. Observations", n_obs)
+		no_model_parameters_text = "{:<20} {:>20}\n".format("No. Model Parameters", n_model_params)
+		dof_text = "{:<20} {:>20}\n".format("Degrees of Freedom", dof)
+		rss_text = "{:<20} {:>20.6}\n".format("Res. Sum of Squares", self.best_muggeo.best_fit.residual_sum_squares)
+		tss_text = "{:<20} {:>20.6}\n".format("Total Sum of Squares", self.best_muggeo.best_fit.total_sum_squares)
+		r_2_text = "{:<20} {:>20.6f}\n".format("R Squared", self.best_muggeo.best_fit.r_squared)
+		adj_r_2_text = "{:<20} {:>20.6f}\n".format("Adjusted R Squared", self.best_muggeo.best_fit.adjusted_r_squared)
+		converged_text = "{:<20} {:>20s}".format("Converged: ", str(self.best_muggeo.converged))
+		if not self.best_muggeo.converged:
+			converged_text += "  (WARNING: NO CONVERGENCE MEANS UNRELIABLE ESTIMATES IN THIS SUMMARY)\n"
+		else:
+			converged_text += "\n"
 
-			table_header_template = "{:<15} {:>12} {:>12} {:>12} {:>12} {:>12} {:>12}\n"
+		overview = double_line + no_obs_text + no_model_parameters_text + dof_text + rss_text + tss_text + r_2_text + adj_r_2_text + converged_text + double_line
 
-			table_header = table_header_template.format("", "Estimate", "Std Err", "t", "P>|t|", "[0.025", "0.975]")
-			#print ("{:<8} {:<15} {:<10}".format( name, age, perc))
+		# Table of results
 
-			table_row_template = "{:<15} {:>12.6} {:>12.3} {:>12.5} {:>12.3} {:>12.5} {:>12.5}\n"
+		table_header_template = "{:<15} {:>12} {:>12} {:>12} {:>12} {:>12} {:>12}\n"
 
-			table_contents = ""
+		table_header = table_header_template.format("", "Estimate", "Std Err", "t", "P>|t|", "[0.025", "0.975]")
+		#print ("{:<8} {:<15} {:<10}".format( name, age, perc))
 
-			beta_names = ["beta{}".format(i+1) for i in range(self.n_breakpoints)]
-			bp_names = ["breakpoint{}".format(i+1) for i in range(self.n_breakpoints)]
+		table_row_template = "{:<15} {:>12.6} {:>12.3} {:>12.5} {:>12.3} {:>12.5} {:>12.5}\n"
 
-			model_estimator_names = ["const", "alpha1"] + beta_names + bp_names
+		table_contents = ""
 
-			estimates = self.best_fit.estimates
+		beta_names = ["beta{}".format(i+1) for i in range(self.n_breakpoints)]
+		bp_names = ["breakpoint{}".format(i+1) for i in range(self.n_breakpoints)]
 
-			for est_name in model_estimator_names:
-				estimator_row = table_row_template.format(est_name, estimates[est_name]["estimate"], estimates[est_name]["se"], 
-				estimates[est_name]["t_stat"], estimates[est_name]["p_t"], 
-				estimates[est_name]["confidence_interval"][0], estimates[est_name]["confidence_interval"][1])
-				table_contents += estimator_row
+		model_estimator_names = ["const", "alpha1"] + beta_names + bp_names
 
-			table_contents += single_line
+		estimates = self.best_muggeo.best_fit.estimates
 
-			table_contents += "These alphas(gradients of segments) are estimated from betas(change in gradient)\n"
+		for est_name in model_estimator_names:
+			estimator_row = table_row_template.format(est_name, estimates[est_name]["estimate"], estimates[est_name]["se"], 
+			estimates[est_name]["t_stat"], estimates[est_name]["p_t"], 
+			estimates[est_name]["confidence_interval"][0], estimates[est_name]["confidence_interval"][1])
+			table_contents += estimator_row
 
-			alpha_names = ["alpha{}".format(alpha_i+1) for alpha_i in range(1, self.n_breakpoints+1)]
+		table_contents += single_line
 
-			table_contents += single_line
+		table_contents += "These alphas(gradients of segments) are estimated from betas(change in gradient)\n"
 
-			for est_name in alpha_names:
-				estimator_row = table_row_template.format(est_name, estimates[est_name]["estimate"], estimates[est_name]["se"], 
-				estimates[est_name]["t_stat"], estimates[est_name]["p_t"], 
-				estimates[est_name]["confidence_interval"][0], estimates[est_name]["confidence_interval"][1])
-				table_contents += estimator_row
+		alpha_names = ["alpha{}".format(alpha_i+1) for alpha_i in range(1, self.n_breakpoints+1)]
 
+		table_contents += single_line
 
-			table_contents += double_line
+		for est_name in alpha_names:
+			estimator_row = table_row_template.format(est_name, estimates[est_name]["estimate"], estimates[est_name]["se"], 
+			estimates[est_name]["t_stat"], estimates[est_name]["p_t"], 
+			estimates[est_name]["confidence_interval"][0], estimates[est_name]["confidence_interval"][1])
+			table_contents += estimator_row
 
-			table = double_line + table_header + single_line + table_contents
 
-			print(header + overview + table)
+		table_contents += double_line
 
-			print("Alternative hypothesis for breakpoints is not that they equal 0 but that they don't exist - t-stat has no meaning")
+		table = double_line + table_header + single_line + table_contents
 
-			"""
-			
-			if self.davies < 0.05:
-				print("Davies test for existence of at least one breakpoint: Null hypothesis of no breakpoint can be ruled out at significance of p<0.05 (p-value is {:.3f})\n".format(self.davies))
-			else:
-				print("Davies test for existence of at least one breakpoint. Null hypothesis of no breakpoint cannot be ruled out at significance of p<0.05 (p-value is {:.3f})\n".format(self.davies))
-			"""
+		print(header + overview + table)
 
-class BootstrapRestarting:
-
-	
-	def __init__(self, xx, yy, n_breakpoints, start_values=None, max_iterations=30, tolerance=10**-5,
-		min_distance_between_breakpoints=0.01, min_distance_to_edge=0.02, verbose=True,
-		n_boot=10):
-
-		print("Insantiating BootstrapRestarting . . . ")
-
-		self.xx = validate_list_of_numbers(xx, "xx", min_length=3)
-		self.yy = validate_list_of_numbers(yy, "yy", min_length=3)
-
-		self.max_iterations = validate_integer(max_iterations, "max_iterations")	
-		self.tolerance = validate_number(tolerance, "tolerance")
-		# In terms of proportion of the data range
-		self.min_distance_between_breakpoints = validate_number(min_distance_between_breakpoints, "min_distance_between_breakpoints")
-		# In terms of quantiles
-		self.min_distance_to_edge = validate_number(min_distance_to_edge, "min_distance_to_edge")
-		self.verbose = validate_boolean(verbose, "verbose")
-
-		self.n_breakpoints = validate_integer(n_breakpoints, "n_breakpoints")
-
-		self.n_boot = validate_integer(n_boot, "n_boot")
-
-		self.start_values = start_values
-
-		self.bootstrap_history = []
-		
-		self.best_muggeo = None
-
-		self.stop = False
-
-		if self.verbose:
-			print("Input data seems okay")		
-
-		self.bootstrap_restarting()
-
-	def bootstrap_restarting(self):
-
-		if self.verbose:
-			print("Running bootstrap restarting . . . ")
-
-		# 1. Run it without bootstrapping first of all
-		if not self.start_values:
-			if self.verbose:
-				print("No start_values given, randomly generating . . . ")
-			min_allowed_bp = np.quantile(self.xx, self.min_distance_to_edge)
-			max_allowed_bp = np.quantile(self.xx, 1-self.min_distance_to_edge)
-			start_bps = np.random.uniform(low=min_allowed_bp, high=max_allowed_bp, size=self.n_breakpoints)
-
-		muggeo_fit = Muggeo(self.xx, self.yy, start_bps)
-		self.bootstrap_history.append(muggeo_fit)
-		if muggeo_fit.converged:
-			self.best_muggeo = muggeo_fit
-
-		# Iterate bootstraps
-		count = 1
-		while not self.stop:
-
-			print("Looping restarting . . ")
-			# Best breakpoints are either from best muggeo so far, start values or random
-			if self.best_muggeo:
-				best_bps = self.best_muggeo.best_fit.next_breakpoints
-			elif self.start_values:
-				# This might be None, in which case the Muggeo algo will randomly choose some
-				best_bps = self.start_values
-			else:
-				min_allowed_bp = np.quantile(self.xx, self.min_distance_to_edge)
-				max_allowed_bp = np.quantile(self.xx, 1-self.min_distance_to_edge)
-				best_bps = np.random.uniform(low=min_allowed_bp, high=max_allowed_bp, size=self.n_breakpoints)
-
-				
-			# Get some new breakpoint values from a bootstrapped fit
-			xx_boot, yy_boot = self.bootstrap_data(self.xx, self.yy)
-			bootstrap_fit = Muggeo(xx_boot, yy_boot, best_bps)
-			if bootstrap_fit.converged:
-				bootstrap_bps = bootstrap_fit.best_fit.next_breakpoints
-			else:
-				# Give it something - even though this is already tested
-				# prefer this to using breaks
-				bootstrap_bps = best_bps
-
-			# Do a new fit with the new breakpoint values 
-			next_muggeo = Muggeo(self.xx, self.yy, bootstrap_bps)
-			self.bootstrap_history.append(next_muggeo)
-
-			# If we get a converged answer, see if this new fit is the best or not
-			if next_muggeo.converged:
-				print("Converged")
-				# If there is already a best_muggeo, see if this one is better
-				if self.best_muggeo:
-					if next_muggeo.best_fit.residual_sum_squares < self.best_muggeo.best_fit.residual_sum_squares:
-						self.best_muggeo = next_muggeo
-						print("New best fit with rss ", next_muggeo.best_fit.residual_sum_squares)
-				else:
-					self.best_muggeo = next_muggeo
-
-			self.stop_or_not_bootstrap()
-
-
-	def bootstrap_data(self, xx, yy):
-		"""
-		Non parametric bootstrap, randomly sample data points with replacement
-		Return bootstrapped data of same length as oriignal data
-		"""
-
-		n = len(xx)
-		# Get bootstrap samples as array index locations
-		boot_indices = np.random.choice(n, size=n, replace=True)
-
-		xx_boot = xx[boot_indices]
-		yy_boot = yy[boot_indices]
-		return xx_boot, yy_boot
-
-	def stop_or_not_bootstrap(self):
-
-		# Stop if maximum iterations reached
-		if len(self.bootstrap_history)>=self.n_boot:
-			if self.verbose:
-				print("Max bootstrap iterations reached. Stopping.")
-			self.stop = True
-
-
-class ModelSection:
-	"""
-	Experimental - uses simple BIC base don simple linear model. Need to check if this applies to breakpoint regression or not
-	"""
-
-	def __init__(self, xx, yy, max_breakpoints, n_boot=10, start_values=None, max_iterations=30, tolerance=10**-5,
-		min_distance_between_breakpoints=0.01, min_distance_to_edge=0.02, verbose=True):
-
-		self.xx = validate_list_of_numbers(xx, "xx", min_length=3)
-		self.yy = validate_list_of_numbers(yy, "yy", min_length=3)
-
-		self.max_iterations = validate_integer(max_iterations, "max_iterations")	
-		self.tolerance = validate_number(tolerance, "tolerance")
-		# In terms of proportion of the data range
-		self.min_distance_between_breakpoints = validate_number(min_distance_between_breakpoints, "min_distance_between_breakpoints")
-		# In terms of quantiles
-		self.min_distance_to_edge = validate_number(min_distance_to_edge, "min_distance_to_edge")
-		self.verbose = validate_boolean(verbose, "verbose")
-
-		self.n_boot = validate_integer(n_boot, "n_boot")
-
-		self.max_breakpoints = validate_integer(max_breakpoints, "max_breakpoints")
-
-		self.models = []
-		
-		self.stop = False
-
-		self.model_selection()
-
-	def model_selection(self):
-
-		for k in range(1, self.max_breakpoints+1):
-			bootstrapped_fit = BootstrapRestarting(self.xx, self.yy, n_breakpoints=k)
-			self.models.append(bootstrapped_fit)
-			
-			#if not bootstrapped_fit.best_muggeo:
-			#	break
-
-		for model in self.models:
-			print(model.best_muggeo)
-
-			#print(model.best_muggeo.next_breakpoints, model.best_muggeo.best_fit.bic, model.best_muggeo.best_fit.residual_sum_squares)
-
-
-	
-
-class Fit:
-	"""
-	Set up the fit etc
-
-	"""
-	pass
-
-
-	#self.davies = None
+		print("Davies test for existence of at least 1 breakpoint: p={:.6} (e.g. p<0.05 means reject null hypothesis of no breakpoints at 5% significance)".format(self.davies))
+		print("\n\n")
 
 
 if __name__=="__main__":
@@ -773,12 +683,34 @@ if __name__=="__main__":
 	alpha = -4
 	beta_1 = -2
 	intercept = 100
-	breakpoint_1 = 7
+	breakpoint_1 = 17
 
 	n_points = 200
 
-	xx = np.linspace(0, 20, n_points)
-	yy = intercept + alpha*xx + beta_1 * np.maximum(xx - breakpoint_1, 0) + np.random.normal(size=n_points)
+	xx = np.linspace(10, 30, n_points)
+	#yy = intercept + alpha*xx + beta_1 * np.maximum(xx - breakpoint_1, 0) + np.random.normal(size=n_points)
+	yy = intercept + alpha*xx + beta_1
+	
+	print(xx, yy)
+
+
+	xx_str = [str(x) for x in xx]
+
+	print(", ". join(xx_str))
+
+	yy_str = [str(y) for y in yy]
+
+	print(", ". join(yy_str))
+
 
 	
-	fit = ModelSection(xx, yy, max_breakpoints=10)
+
+	fit = Fit(xx, yy, n_breakpoints=1)
+
+
+	fit.summary()
+
+	fit.plot()
+	plt.show()
+
+	

@@ -20,12 +20,12 @@ bibliography: paper.bib
 
 # Summary
 
-Piecewise regression (also known as segmented regression, broken-line regression or breakpoint analysis) allows for the fitting of continuous straight lines to data where there is one or more breakpoint where the gradient changes. The approach here is described by Muggeo [@muggeo2003estimating], whereby the breakpoint positions and the straight line models are simultaneously fit using an iterative method. The package includes comprehensive statistical analysis that gives confidence intervals for all model variables, and hypothesis testing for the existence of breakpoints. 
+Piecewise regression (also known as segmented regression, broken-line regression or breakpoint analysis) allows for the fitting of continuous straight lines to data where there is one or more breakpoints where the gradient changes. The approach here is that described by Muggeo [@muggeo2003estimating], where the breakpoint positions and the straight line models are simultaneously fit using an iterative method. The package includes comprehensive statistical analysis that gives confidence intervals for all model variables, and hypothesis testing for the existence of breakpoints. 
 
 
 # Statement of need
 
-A common problem is to fit a linear regression model that includes some change(s) in gradient. One approach would be numerical minimisation of the sum of squared errors via a grid search for the breakpoint position(s). Muggeo [@muggeo2003estimating] derived a method that is superior to grid search in that it is computationally more efficient and allows for more robust statistical analysis. There are many R packages that implement this method including the segmented R package written by Muggeo himself [@muggeo2008segmented]. However, at the time of writing there are not comparable resources in Python. 
+A common problem is to fit a linear regression model that includes some change(s) in gradient. One approach would be numerical minimisation of the sum of squared errors via a grid search for the breakpoint position(s). Muggeo [@muggeo2003estimating] derived a method that has advantages over grid search in being more computationally efficient and allowing for more robust statistical analysis. There are many R packages that implement this method including the segmented R package written by Muggeo himself [@muggeo2008segmented]. However, at the time of writing there are not comparable resources in Python. 
 
 # Examples
 
@@ -48,7 +48,25 @@ where given some data, $x$, $y$, we are trying to estimate the gradient of the f
     y \approx \alpha x + c + \beta (x - \psi^{(0)}) H (x - \psi^{(0)}) - \beta (\psi - \psi^{(0)}) H(x - \psi^{(0)}) \,.
 \end{equation}
 
-This is a linear relationship and we can find a new breakpoint estimate, $\psi^{(1)}$, through linear regression. We iterate in this way until the breakpoint estimate converges, at which point we stop the algorithm. The same method is used with multiple breakpoints, taking a multivarite Taylor expansion around initial guesses for the breakpoints.
+This is a linear relationship and we can find a new breakpoint estimate, $\psi^{(1)}$, through linear regression. We iterate in this way until the breakpoint estimate converges, at which point we stop the algorithm. The same method is used with multiple breakpoints, taking a multivarite Taylor expansion around initial guesses for the breakpoints. 
+
+# Features
+
+The package includes the following features:
+
+- Standard fit using the iterative method described by Muggeo. This requires initial guesses for the breakpoints. 
+- Bootstrap restarting to avoid local minima.
+- Bootstrap restarting with randomised initial breakpoint guesses. This requires the number of breakpoints.
+- Model comparision with an unknown number of breakpoints with the best fit based on the Bayesian Information Criterion.  
+- Calculation of Standard Errors and confidence intervals.
+- Davies hypothesis test for the existence of a breakpoint. 
+- Customisable plots of fits.
+- Customisable plots of algorithm iterations.
+- Printable summary.
+- Full data output.
+- Comprehensive tests.
+
+Please see the github repo for implementation details.
 
 
 # Acknowledgements
