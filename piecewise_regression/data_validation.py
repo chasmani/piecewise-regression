@@ -7,14 +7,14 @@ def validate_boolean(var, var_name):
 	else:
 		raise ValueError("{} must be a Boolean: True or False".format(var_name))
 
-def validate_integer(var, var_name):
-	if isinstance(var, int):
+def validate_positive_integer(var, var_name):
+	if isinstance(var, int) and var>0:
 		return var
 	else:
-		raise ValueError("{} must be an Integer".format(var_name))
+		raise ValueError("{} must be a positive Integer".format(var_name))
 
-def validate_number(var, var_name):
-	if isinstance(var, float) or isinstance(var, int):
+def validate_positive_number(var, var_name):
+	if (isinstance(var, float) or isinstance(var, int)) and var>0:
 		return var
 	else:
 		raise ValueError("{} must be a Float".format(var_name))
