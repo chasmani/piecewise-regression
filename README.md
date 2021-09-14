@@ -79,7 +79,7 @@ There are also tools for plotting data
     plt.show()
     plt.close()
 
-![Fit Example Plot](../paper/example2.png)
+![Fit Example Plot](./paper/example2.png)
 
 
 
