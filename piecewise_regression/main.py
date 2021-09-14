@@ -297,7 +297,7 @@ class Muggeo:
 
 		self.verbose = verbose
 		if self.verbose:
-			print("Instantiating Muggeo . . . with start_values = {}".format(start_values))
+			print("\nInstantiating Muggeo . . . with start_values = {}".format(start_values))
 
 		# validation is done at a higher level
 		self.xx = xx
@@ -348,8 +348,9 @@ class Muggeo:
 					warnings.simplefilter("ignore")
 					IteratedFit = NextBreakpoints(self.xx, self.yy, current_breakpoints)
 					self.fit_history.append(IteratedFit)
-					print(IteratedFit.next_breakpoints)
 					self.stop_or_not()
+					if self.verbose:
+						print("Next breakpoints are ", IteratedFit.next_breakpoints)
 			except Exception as e:
 				self.stop=True
 				self.stop_reason = "Error encountered: " + str(e)
@@ -387,6 +388,21 @@ class Muggeo:
 		if len(self.fit_history) > 2:
 			breakpoint_two_step_differences = self.fit_history[-3].next_breakpoints - self.fit_history[-1].next_breakpoints
 			if np.max(np.abs(breakpoint_two_step_differences)) <= self.tolerance:
+				self.stop_reason = "Algorithm converged on breakpoint values"
+				self.stop = True
+				self.converged = True
+
+				# Stop if the algorithm is iterating back to previous values, within tolerance
+		if len(self.fit_history) > 3:
+			breakpoint_step_differences = self.fit_history[-4].next_breakpoints - self.fit_history[-1].next_breakpoints
+			if np.max(np.abs(breakpoint_step_differences)) <= self.tolerance:
+				self.stop_reason = "Algorithm converged on breakpoint values"
+				self.stop = True
+				self.converged = True
+
+		if len(self.fit_history) > 4:
+			breakpoint_step_differences = self.fit_history[-5].next_breakpoints - self.fit_history[-1].next_breakpoints
+			if np.max(np.abs(breakpoint_step_differences)) <= self.tolerance:
 				self.stop_reason = "Algorithm converged on breakpoint values"
 				self.stop = True
 				self.converged = True
@@ -438,12 +454,12 @@ class Muggeo:
 		"""
 		Rnadomly generate some breakpoint values that are valid
 		"""
-		print("Genearting breakpoints . . .")
 		# Get breakpoints within allowed range
 		min_allowed_bp = np.quantile(self.xx, self.min_distance_to_edge)
 		max_allowed_bp = np.quantile(self.xx, 1-self.min_distance_to_edge)
 		start_values = np.random.uniform(low=min_allowed_bp, high=max_allowed_bp, size=self.n_breakpoints)
-		print(start_values)
+		if self.verbose:
+			print("Generating some random breakpoints: ", start_values)
 		return start_values
 
 
@@ -460,13 +476,19 @@ class Fit:
 		yy, # list(float) or numpy(float). REQUIRED Data series in y-axis
 		start_values=None, # list(float) or numpy(float). Initial guesses for breakpoint positions 
 		n_breakpoints=None, # int. If not start_values, the number of breakpoints to fit. REQUIRED if no start_values 
-		n_boot=10, # Positive int. The number of times to run the bootstrap restarting. n_boot=0 runs the Muggeo algorithm with no bootstrap
+		n_boot=20, # Positive int. The number of times to run the bootstrap restarting. n_boot=0 runs the Muggeo algorithm with no bootstrap
 		verbose=True, # Boolean. whether to print progress to terminal. 
 		max_iterations=30, # Positive int. Maximum iterations of Muggeo algorithm if not converged
 		tolerance=10**-5, # Positive float. If breakpoints change less than the tolerance then the algorithm has converged
 		min_distance_between_breakpoints=0.01, # Positive float. The minimum required distance between breakpoints, as a proportion of the data range. 
 		min_distance_to_edge=0.02, # Positive float. Minimum distance from edge of data to a breakpoint, as a proportion of the data range. 
 		):
+
+
+		self.verbose = validate_boolean(verbose, "verbose")
+		
+		if self.verbose:
+			print("\nInstantiating Fit . . . ")
 
 		# Validate all input data
 		self.xx = validate_list_of_numbers(xx, "xx", min_length=3)
@@ -476,7 +498,6 @@ class Fit:
 			raise ValueError("x and y data series must be the same size len(xx)={}, len(yy)={}".format(len(self.xx), len(self.yy)))
 
 		self.n_boot = validate_non_negative_integer(n_boot, "n_boot")
-		self.verbose = validate_boolean(verbose, "verbose")
 		self.max_iterations = validate_positive_integer(max_iterations, "max_iterations")
 		self.tolerance = validate_positive_number(tolerance, "tolerance")
 		self.min_distance_between_breakpoints = validate_positive_number(min_distance_between_breakpoints, "min_distance_between_breakpoints")
@@ -491,7 +512,8 @@ class Fit:
 		if start_values is None:
 			self.start_values = None
 		else:
-			self.start_values = self.validate_list_of_numbers(start_values)
+			self.start_values = validate_list_of_numbers(start_values, "start_values", min_length=1)
+			self.n_breakpoints = len(self.start_values)
 
 		if start_values is None and n_breakpoints is None:
 			raise ValueError("The Fit algorithm requires either the start_values or n_breakpoints")								
@@ -612,35 +634,35 @@ class Fit:
 		Plot the fitted model
 		Passes any kwargs to the matplotlib plot function, e.g. color="red"
 		"""
-		if not self.best_muggeo.converged:
-			print("Algorithm didn't converge. Plotting best fit anyway (not very meaningful)")
+		if not self.best_muggeo:
+			print("Algorithm didn't converge. No fit to plot.")
+		else:
+			# Get the final results from the fitted model variables
+			# Params are in terms of [intercept, alpha, betas, gammas]
+			final_params = self.best_muggeo.best_fit.raw_params
+			breakpoints = self.best_muggeo.best_fit.next_breakpoints
+			
+			# Extract what we need from params etc
+			intercept_hat = final_params[0]
+			alpha_hat = final_params[1]
+			beta_hats = final_params[2:2+len(breakpoints)]
+			
+			xx_plot = np.linspace(min(self.xx), max(self.xx), 100)
 
-		# Get the final results from the fitted model variables
-		# Params are in terms of [intercept, alpha, betas, gammas]
-		final_params = self.best_muggeo.best_fit.raw_params
-		breakpoints = self.best_muggeo.best_fit.next_breakpoints
-		
-		# Extract what we need from params etc
-		intercept_hat = final_params[0]
-		alpha_hat = final_params[1]
-		beta_hats = final_params[2:2+len(breakpoints)]
-		
-		xx_plot = np.linspace(min(self.xx), max(self.xx), 100)
+			# Build the fit plot segment by segment. Betas are defined as difference in gradient from previous section
+			yy_plot = intercept_hat + alpha_hat*xx_plot
+			for bp_count in range(len(breakpoints)):
+				yy_plot += beta_hats[bp_count] * np.maximum(xx_plot - breakpoints[bp_count], 0)
 
-		# Build the fit plot segment by segment. Betas are defined as difference in gradient from previous section
-		yy_plot = intercept_hat + alpha_hat*xx_plot
-		for bp_count in range(len(breakpoints)):
-			yy_plot += beta_hats[bp_count] * np.maximum(xx_plot - breakpoints[bp_count], 0)
-
-		plt.plot(xx_plot, yy_plot, **kwargs)
+			plt.plot(xx_plot, yy_plot, **kwargs)
 
 	def plot_breakpoints(self, **kwargs):
 		"""
 		Plot the breakpoint locations
 		Passes kwargs to the matplotlib function, e.g. color="red"
 		"""
-		if not self.best_muggeo.converged:
-			print("Algorithm didn't converge. No meaningful breakpoint estimates to plot")
+		if not self.best_muggeo:
+			print("Algorithm didn't converge. No breakpoints to plot")
 		else:
 			breakpoints = self.best_muggeo.best_fit.next_breakpoints			
 			
@@ -652,8 +674,8 @@ class Fit:
 		Plot the breakpoint cis as shaded regions
 		"""
 	
-		if not self.best_muggeo.converged:
-			print("Algorithm didn't converge. No meaningful breakpoint estimates to plot")
+		if not self.best_muggeo:
+			print("Algorithm didn't converge. No breakpoint estimates to plot")
 		else:			
 			estimates = self.best_muggeo.best_fit.estimates			
 			
@@ -666,22 +688,22 @@ class Fit:
 		Plot the history of the breakpoints as they iterate. 
 		History of the best muggeo fit.
 		"""
-		if not self.best_muggeo.converged:
-			print("Algorithm didn't converge. Plotting breakpoint history anyway")
-
-		# Get the data from the best_muggeo in a form for plotting
-		breakpoint_history = [self.best_muggeo.start_values]
-		for fit_details in self.best_muggeo.fit_history:
-			breakpoint_history.append(fit_details.next_breakpoints)
-		breakpoint_history_series = zip(*breakpoint_history)
-		
-		# Plot a history for each breakpoint 
-		count = 0
-		for bh in breakpoint_history_series:
-			count += 1
-			plt.plot(range(0, len(bh)), bh, label="Breakpoint {}".format(count), **kwargs)
-			plt.xlabel("Muggeo Iteration")
-			plt.ylabel("Breakpoint")
+		if not self.best_muggeo:
+			print("Algorithm didn't converge. No meaningful history to plot")
+		else:
+			# Get the data from the best_muggeo in a form for plotting
+			breakpoint_history = [self.best_muggeo.start_values]
+			for fit_details in self.best_muggeo.fit_history:
+				breakpoint_history.append(fit_details.next_breakpoints)
+			breakpoint_history_series = zip(*breakpoint_history)
+			
+			# Plot a history for each breakpoint 
+			count = 0
+			for bh in breakpoint_history_series:
+				count += 1
+				plt.plot(range(0, len(bh)), bh, label="Breakpoint {}".format(count), **kwargs)
+				plt.xlabel("Muggeo Iteration")
+				plt.ylabel("Breakpoint")
 
 	def plot_bootstrap_restarting_history(self, **kwargs):
 		"""
@@ -716,7 +738,7 @@ class Fit:
 		Plot the history of the breakpoints as they iterate. 
 		History of the best muggeo fit.
 		"""
-		if not self.best_muggeo.converged:
+		if not self.best_muggeo:
 			print("Algorithm didn't converge. Plotting rss history anyway")
 
 		# Get the data from the best_muggeo in a form for plotting
@@ -747,79 +769,83 @@ class Fit:
 		Print a summary of the ebst fit, along the lines of the summary given by python's statsmodels OLS fit.
 		"""
 
+		if not self.best_muggeo:
+			print("Algorithm did not converge. Try different n_breakpoints, different start_values, or start_values=None")
 
-		header = "\n{:^70}\n".format("Breakpoint Regression Results")
-
-		line_length=100
-		double_line = "=" * line_length + "\n"
-		single_line = "-" * line_length + "\n"
-
-		# Overview
-		n_obs = len(self.xx)
-		n_model_params = 2 + 2*self.n_breakpoints
-		dof = n_obs - n_model_params
-		no_obs_text = "{:<20} {:>20}\n".format("No. Observations", n_obs)
-		no_model_parameters_text = "{:<20} {:>20}\n".format("No. Model Parameters", n_model_params)
-		dof_text = "{:<20} {:>20}\n".format("Degrees of Freedom", dof)
-		rss_text = "{:<20} {:>20.6}\n".format("Res. Sum of Squares", self.best_muggeo.best_fit.residual_sum_squares)
-		tss_text = "{:<20} {:>20.6}\n".format("Total Sum of Squares", self.best_muggeo.best_fit.total_sum_squares)
-		r_2_text = "{:<20} {:>20.6f}\n".format("R Squared", self.best_muggeo.best_fit.r_squared)
-		adj_r_2_text = "{:<20} {:>20.6f}\n".format("Adjusted R Squared", self.best_muggeo.best_fit.adjusted_r_squared)
-		converged_text = "{:<20} {:>20s}".format("Converged: ", str(self.best_muggeo.converged))
-		if not self.best_muggeo.converged:
-			converged_text += "  (WARNING: NO CONVERGENCE MEANS UNRELIABLE ESTIMATES IN THIS SUMMARY)\n"
+			print("Summary of why the algorithm did not converge:")
+			run_count = 1
+			for muggeo_fit in self.bootstrap_history:
+				print("Run {}: {}".format(run_count, muggeo_fit.stop_reason))
+				run_count += 1
 		else:
-			converged_text += "\n"
+			header = "\n{:^70}\n".format("Breakpoint Regression Results")
 
-		overview = double_line + no_obs_text + no_model_parameters_text + dof_text + rss_text + tss_text + r_2_text + adj_r_2_text + converged_text + double_line
+			line_length=100
+			double_line = "=" * line_length + "\n"
+			single_line = "-" * line_length + "\n"
 
-		# Table of results
+			# Overview
+			n_obs = len(self.xx)
+			n_model_params = 2 + 2*self.n_breakpoints
+			dof = n_obs - n_model_params
+			no_obs_text = "{:<20} {:>20}\n".format("No. Observations", n_obs)
+			no_model_parameters_text = "{:<20} {:>20}\n".format("No. Model Parameters", n_model_params)
+			dof_text = "{:<20} {:>20}\n".format("Degrees of Freedom", dof)
+			rss_text = "{:<20} {:>20.6}\n".format("Res. Sum of Squares", self.best_muggeo.best_fit.residual_sum_squares)
+			tss_text = "{:<20} {:>20.6}\n".format("Total Sum of Squares", self.best_muggeo.best_fit.total_sum_squares)
+			r_2_text = "{:<20} {:>20.6f}\n".format("R Squared", self.best_muggeo.best_fit.r_squared)
+			adj_r_2_text = "{:<20} {:>20.6f}\n".format("Adjusted R Squared", self.best_muggeo.best_fit.adjusted_r_squared)
+			converged_text = "{:<20} {:>20s}\n".format("Converged: ", str(self.best_muggeo.converged))
 
-		table_header_template = "{:<15} {:>12} {:>12} {:>12} {:>12} {:>12} {:>12}\n"
+			overview = double_line + no_obs_text + no_model_parameters_text + dof_text + rss_text + tss_text + r_2_text + adj_r_2_text + converged_text + double_line
 
-		table_header = table_header_template.format("", "Estimate", "Std Err", "t", "P>|t|", "[0.025", "0.975]")
-		#print ("{:<8} {:<15} {:<10}".format( name, age, perc))
+			# Table of results
 
-		table_row_template = "{:<15} {:>12.6} {:>12.3} {:>12.5} {:>12.3} {:>12.5} {:>12.5}\n"
+			table_header_template = "{:<15} {:>12} {:>12} {:>12} {:>12} {:>12} {:>12}\n"
 
-		table_contents = ""
+			table_header = table_header_template.format("", "Estimate", "Std Err", "t", "P>|t|", "[0.025", "0.975]")
+			#print ("{:<8} {:<15} {:<10}".format( name, age, perc))
 
-		beta_names = ["beta{}".format(i+1) for i in range(self.n_breakpoints)]
-		bp_names = ["breakpoint{}".format(i+1) for i in range(self.n_breakpoints)]
+			table_row_template = "{:<15} {:>12.6} {:>12.3} {:>12.5} {:>12.3} {:>12.5} {:>12.5}\n"
 
-		model_estimator_names = ["const", "alpha1"] + beta_names + bp_names
+			table_contents = ""
 
-		estimates = self.best_muggeo.best_fit.estimates
+			beta_names = ["beta{}".format(i+1) for i in range(self.n_breakpoints)]
+			bp_names = ["breakpoint{}".format(i+1) for i in range(self.n_breakpoints)]
 
-		for est_name in model_estimator_names:
-			estimator_row = table_row_template.format(est_name, estimates[est_name]["estimate"], estimates[est_name]["se"], 
-			estimates[est_name]["t_stat"], estimates[est_name]["p_t"], 
-			estimates[est_name]["confidence_interval"][0], estimates[est_name]["confidence_interval"][1])
-			table_contents += estimator_row
+			model_estimator_names = ["const", "alpha1"] + beta_names + bp_names
 
-		table_contents += single_line
+			estimates = self.best_muggeo.best_fit.estimates
 
-		table_contents += "These alphas(gradients of segments) are estimated from betas(change in gradient)\n"
+			for est_name in model_estimator_names:
+				estimator_row = table_row_template.format(est_name, estimates[est_name]["estimate"], estimates[est_name]["se"], 
+				estimates[est_name]["t_stat"], estimates[est_name]["p_t"], 
+				estimates[est_name]["confidence_interval"][0], estimates[est_name]["confidence_interval"][1])
+				table_contents += estimator_row
 
-		alpha_names = ["alpha{}".format(alpha_i+1) for alpha_i in range(1, self.n_breakpoints+1)]
+			table_contents += single_line
 
-		table_contents += single_line
+			table_contents += "These alphas(gradients of segments) are estimated from betas(change in gradient)\n"
 
-		for est_name in alpha_names:
-			estimator_row = table_row_template.format(est_name, estimates[est_name]["estimate"], estimates[est_name]["se"], 
-			estimates[est_name]["t_stat"], estimates[est_name]["p_t"], 
-			estimates[est_name]["confidence_interval"][0], estimates[est_name]["confidence_interval"][1])
-			table_contents += estimator_row
+			alpha_names = ["alpha{}".format(alpha_i+1) for alpha_i in range(1, self.n_breakpoints+1)]
+
+			table_contents += single_line
+
+			for est_name in alpha_names:
+				estimator_row = table_row_template.format(est_name, estimates[est_name]["estimate"], estimates[est_name]["se"], 
+				estimates[est_name]["t_stat"], estimates[est_name]["p_t"], 
+				estimates[est_name]["confidence_interval"][0], estimates[est_name]["confidence_interval"][1])
+				table_contents += estimator_row
 
 
-		table_contents += double_line
+			table_contents += double_line
 
-		table = double_line + table_header + single_line + table_contents
+			table = double_line + table_header + single_line + table_contents
 
-		print(header + overview + table)
+			print(header + overview + table)
 
-		print("Davies test for existence of at least 1 breakpoint: p={:.6} (e.g. p<0.05 means reject null hypothesis of no breakpoints at 5% significance)".format(self.davies))
-		print("\n\n")
+			print("Davies test for existence of at least 1 breakpoint: p={:.6} (e.g. p<0.05 means reject null hypothesis of no breakpoints at 5% significance)".format(self.davies))
+			print("\n\n")
 
 
 if __name__=="__main__":

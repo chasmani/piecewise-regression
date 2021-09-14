@@ -199,7 +199,88 @@ def test_fit_3_check_this_makes_sense():
 
 	ms = ModelSelection(xx, yy, max_breakpoints=6)
 
+
+def fit_with_initally_diverging():
+	np.random.seed(2)
+
+	alpha = 10
+	beta_1 = -8
+	beta_2 = 3
+	beta_3 = 10
+	intercept = 100
+	breakpoint_1 = 7
+	breakpoint_2 = 10
+	breakpoint_3 = 14
+
+	n_points = 200
+
+	xx = np.linspace(0, 20, n_points)
+
+	yy = intercept + alpha*xx 
+	yy += beta_1 * np.maximum(xx - breakpoint_1, 0) 
+	yy += beta_2 * np.maximum(xx - breakpoint_2, 0)  
+	yy += beta_3 * np.maximum(xx - breakpoint_3, 0)
+	yy += np.random.normal(size=n_points)
+
+
+	pr = Fit(xx, yy, n_breakpoints=2)
+	print(pr.summary)
+
+def fit_with_initially_diverging_start_values():
+
+	np.random.seed(0)
+
+	alpha = 10
+	beta_1 = -8
+	beta_2 = 3
+	beta_3 = 10
+	intercept = 100
+	breakpoint_1 = 7
+	breakpoint_2 = 10
+	breakpoint_3 = 14
+
+	n_points = 200
+
+	xx = np.linspace(0, 20, n_points)
+
+	yy = intercept + alpha*xx 
+	yy += beta_1 * np.maximum(xx - breakpoint_1, 0) 
+	yy += beta_2 * np.maximum(xx - breakpoint_2, 0)  
+	yy += beta_3 * np.maximum(xx - breakpoint_3, 0)
+	yy += np.random.normal(size=n_points)
+
+
+	pr = Fit(xx, yy, start_values=[2.15646833, 0.98300926], n_boot=20)
+	pr.summary()
+
+def fit_with_initially_diverging_start_values_b():
+
+	np.random.seed(0)
+
+	alpha = 10
+	beta_1 = -8
+	beta_2 = 3
+	beta_3 = 10
+	intercept = 100
+	breakpoint_1 = 7
+	breakpoint_2 = 10
+	breakpoint_3 = 14
+
+	n_points = 200
+
+	xx = np.linspace(0, 20, n_points)
+
+	yy = intercept + alpha*xx 
+	yy += beta_1 * np.maximum(xx - breakpoint_1, 0) 
+	yy += beta_2 * np.maximum(xx - breakpoint_2, 0)  
+	yy += beta_3 * np.maximum(xx - breakpoint_3, 0)
+	yy += np.random.normal(size=n_points)
+
+
+	pr = Fit(xx, yy, start_values=[1.2, 0.53], n_boot=25)
+	pr.summary()
+
+
 if __name__=="__main__":
 
-	
-	test_fit_3_check_this_makes_sense()
+	fit_with_initially_diverging_start_values_b()

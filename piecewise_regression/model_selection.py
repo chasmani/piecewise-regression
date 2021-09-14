@@ -21,7 +21,7 @@ class ModelSelection:
 	Experimental - uses simple BIC based on simple linear model.
 	"""
 
-	def __init__(self, xx, yy, max_breakpoints=10, n_boot=10, max_iterations=30, tolerance=10**-5,
+	def __init__(self, xx, yy, max_breakpoints=10, n_boot=20, max_iterations=30, tolerance=10**-5,
 		min_distance_between_breakpoints=0.01, min_distance_to_edge=0.02, verbose=True):
 
 
@@ -38,7 +38,9 @@ class ModelSelection:
 		for k in range(1, max_breakpoints+1):
 			if verbose==True:
 				print("Running fit with n_breakpoint = {} . . ".format(k))
-			bootstrapped_fit = Fit(xx, yy, n_breakpoints=k, verbose=False)
+			bootstrapped_fit = Fit(xx, yy, n_breakpoints=k, verbose=False, 
+				n_boot=n_boot, max_iterations=max_iterations, tolerance=tolerance,
+				min_distance_between_breakpoints=min_distance_between_breakpoints, min_distance_to_edge=min_distance_to_edge)
 			fit_summary = bootstrapped_fit.get_results()
 			fit_summary["n_breakpoints"] = k
 			print(fit_summary)

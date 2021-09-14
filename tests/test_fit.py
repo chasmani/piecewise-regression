@@ -10,7 +10,22 @@ sys.path.insert(1, os.path.join(sys.path[0], '..'))
 from piecewise_regression.main import Fit, Muggeo
 
 
-class TestMuggeo(unittest.TestCase):
+class TestFit(unittest.TestCase):
+
+    def test_it_works_with_differnet_options(self):
+
+        xx = np.linspace(0,1,100)
+        yy = np.linspace(0,1,100)
+
+        fit = Fit(xx, yy, n_breakpoints=2, verbose=False, n_boot=3)
+        fit = Fit(xx, yy, n_breakpoints=1, verbose=False, n_boot=3)
+        fit = Fit(xx, yy, n_breakpoints=4, verbose=False, n_boot=3)
+        fit = Fit(xx, yy, n_breakpoints=7, verbose=False, n_boot=3)
+        fit = Fit(xx, yy, start_values=[0.1,0.6], verbose=False)
+        fit = Fit(xx, yy, start_values=[2,3], verbose=False)
+        fit = Fit(xx, yy, start_values=[2], verbose=False)
+
+
 
     def test_against_muggeo_r_package_data_1(self):
         """
@@ -245,7 +260,7 @@ class TestMuggeo(unittest.TestCase):
 
         best_fit = fit.best_muggeo.best_fit
 
-        fit_muggeo = Muggeo(xx, yy, start_values=bps, verbose=False)
+        fit_muggeo = Muggeo(xx, yy, start_values=bps, n_breakpoints=2, verbose=False)
         best_fit_2 = fit_muggeo.best_fit
 
 
