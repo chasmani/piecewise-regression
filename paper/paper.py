@@ -6,7 +6,7 @@ import math
 import os, sys
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 
-from piecewise_regression import Fit
+from piecewise_regression import Fit, ModelSelection
 
 def plot_basic_example():
     """
@@ -87,6 +87,22 @@ def plot_basic_example_2():
     plt.show()
     plt.close()
 
+def model_selection_basic_example():
+
+
+    # Generate some test data with 1 breakpoint
+    alpha_1 = -4
+    alpha_2 = -2
+    intercept = 100
+    breakpoint_1 = 7
+    n_points = 200
+    np.random.seed(0)
+
+    xx = np.linspace(0, 20, n_points)
+    yy = intercept + alpha_1*xx + (alpha_2-alpha_1) * np.maximum(xx - breakpoint_1, 0) + np.random.normal(size=n_points)
+
+    # Given some data, fit the model
+    ms = ModelSelection(xx, yy, max_breakpoints=6)
 
 if __name__=="__main__":
-    plot_basic_example_2()
+    model_selection_basic_example()

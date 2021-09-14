@@ -1,0 +1,290 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>&lt;no title&gt; &#8212; piecewise-regression 1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <span class="target" id="module-piecewise_regression.main"></span><dl class="py class">
+<dt class="sig sig-object py" id="piecewise_regression.main.Fit">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">piecewise_regression.main.</span></span><span class="sig-name descname"><span class="pre">Fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_breakpoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_boot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_distance_between_breakpoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_distance_to_edge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.02</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit a segmented regression model to data
+Uses bootstrap restarting to avoid local minima
+Requires either n_breakpoints of start_values
+if no start_vaues are given, they are instead uniformly randomly generated across range of data
+Also variabels to control how the fit is run</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="piecewise_regression.main.Fit.bootstrap_data">
+<span class="sig-name descname"><span class="pre">bootstrap_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Fit.bootstrap_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Non parametric bootstrap, randomly sample data points with replacement
+Return bootstrapped data of same length as oriignal data</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="piecewise_regression.main.Fit.bootstrap_restarting">
+<span class="sig-name descname"><span class="pre">bootstrap_restarting</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Fit.bootstrap_restarting" title="Permalink to this definition">¶</a></dt>
+<dd><p>The main fitting algorithm
+Begins by doing a fit based on Muggeo’s algorithm. 
+if n_boot = 0 we stop there. Otherwise we do some bootstrap restarting 
+Bootstrap Restarting escapes local minima
+Each bootstrap restart:</p>
+<blockquote>
+<div><p>We take the best current breakpoints, get new data by running a non-parametric bootstrap by resampling data
+Run a Muggeo fit on the new data and best current breakpoints
+This gives new breakpoint values - run a Muggeo fit again with the original data and these new breakpoint values to start with
+Throughout, keep track of the history of fits and the best_muggeo fit - defined as the lowest residual sum of squares</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="piecewise_regression.main.Fit.get_results">
+<span class="sig-name descname"><span class="pre">get_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Fit.get_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a small dictionary with key results form the fit
+Useful for using this code in a larger analysis. E.g. ModelSelection</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="piecewise_regression.main.Fit.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Fit.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the data, fit, breakpoint positions and breakpoint confidence intervals</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="piecewise_regression.main.Fit.plot_best_muggeo_breakpoint_history">
+<span class="sig-name descname"><span class="pre">plot_best_muggeo_breakpoint_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Fit.plot_best_muggeo_breakpoint_history" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the history of the breakpoints as they iterate. 
+History of the best muggeo fit.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="piecewise_regression.main.Fit.plot_bootstrap_restarting_history">
+<span class="sig-name descname"><span class="pre">plot_bootstrap_restarting_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Fit.plot_bootstrap_restarting_history" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the history of the breakpoints as they iterate. 
+History of the best muggeo fit.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="piecewise_regression.main.Fit.plot_bootstrap_restarting_rss_history">
+<span class="sig-name descname"><span class="pre">plot_bootstrap_restarting_rss_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Fit.plot_bootstrap_restarting_rss_history" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the history of the breakpoints as they iterate. 
+History of the best muggeo fit.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="piecewise_regression.main.Fit.plot_breakpoint_confidence_intervals">
+<span class="sig-name descname"><span class="pre">plot_breakpoint_confidence_intervals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Fit.plot_breakpoint_confidence_intervals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the breakpoint cis as shaded regions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="piecewise_regression.main.Fit.plot_breakpoints">
+<span class="sig-name descname"><span class="pre">plot_breakpoints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Fit.plot_breakpoints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the breakpoint locations
+Passes kwargs to the matplotlib function, e.g. color=”red”</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="piecewise_regression.main.Fit.plot_data">
+<span class="sig-name descname"><span class="pre">plot_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Fit.plot_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the data as a scatter plot
+Passes any kwargs to the matplotlib scatter function, e.g. color=”red”</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="piecewise_regression.main.Fit.plot_fit">
+<span class="sig-name descname"><span class="pre">plot_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Fit.plot_fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the fitted model
+Passes any kwargs to the matplotlib plot function, e.g. color=”red”</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="piecewise_regression.main.Fit.summary">
+<span class="sig-name descname"><span class="pre">summary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Fit.summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print a summary of the ebst fit, along the lines of the summary given by python’s statsmodels OLS fit.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="piecewise_regression.main.Muggeo">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">piecewise_regression.main.</span></span><span class="sig-name descname"><span class="pre">Muggeo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_breakpoints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_distance_between_breakpoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_distance_to_edge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.02</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Muggeo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Muggeo’s iterative segmented regression method
+Simple version. Errors are handled at a higher level in the Fit object
+See Muggeo (2003) for more information</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="piecewise_regression.main.Muggeo.stop_or_not">
+<span class="sig-name descname"><span class="pre">stop_or_not</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Muggeo.stop_or_not" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop if it’s converegd or max_iterations reached</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="piecewise_regression.main.NextBreakpoints">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">piecewise_regression.main.</span></span><span class="sig-name descname"><span class="pre">NextBreakpoints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_breakpoints</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.NextBreakpoints" title="Permalink to this definition">¶</a></dt>
+<dd><p>One iteration of Muggeo’s segmented regression algorithm
+Gets the next breakpoints. 
+Also gets interesting statistics etc</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="piecewise_regression.main.NextBreakpoints.breakpoint_fit">
+<span class="sig-name descname"><span class="pre">breakpoint_fit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.NextBreakpoints.breakpoint_fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit the linear approximation given the current breakpoint guesses
+Return the next breakpoints and the params from the fit
+The params are of the form [c, a, beta_hats, gamma_hats]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="piecewise_regression.main.NextBreakpoints.calculate_all_confidence_intervals">
+<span class="sig-name descname"><span class="pre">calculate_all_confidence_intervals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.NextBreakpoints.calculate_all_confidence_intervals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Confidence intervals based on t-distribution</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="piecewise_regression.main.NextBreakpoints.calculate_all_estimates">
+<span class="sig-name descname"><span class="pre">calculate_all_estimates</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.NextBreakpoints.calculate_all_estimates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save all params in self.estimates dictionary</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="piecewise_regression.main.NextBreakpoints.calculate_all_standard_errors">
+<span class="sig-name descname"><span class="pre">calculate_all_standard_errors</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.NextBreakpoints.calculate_all_standard_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate standrd errors for all the variables of interest
+Save to the estimates dictionary</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="piecewise_regression.main.NextBreakpoints.calculate_all_t_stats">
+<span class="sig-name descname"><span class="pre">calculate_all_t_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.NextBreakpoints.calculate_all_t_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get t stats for all the estimators</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="piecewise_regression.main.NextBreakpoints.calculate_bayesian_information_criterion">
+<span class="sig-name descname"><span class="pre">calculate_bayesian_information_criterion</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.NextBreakpoints.calculate_bayesian_information_criterion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assuming normal noise, uses the standard version for OLS models. 
+I beleive this holds for breakpoint regression models, because the BIC is based on the likelihood of the data
+given the model. That likelihood function won’t include the breakpoint values - it just depends on distances of the data to the fitted model predictions
+Also depends on the error in the noise term, should work as long as the noise is constant.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="piecewise_regression.main.NextBreakpoints.calculate_r_squared">
+<span class="sig-name descname"><span class="pre">calculate_r_squared</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.NextBreakpoints.calculate_r_squared" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate R squared from fitted model
+Uses an imported function from another file</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="piecewise_regression.main.NextBreakpoints.get_alpha_standard_errors">
+<span class="sig-name descname"><span class="pre">get_alpha_standard_errors</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.NextBreakpoints.get_alpha_standard_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the standard errors for the alphas (gradients of segments)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="piecewise_regression.main.NextBreakpoints.get_bp_standard_errors">
+<span class="sig-name descname"><span class="pre">get_bp_standard_errors</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.NextBreakpoints.get_bp_standard_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the standard errors of the breakpoints
+bp = gamma/beta + bp_0
+Variance of bp estimator found using ratio/delta method
+See e.g. Muggeo (2003) for clarification</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="piecewise_regression.main.NextBreakpoints.get_predicted_yy">
+<span class="sig-name descname"><span class="pre">get_predicted_yy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.NextBreakpoints.get_predicted_yy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the model predictions for each of the xx data points</p>
+</dd></dl>
+
+</dd></dl>
+
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">piecewise-regression</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Charlie Pilgrim.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/fit.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -5,10 +5,19 @@ import math
 
 def get_test_statistic(xx_davies, yy_davies, theta):
 	"""
-	Compute a test statistic for the Davies test for the p-value of existence of a breakpoint
-	Based on Davies(1987)
-		"Hypothesis Testing when a nuisance parameter is present only under the alternative"
-	All the values worked out here are as named and described in that paper
+	Compute a test statistic for the Davies test for the p-value of existence of a breakpoint.
+	Based on Davies(1987) "Hypothesis Testing when a nuisance parameter is present only under the alternative".
+	All the variables in this function are as named and described in that paper.
+
+	:param xx_davies: Data series in x-axis (same axis as the breakpoints).
+	:type xx_davies: list of floats
+
+	:param yy_davies: Data series in y-axis.
+	:type yy_davies: list of floats
+
+	:param theta: A test value from within the range of data in xx
+	:type theta: float
+
 	"""
 	n = len(xx_davies)
 	s_0 = 0
@@ -42,11 +51,24 @@ def get_test_statistic(xx_davies, yy_davies, theta):
 def davies_test(xx, yy, k=10, alternative="two_sided"):
 	"""
 	Significance test for the existence of a breakpoint
-	Null hypothesis is that there is no breakpoint, or that the change in gradient is zero
-	Alternative hypothesis is that there is a breakpoint, with a non-zero change in gradient
-	The change is gradietn is a function of the breakpoint position
-	The breakpoint posiition is a nuisannce parameter that only exists in the alternative hypothesis
-	Based on Davies (1987), "Hypothesis Testing when a nuisance parameter is present only under the alternative"
+	Null hypothesis is that there is no breakpoint, or that the change in gradient is zero.
+	Alternative hypothesis is that there is a breakpoint, with a non-zero change in gradient.
+	The change is gradient is a function of the breakpoint position.
+	The breakpoint posiition is a nuisannce parameter that only exists in the alternative hypothesis.
+	Based on Davies (1987), "Hypothesis Testing when a nuisance parameter is present only under the alternative".
+
+	:param xx: Data series in x-axis (same axis as the breakpoints).
+	:type xx: list of floats
+
+	:param yy: Data series in y-axis.
+	:type yy: list of floats
+
+	:param k: A control parameter that determines the number of points to consider within the xx range.
+	:type k: int
+
+	:param alternative: Whether to consider a two-sided hypothesis test, or a one sided test with change of gradient greater or less than zero. For existence of a breakpoint, use "two-sided".
+	:type alternative: str. One of "two_sided", "less", "greater"	
+
 	"""
 	# Centre the x values - makes no difference to existence of a breakpoint
 	# The Davies test has this as an assumption

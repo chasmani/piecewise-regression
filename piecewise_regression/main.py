@@ -19,9 +19,19 @@ except:
 
 class NextBreakpoints:
 	"""
-	One iteration of Muggeo's segmented regression algorithm
-	Gets the next breakpoints. 
-	Also gets interesting statistics etc
+	One iteration of Muggeo's segmented regression algorithm. Gets the next breakpoints. 
+	Also calculates interesting statistics. This expects data validation and error 
+	handling are done at a higher level.
+
+	:param xx: Data series in x-axis for fitting (same axis as the breakpoints)
+	:type xx: list
+
+	:param yy: Data series in y-axis for fitting
+	:type yy: list
+
+	:param current_breakpoints: The starting breakpoints for this iteration
+	:type current_breakpoints: list
+
 	"""
 	def __init__(self,
 		xx, # list(float) or numpy(float). REQUIRED. Data series in x-axis
@@ -63,11 +73,9 @@ class NextBreakpoints:
 
 	def breakpoint_fit(self):
 		"""
-		Fit the linear approximation given the current breakpoint guesses
-		Return the next breakpoints and the params from the fit
-		The params are of the form [c, a, beta_hats, gamma_hats]
+		Fit the linear approximation given the current breakpoint guesses. Sets the next breakpoints 
+		and the params from the fit. The params are of the form [c, a, beta_hats, gamma_hats]
 		"""
-
 		Z = np.array([self.xx])
 		# Convert data based on breakpoints
 
@@ -95,7 +103,7 @@ class NextBreakpoints:
 
 	def calculate_all_estimates(self):
 		"""
-		Save all params in self.estimates dictionary
+		Extract estiamtes from the params and saves in the self.estimates dictionary
 		"""
 		params = self.raw_params
 	
@@ -136,9 +144,8 @@ class NextBreakpoints:
 
 	def get_bp_standard_errors(self):
 		"""
-		Get the standard errors of the breakpoints
-		bp = gamma/beta + bp_0
-		Variance of bp estimator found using ratio/delta method
+		Get the standard errors of the breakpoints. Considering bp = gamma/beta + bp_0, the 
+		standard error of the breakpoint estaimtes can be found using the ratio/delta method. 
 		See e.g. Muggeo (2003) for clarification
 		"""
 		cov_matrix = self.covariance_matrix
@@ -167,6 +174,9 @@ class NextBreakpoints:
 
 
 	def get_const_standard_error(self):
+		"""
+		Get the constant standard error from the covariance matrix
+		""" 
 		# Covariance matrix is [c, alpha, betas, gammas]
 		# Constant variance is just the top left cell in covariance matrix
 		cov_matrix = self.covariance_matrix
@@ -174,6 +184,9 @@ class NextBreakpoints:
 		return np.sqrt(c_var)
 
 	def get_beta_standard_errors(self):
+		"""
+		Get the beta estimates standard errors from the covariance matrix
+		"""
 		# Covariance matrix is [c, alpha, betas, gammas]
 		# Beta variances are along the diagonal of the covariance matrix
 		cov_matrix = self.covariance_matrix
@@ -184,8 +197,8 @@ class NextBreakpoints:
 
 	def calculate_all_standard_errors(self):
 		"""
-		Calculate standrd errors for all the variables of interest
-		Save to the estimates dictionary
+		Calculate standard errors for all the variables of interest. 
+		Save to the self.estimates dictionary
 		"""
 		const_ses = self.get_const_standard_error()
 		self.estimates["const"]["se"] = const_ses
@@ -202,7 +215,7 @@ class NextBreakpoints:
 
 	def calculate_all_confidence_intervals(self):
 		"""
-		Confidence intervals based on t-distribution
+		Calculate all confidence intervals, based on t-distribution and standard errors.
 		"""	
 		# Estimates
 		dof = len(self.xx) - 2 - 2*self.n_breakpoints
@@ -256,8 +269,7 @@ class NextBreakpoints:
 
 	def calculate_r_squared(self):
 		"""
-		Calculate R squared from fitted model
-		Uses an imported function from another file
+		Calculate R squared from the fitted model.
 		"""
 		yy_predicted = self.get_predicted_yy()
 		n_params = 2 * self.n_breakpoints + 2
@@ -266,10 +278,11 @@ class NextBreakpoints:
 
 	def calculate_bayesian_information_criterion(self):
 		"""
+		Calculates the Bayesian Information Criterion of the fitted model. 
 		Assuming normal noise, uses the standard version for OLS models. 
-		I beleive this holds for breakpoint regression models, because the BIC is based on the likelihood of the data
-		given the model. That likelihood function won't include the breakpoint values - it just depends on distances of the data to the fitted model predictions
-		Also depends on the error in the noise term, should work as long as the noise is constant.  
+		This should hold for breakpoint regression models, because the BIC is based on the likelihood of the data
+		given the model. That likelihood function doesn't involve the breakpoint values - it just depends on distances 
+		of the data to the fitted model predictions. Also depends on the error in the noise term being constant.  
 		"""
 		n = len(self.xx) # No. data points
 		k =  2 + 2*self.n_breakpoints # No. model parameters
@@ -279,10 +292,41 @@ class NextBreakpoints:
 
 class Muggeo:
 	"""
-	Muggeo's iterative segmented regression method
-	Simple version. Errors are handled at a higher level in the Fit object
-	See Muggeo (2003) for more information
+	Muggeo's iterative segmented regression method. This is a simple version. 
+	Errors are handled at a higher level in the Fit object. See Muggeo (2003) for more information.
+	If the breakpoints get too close together, or get outside (or near the edge) of the data range, 
+	the algorithm is stopped because this is likely to be a local minimum that is difficult to escape, as well
+	as possibly generating errors in the iterative procedue. 
+
+	:param xx: Data series in x-axis for fitting (same axis as the breakpoints)
+	:type xx: list of floats
+
+	:param yy: Data series in y-axis for fitting
+	:type yy: list of floats
+
+	:param n_breakpoints: The number of breakpoints to fit
+	:type n_breakpoints: positive int
+
+	:param start_values: A list of initial guesses for the breakpoints
+	:type start_values: list floats
+
+	:param verbose: If True, prints out updates to the terminal
+	:type verbose: bool	
+
+	:param max_iterations: How many iterations before stopping if not converged
+	:type max_iterations: positive int		
+
+	:param tolerance: How close breakpoints from pervious iterations must be to consider converged. 
+	:type tolerance: positive float		
+
+	:param min_distance_between_breakpoints: The minimum allowed distance between breakpoints, as a proportion of the data range.
+	:type min_distance_between_breakpoints: positive float
+
+	:param min_distance_between_breakpoints: The minimum allowed distance from the edge of data to a breakpoint, as a proportion of the data range.
+	:type min_distance_between_breakpoints: positive float	
+
 	"""
+
 	def __init__(self, 
 		xx, # list(float) or numpy(float). REQUIRED. Data series in x-axis
 		yy, # list(float) or numpy(float). REQUIRED. Data series in y-axis
@@ -332,7 +376,9 @@ class Muggeo:
 
 
 	def fit(self):
-		# Run the breakpoint iterative procedure
+		"""
+		Runs the breakpoint iterative procedure
+		"""
 		if self.verbose:
 			print("Running Muggeo's iterative algorithm . . . ")
 		while not self.stop:
@@ -361,7 +407,9 @@ class Muggeo:
 
 	def stop_or_not(self):
 		"""
-		Stop if it's converegd or max_iterations reached
+		Test to see if the iterative procedure should stop. 
+		Stop if it's converged, if max_iterations reached, of the breakpoints fall into values that
+		are too close together or outside of the allowed rance.
 		"""
 		# Stop if maximum iterations reached
 		if len(self.fit_history)>self.max_iterations:
@@ -394,8 +442,13 @@ class Muggeo:
 
 	def _validate_start_values(self, start_values):
 		"""
-		breakpoint start_values should be a list of numbers, or numpy list of numbers
+		Validate the breakpoint start_values.  
+		Should be a list of numbers, or a numpy list of numbers.
 		They should also be not too close to the edge of the data, and not too close together - to avoid the Muggeo algorithm diverging
+	
+		:param start_values: A list of initial guesses for the breakpoints
+		:type start_values: list floats
+
 		"""
 
 		start_values = validate_list_of_numbers(start_values, "start_values", min_length=1)
@@ -412,7 +465,11 @@ class Muggeo:
 
 	def _are_breakpoint_values_within_range(self, breakpoints):
 		"""
-		Check a list of breakpoints are self.min_distance_to_edge * range away for the edge of the data in xx
+		Check that breakpoints are self.min_distance_to_edge * range away for the edge of the data in x
+
+		:param breakpoints: A list of breakpoints
+		:type breakpoints: list floats
+
 		"""
 		min_allowed_bp = np.quantile(self.xx, self.min_distance_to_edge)
 		max_allowed_bp = np.quantile(self.xx, 1-self.min_distance_to_edge)
@@ -424,7 +481,11 @@ class Muggeo:
 
 	def _are_breakpoint_values_far_apart(self, breakpoints):
 		"""
-		Check if breakpoint values are self.min_distance_between_breakpoints*range away form each other
+		Check if breakpoint values are self.min_distance_between_breakpoints*range away from each other
+		
+		:param breakpoints: A list of breakpoints
+		:type breakpoints: list floats
+
 		"""
 		min_distance = np.diff(np.sort(breakpoints))
 
@@ -437,7 +498,7 @@ class Muggeo:
 
 	def _generate_breakpoints(self):
 		"""
-		Rnadomly generate some breakpoint values that are valid
+		Randomly generate some breakpoint values
 		"""
 		# Get breakpoints within allowed range
 		min_allowed_bp = np.quantile(self.xx, self.min_distance_to_edge)
@@ -450,11 +511,42 @@ class Muggeo:
 
 class Fit:
 	"""
-	Fit a segmented regression model to data
-	Uses bootstrap restarting to avoid local minima
-	Requires either n_breakpoints of start_values
-	if no start_vaues are given, they are instead uniformly randomly generated across range of data
-	Also variabels to control how the fit is run
+	Fit a peicewise (segmented) regression model to data. 
+	Uses bootstrap restarting to avoid local minima. 
+	Requires either n_breakpoints of start_values. 
+	if no start_vaues are given, they are instead uniformly randomly generated across range of data.
+	This is the main user facing object and input data is validated mainly at this level. 
+
+	:param xx: Data series in x-axis for fitting (same axis as the breakpoints).
+	:type xx: list of floats
+
+	:param yy: Data series in y-axis for fitting.
+	:type yy: list of floats
+
+	:param n_breakpoints: The number of breakpoints to fit.
+	:type n_breakpoints: positive int
+
+	:param start_values: A list of initial guesses for the breakpoints.
+	:type start_values: list floats
+
+	:param n_boot: How many times to run the bootstrap restarting procedure. Set to zero for no bootstrap restarting. 
+	:type n_boot: non-negative int
+
+	:param verbose: If True, prints out updates to the terminal.
+	:type verbose: bool	
+
+	:param max_iterations: How many iterations before stopping if not converged, in the Muggeo iterative procedure.
+	:type max_iterations: positive int		
+
+	:param tolerance: How close breakpoints from pervious iterations must be to consider converged. 
+	:type tolerance: positive float		
+
+	:param min_distance_between_breakpoints: The minimum allowed distance between breakpoints, as a proportion of the data range.
+	:type min_distance_between_breakpoints: positive float
+
+	:param min_distance_between_breakpoints: The minimum allowed distance from the edge of data to a breakpoint, as a proportion of the data range.
+	:type min_distance_between_breakpoints: positive float	
+
 	"""
 	def __init__(self, 
 		xx, # list(float) or numpy(float). REQUIRED Data series in x-axis
@@ -514,8 +606,9 @@ class Fit:
 	
 	def get_results(self):
 		"""
-		Return a small dictionary with key results form the fit
+		Return a small dictionary with key results form the fit.
 		Useful for using this code in a larger analysis. E.g. ModelSelection
+		
 		"""
 
 		results = {
@@ -533,15 +626,14 @@ class Fit:
 
 	def bootstrap_restarting(self):
 		"""
-		The main fitting algorithm
-		Begins by doing a fit based on Muggeo's algorithm. 
-		if n_boot = 0 we stop there. Otherwise we do some bootstrap restarting 
-		Bootstrap Restarting escapes local minima
+		The main fitting algorithm. Begins by doing a fit based on Muggeo's algorithm. 
+		if n_boot = 0 we stop there. Otherwise we do some bootstrap restarting.  
+		Bootstrap Restarting escapes local minima.
 		Each bootstrap restart: 
-			We take the best current breakpoints, get new data by running a non-parametric bootstrap by resampling data
-			Run a Muggeo fit on the new data and best current breakpoints
-			This gives new breakpoint values - run a Muggeo fit again with the original data and these new breakpoint values to start with
-			Throughout, keep track of the history of fits and the best_muggeo fit - defined as the lowest residual sum of squares
+			We take the best current breakpoints, and get new data by running a non-parametric bootstrap by resampling data. 
+			Then run a Muggeo fit on the new data and best current breakpoints. This gives new breakpoint values. 
+			Then run a Muggeo fit again with the original data and these new breakpoint values. 
+			Throughout, keep track of the history of fits and the best_muggeo fit that converged - defined as the lowest residual sum of squares.
 		"""			
 		muggeo_fit = Muggeo(xx=self.xx, yy=self.yy, start_values=self.start_values, n_breakpoints = self.n_breakpoints,
 			max_iterations=self.max_iterations, tolerance = self.tolerance, verbose=self.verbose, 
@@ -596,8 +688,15 @@ class Fit:
 
 	def bootstrap_data(self, xx, yy):
 		"""
-		Non parametric bootstrap, randomly sample data points with replacement
-		Return bootstrapped data of same length as oriignal data
+		Non parametric bootstrap, randomly sample data points with replacement. 
+		Return bootstrapped data of same length as oriignal data.
+
+		:param xx: Data series in x-axis.
+		:type xx: list of floats
+
+		:param yy: Data series in y-axis.
+		:type yy: list of floats
+
 		"""
 		n = len(xx)
 		# Get bootstrap samples as array index locations
@@ -609,15 +708,17 @@ class Fit:
 
 	def plot_data(self, **kwargs):
 		"""
-		Plot the data as a scatter plot
-		Passes any kwargs to the matplotlib scatter function, e.g. color="red"
+		Plot the data as a scatter plot. 
+		Passes any kwargs to the matplotlib scatter function, e.g. color="red".
+
 		"""
 		plt.scatter(self.xx, self.yy, **kwargs)
 
 	def plot_fit(self, **kwargs):
 		"""
-		Plot the fitted model
-		Passes any kwargs to the matplotlib plot function, e.g. color="red"
+		Plot the fitted model as a series of straight lines. 
+		Passes any kwargs to the matplotlib plot function, e.g. color="red".
+
 		"""
 		if not self.best_muggeo:
 			print("Algorithm didn't converge. No fit to plot.")
@@ -643,8 +744,9 @@ class Fit:
 
 	def plot_breakpoints(self, **kwargs):
 		"""
-		Plot the breakpoint locations
-		Passes kwargs to the matplotlib function, e.g. color="red"
+		Plot the breakpoint locations as vertical lines. 
+		Passes kwargs to the matplotlib function, e.g. color="red".
+
 		"""
 		if not self.best_muggeo:
 			print("Algorithm didn't converge. No breakpoints to plot")
@@ -656,7 +758,9 @@ class Fit:
 
 	def plot_breakpoint_confidence_intervals(self, **kwargs):
 		"""
-		Plot the breakpoint cis as shaded regions
+		Plot the breakpoint confidence intervals as vertical shaded regions.
+		Passes kwargs to the matplotlib function, e.g. color="red".
+		
 		"""
 	
 		if not self.best_muggeo:
@@ -671,7 +775,8 @@ class Fit:
 	def plot_best_muggeo_breakpoint_history(self, **kwargs):
 		"""
 		Plot the history of the breakpoints as they iterate. 
-		History of the best muggeo fit.
+		History of the best_muggeo fit.
+
 		"""
 		if not self.best_muggeo:
 			print("Algorithm didn't converge. No meaningful history to plot")
@@ -692,8 +797,9 @@ class Fit:
 
 	def plot_bootstrap_restarting_history(self, **kwargs):
 		"""
-		Plot the history of the breakpoints as they iterate. 
-		History of the best muggeo fit.
+		Plot the history of the breakpoint values as they iterate. 
+		History of the bootstrap restarting procedure.
+
 		"""
 		if not self.best_muggeo.converged:
 			print("Algorithm didn't converge. Plotting breakpoint history anyway")
@@ -720,8 +826,9 @@ class Fit:
 
 	def plot_bootstrap_restarting_rss_history(self, **kwargs):
 		"""
-		Plot the history of the breakpoints as they iterate. 
-		History of the best muggeo fit.
+		Plot the history of the residual sum of squares. 
+		History of the bootstrap restarting algorithm.
+
 		"""
 		if not self.best_muggeo:
 			print("Algorithm didn't converge. Plotting rss history anyway")
@@ -742,7 +849,8 @@ class Fit:
 
 	def plot(self):
 		"""
-		Plot the data, fit, breakpoint positions and breakpoint confidence intervals
+		Plot the full fit including the data, fitted model, breakpoint positions and breakpoint confidence intervals.
+		Doesn't allow control of matplotlib kwargs for style changes.
 		"""
 		self.plot_data()
 		self.plot_fit()
@@ -751,7 +859,8 @@ class Fit:
 
 	def summary(self):
 		"""
-		Print a summary of the ebst fit, along the lines of the summary given by python's statsmodels OLS fit.
+		Print a summary of the best fit, along the lines of the summary given by python's statsmodels OLS fit.
+		
 		"""
 
 		if not self.best_muggeo:

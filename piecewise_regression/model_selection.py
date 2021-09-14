@@ -46,10 +46,10 @@ class ModelSelection:
 			self.models.append(fit_summary)
 			self.full_models_data.append(bootstrapped_fit)
 
-		self.print_summary()
+		self.summary()
 
 
-	def print_summary(self):
+	def summary(self):
 		
 		header = "\n{:^70}\n".format("Breakpoint Model Comparision Results")
 
