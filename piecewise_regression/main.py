@@ -392,21 +392,6 @@ class Muggeo:
 				self.stop = True
 				self.converged = True
 
-				# Stop if the algorithm is iterating back to previous values, within tolerance
-		if len(self.fit_history) > 3:
-			breakpoint_step_differences = self.fit_history[-4].next_breakpoints - self.fit_history[-1].next_breakpoints
-			if np.max(np.abs(breakpoint_step_differences)) <= self.tolerance:
-				self.stop_reason = "Algorithm converged on breakpoint values"
-				self.stop = True
-				self.converged = True
-
-		if len(self.fit_history) > 4:
-			breakpoint_step_differences = self.fit_history[-5].next_breakpoints - self.fit_history[-1].next_breakpoints
-			if np.max(np.abs(breakpoint_step_differences)) <= self.tolerance:
-				self.stop_reason = "Algorithm converged on breakpoint values"
-				self.stop = True
-				self.converged = True
-
 	def _validate_start_values(self, start_values):
 		"""
 		breakpoint start_values should be a list of numbers, or numpy list of numbers
