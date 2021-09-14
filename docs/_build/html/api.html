@@ -327,12 +327,10 @@ Based on Davies (1987), “Hypothesis Testing when a nuisance parameter is prese
 <li><p><strong>xx</strong> (<em>list of floats</em>) – Data series in x-axis (same axis as the breakpoints).</p></li>
 <li><p><strong>yy</strong> (<em>list of floats</em>) – Data series in y-axis.</p></li>
 <li><p><strong>k</strong> (<em>int</em>) – A control parameter that determines the number of points to consider within the xx range.</p></li>
-<li><p><strong>alternative</strong> – Whether to consider a two-sided hypothesis test, or a one sided test with change of gradient greater or less than zero.</p></li>
+<li><p><strong>alternative</strong> (<em>str. One of &quot;two_sided&quot;</em><em>, </em><em>&quot;less&quot;</em><em>, </em><em>&quot;greater&quot;</em>) – Whether to consider a two-sided hypothesis test, or a one sided test with change of gradient greater or less than zero. For existence of a breakpoint, use “two-sided”.</p></li>
 </ul>
 </dd>
 </dl>
-<p>For existence of a breakpoint, use “two-sided”.
-:type alternative: str. One of “two_sided”, “less”, “greater”</p>
 </dd></dl>
 
 <dl class="py function">
