@@ -140,4 +140,4 @@ There are also a series of simluation tests that check the estimates have realis
 
 Documentation
 ==============
-Full docs, including an API, can be found at Read The Docs.
+`Full docs, including an API reference. <https://piecewise-regression.readthedocs.io/en/latest/>`_

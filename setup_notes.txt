@@ -8,3 +8,7 @@ To send a new version to the package manager:
 To make new docs:
 1. navigate to the docs folder in terminal
 2. type make html
+3. Maybe also need to do 'python setup.py sdist bdist_wheel'
+4. you might need to update the theme. Can be set in conf.py. Might also need to install 'sudo pip3 install sphinx-rtd-theme'
+5. Push it all to github
+6. On readthedocs.org - add github repo
