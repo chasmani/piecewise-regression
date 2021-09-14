@@ -4,15 +4,16 @@ import setuptools
 # The directory containing this file
 HERE = pathlib.Path(__file__).parent
 
-# The text of the README file
-README = (HERE / "README.md").read_text()
+def readme():
+    with open('README.rst') as f:
+        return f.read()
 
 # This call to setup() does all the work
 setuptools.setup(
     name="piecewise-regression",
-    version="0.1.1",
+    version="0.2",
     description="piecewise (segmented) regression in python",
-    long_description=README,
+    long_description=readme(),
     long_description_content_type="text/markdown",
     url="https://github.com/chasmani/piecewise-regression",
     author="Charlie Pilgrim",

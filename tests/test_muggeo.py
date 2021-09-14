@@ -25,7 +25,8 @@ class TestMuggeo(unittest.TestCase):
         # Choose some bps values from Muggeo converged values
         bps = np.array([7, 13])
 
-        fit = Muggeo(xx, yy, bps, verbose=False)
+
+        fit = Muggeo(xx, yy, n_breakpoints=2, start_values=bps, verbose=False)
 
         best_fit = fit.best_fit
         
@@ -110,7 +111,7 @@ class TestMuggeo(unittest.TestCase):
         # Choose some bps values from Muggeo converged values
         bps = np.array([1.608])
 
-        fit = Muggeo(xx, yy, bps, verbose=False)
+        fit = Muggeo(xx, yy, n_breakpoints=1, start_values=bps, verbose=False)
 
         best_fit = fit.best_fit
 

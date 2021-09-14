@@ -12,7 +12,7 @@ from piecewise_regression import Fit
 from piecewise_regression import ModelSelection
 
 
-def test_on_data_1():
+def on_data_1():
 
 	alpha = -4
 	beta_1 = -2
@@ -38,7 +38,7 @@ def test_on_data_1():
 	#plt.show()
 
 
-def test_on_data_1b():
+def on_data_1b():
 
 	alpha = -4
 	beta_1 = -4
@@ -69,7 +69,7 @@ def test_on_data_1b():
 
 
 
-def test_on_data_1c():
+def on_data_1c():
 
 	alpha = -4
 	beta_1 = -2
@@ -121,7 +121,7 @@ def test_on_data_1c():
 
 
 
-def test_model_selection_1():
+def model_selection_1():
 
 	alpha = -4
 	beta_1 = -2
@@ -141,7 +141,7 @@ def test_model_selection_1():
 	ms = ModelSelection(xx, yy, max_breakpoints=6)
 
 
-def test_model_selection_2():
+def model_selection_2():
 
 
 	alpha = -4
@@ -161,7 +161,7 @@ def test_model_selection_2():
 	ms = ModelSelection(xx, yy)
 
 
-def test_fit_3_check_this_makes_sense():
+def fit_3_check_this_makes_sense():
 
 	np.random.seed(0)
 

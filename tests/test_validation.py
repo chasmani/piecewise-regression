@@ -24,7 +24,7 @@ class TestValidation(unittest.TestCase):
 
         # Lots of invalid data types
         for test_variable in ["xx", "yy", "start_values"]:
-            for invalid_value in [None, "hi", 12.1, 12, [1,1,1,1,1], 0, [], [-100, 10000]]:
+            for invalid_value in [None, "hi", 12.1, 12, 0, []]:
                 
                 new_kwargs = copy.deepcopy(KWARGS)
                 new_kwargs[test_variable] = invalid_value
@@ -49,13 +49,6 @@ class TestValidation(unittest.TestCase):
         self.assertRaises(TypeError, Fit, xx, start_values=[3])
         self.assertRaises(TypeError, Fit, yy, start_values=[3])
 
-
-    def test_with_start_values_too_wide(self):
-
-        xx = np.linspace(0,10)
-        yy = np.linspace(0,10)
-
-        self.assertRaises(ValueError, Fit, xx, yy, start_values=[22])
 
 
 if __name__ == '__main__':

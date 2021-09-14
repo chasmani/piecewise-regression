@@ -4,3 +4,7 @@ To send a new version to the package manager:
 2. Update the version number in setup.py
 3. 'python setup.py sdist bdist_wheel' - this creates a dist package in the dist/ folder
 4. 'twine upload dist/*'
+
+To make new docs:
+1. navigate to the docs folder in terminal
+2. type make html

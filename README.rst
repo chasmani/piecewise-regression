@@ -4,11 +4,11 @@ Piecewise (aka segmented) regression in Python. Simultaneously find breakpoints 
 Installation
 ========================
 
-You can install piecewise-regression from [PyPI](https://pypi.org/project/breakpoint-regression/): ::
+You can install piecewise-regression from `PyPI <https://pypi.org/project/piecewise-regression/>`_
 
     pip install piecewise-regression
 
-The package is supported on Python 3.7 and above.
+The package was developed and tested on Python 3.7.
 
 Getting started
 ========================
@@ -88,7 +88,8 @@ There are also tools for plotting data: ::
 	plt.show()
 	plt.close()
 
-![Fit Example Plot](./paper/example2.png)
+.. image:: https://github.com/chasmani/piecewise-regression/blob/master/paper/example2.png
+    :alt: fit-example-plot
 
 How It Works
 ======================
