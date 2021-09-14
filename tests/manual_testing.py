@@ -167,7 +167,7 @@ def test_fit_3_check_this_makes_sense():
 
 	alpha = 10
 	beta_1 = -8
-	beta_2 = 3
+	beta_2 = -6
 	beta_3 = 10
 	intercept = 100
 	breakpoint_1 = 7
@@ -190,9 +190,12 @@ def test_fit_3_check_this_makes_sense():
 	plt.show()
 
 	pr3 = Fit(xx, yy, n_breakpoints=3)
-	pr.plot()
+	pr3.plot()
 	plt.show()
 
+	pr4 = Fit(xx, yy, n_breakpoints=4)
+	pr4.plot()
+	plt.show()
 
 	ms = ModelSelection(xx, yy, max_breakpoints=6)
 

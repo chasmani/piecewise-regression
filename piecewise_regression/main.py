@@ -401,11 +401,11 @@ class Muggeo:
 
 		if not self._are_breakpoint_values_within_range(start_values):
 			self.stop = True
-			raise ValueError("start_values are not within allowed range. Try changing min_distance_to_edge")
+			self.stop_reason = "start_values are not within allowed range. Try changing min_distance_to_edge"
 			
 		if not self._are_breakpoint_values_far_apart(start_values):
 			self.stop = True
-			raise ValueError("start_values are too close together. Try changing min_distance_between_breakpoints")
+			self.stop_reason = "start_values are too close together. Try changing min_distance_between_breakpoints"
 		return start_values
 
 
