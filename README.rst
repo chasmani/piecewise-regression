@@ -88,7 +88,7 @@ There are also tools for plotting data: ::
 	plt.show()
 	plt.close()
 
-.. image:: https://github.com/chasmani/piecewise-regression/blob/master/paper/example2.png
+.. image:: paper/example2.png
     :alt: fit-example-plot
 
 How It Works
