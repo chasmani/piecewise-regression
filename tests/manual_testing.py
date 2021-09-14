@@ -280,7 +280,43 @@ def fit_with_initially_diverging_start_values_b():
 	pr = Fit(xx, yy, start_values=[1.2, 0.53], n_boot=25)
 	pr.summary()
 
+def fit_with_straight_line():
+
+	np.random.seed(0)
+
+	alpha = 10
+	intercept = 100
+
+	n_points = 200
+
+	xx = np.linspace(0, 20, n_points)
+
+	yy = intercept + alpha*xx 
+	yy += np.random.normal(size=n_points)
+
+
+	pr = Fit(xx, yy, n_breakpoints=0, n_boot=25)
+	pr.summary()
+
+
+def model_comparision_straight_line():
+
+	np.random.seed(0)
+
+	alpha = 10
+	intercept = 100
+
+	n_points = 200
+
+	xx = np.linspace(0, 20, n_points)
+
+	yy = intercept + alpha*xx 
+	yy += np.random.normal(size=n_points)
+
+
+	ms = ModelSelection(xx, yy, max_breakpoints=6)
+
 
 if __name__=="__main__":
 
-	fit_with_initially_diverging_start_values_b()
+	model_comparision_straight_line()

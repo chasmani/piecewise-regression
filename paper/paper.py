@@ -56,6 +56,37 @@ def plot_basic_example():
     
     plt.show()
 
+def plot_basic_example_2():
+
+    # Generate some test data with 1 breakpoint
+    alpha_1 = -4
+    alpha_2 = -2
+    intercept = 100
+    breakpoint_1 = 7
+    n_points = 200
+    np.random.seed(0)
+
+    xx = np.linspace(0, 20, n_points)
+    yy = intercept + alpha_1*xx + (alpha_2-alpha_1) * np.maximum(xx - breakpoint_1, 0) + np.random.normal(size=n_points)
+
+    # Given some data, fit the model
+    bp_fit = Fit(xx, yy, start_values=[5], n_breakpoints=1)
+
+    # Print a summary of the fit
+    bp_fit.summary()
+
+    # Plot the data, fit, breakpoints and confidence intervals
+    bp_fit.plot_data(color="grey", s=20)
+    # Pass in standard matplotlib keywords to control any of the plots
+    bp_fit.plot_fit(color="red", linewidth=4) 
+    bp_fit.plot_breakpoints()
+    bp_fit.plot_breakpoint_confidence_intervals()
+    plt.xlabel("x")
+    plt.ylabel("y")
+    plt.savefig("example2.png")
+    plt.show()
+    plt.close()
+
 
 if __name__=="__main__":
-    plot_basic_example()
+    plot_basic_example_2()

@@ -43,7 +43,6 @@ class ModelSelection:
 				min_distance_between_breakpoints=min_distance_between_breakpoints, min_distance_to_edge=min_distance_to_edge)
 			fit_summary = bootstrapped_fit.get_results()
 			fit_summary["n_breakpoints"] = k
-			print(fit_summary)
 			self.models.append(fit_summary)
 			self.full_models_data.append(bootstrapped_fit)
 

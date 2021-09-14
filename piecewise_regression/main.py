@@ -288,7 +288,7 @@ class Muggeo:
 		yy, # list(float) or numpy(float). REQUIRED. Data series in y-axis
 		n_breakpoints, # int. REQUIRED. Number of breakpoints
 		start_values=None, # list(float) or numpy(float). REQUIRED. Initial guesses for breakpoint positions 
-		verbose=True, # Boolean. whether to print progress to terminal. 
+		verbose=False, # Boolean. whether to print progress to terminal. 
 		max_iterations=30, # Positive int. Maximum iterations of Muggeo algorithm if not converged
 		tolerance=10**-5, # Positive float. If breakpoints change less than the tolerance then the algorithm has converged
 		min_distance_between_breakpoints=0.01, # Positive float. The minimum required distance between breakpoints, as a proportion of the data range. 
@@ -462,7 +462,7 @@ class Fit:
 		start_values=None, # list(float) or numpy(float). Initial guesses for breakpoint positions 
 		n_breakpoints=None, # int. If not start_values, the number of breakpoints to fit. REQUIRED if no start_values 
 		n_boot=20, # Positive int. The number of times to run the bootstrap restarting. n_boot=0 runs the Muggeo algorithm with no bootstrap
-		verbose=True, # Boolean. whether to print progress to terminal. 
+		verbose=False, # Boolean. whether to print progress to terminal. 
 		max_iterations=30, # Positive int. Maximum iterations of Muggeo algorithm if not converged
 		tolerance=10**-5, # Positive float. If breakpoints change less than the tolerance then the algorithm has converged
 		min_distance_between_breakpoints=0.01, # Positive float. The minimum required distance between breakpoints, as a proportion of the data range. 
@@ -835,28 +835,5 @@ class Fit:
 
 if __name__=="__main__":
 
-	np.random.seed(2)
 
-	alpha = 10
-	beta_1 = -8
-	beta_2 = 3
-	beta_3 = 10
-	intercept = 100
-	breakpoint_1 = 7
-	breakpoint_2 = 10
-	breakpoint_3 = 14
-
-	n_points = 200
-
-	xx = np.linspace(0, 20, n_points)
-
-	yy = intercept + alpha*xx 
-	yy += beta_1 * np.maximum(xx - breakpoint_1, 0) 
-	yy += beta_2 * np.maximum(xx - breakpoint_2, 0)  
-	yy += beta_3 * np.maximum(xx - breakpoint_3, 0)
-	yy += np.random.normal(size=n_points)
-
-
-	pr = Fit(xx, yy, n_breakpoints=2)
-	print(pr.summary)
-	
+	pass
