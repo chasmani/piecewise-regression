@@ -1,4 +1,4 @@
-Piecewise (aka segmented) regression in Python. Simultaneously find breakpoints and fit straightline segments between those breakpoints. Based on Muggeo "Estimating regression models with unknown break-points" (2003)
+Piecewise (aka segmented) regression in Python. Simultaneously find breakpoints and fit straightline segments between those breakpoints. Based on Muggeo "Estimating regression models with unknown break-points" (2003).
 
 
 Installation
