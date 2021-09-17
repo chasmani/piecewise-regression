@@ -6,9 +6,7 @@ HERE = pathlib.Path(__file__).parent
 
 def readme():
     with open('README.rst') as f:
-        readme_txt = f.read()
-        readme_txt.replace("../paper/example.png", "https://raw.githubusercontent.com/chasmani/piecewise-regression/master/paper/example.png")
-        return readme_txt
+        return f.read()
 
 # This call to setup() does all the work
 setuptools.setup(
