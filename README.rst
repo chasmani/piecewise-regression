@@ -112,9 +112,11 @@ There are also tools for plotting data: ::
 How It Works
 ======================
 
-The package implements Muggeo's iterative algorithm (Muggeo "Estimating regression models with unknown break-points" (2003)), to quickly find breakpoints. The Fit method also implements a non-parametric bootstrap restarting to escape local minima, this can be controlled with `n_boot`. To run the Fit without bootstrap restarting, set `n_boot=0`. Muggeo's algorthm does not always converge. In this case, the Fit method will keep trying to find a fit using bootstrap restarting `n_boot` times. 
+The package implements Muggeo's iterative algorithm (Muggeo "Estimating regression models with unknown break-points" (2003)), to quickly find breakpoints. 
 
-If you don't have good guesses for inital breakpoints, you can just set the number of e.g. `n_breakpoints=3`. in this case the algorithm will randomly generate starting breakpoints until it finds a slution that converges (up to `n_boot` times). This is a good option if the algorithm is otherwise not converging. 
+This iteartive method does not always converge to a global optimal solution, and can instead converge to a local optima or not converge at all. For this reason the Fit method also implements a non-parametric bootstrap restarting to escape local minima, this can be controlled with `n_boot`. To run the Fit without bootstrap restarting, set `n_boot=0`. If Muggeo's algorthm has not converged, the Fit method will keep trying to find a fit using bootstrap restarting `n_boot` times. 
+
+If you don't have good guesses for inital breakpoints, you can just set the number of e.g. `n_breakpoints=3`. in this case the algorithm will randomly generate starting breakpoints until it finds a solution that converges (up to `n_boot` times). This is a good option if the algorithm is otherwise not converging. 
 
 Model Selection
 ==========================
@@ -154,7 +156,7 @@ Note: This requires nosetests, can be downloaded from apt with: ::
 
 	sudo apt install python3-nose
 
-There are also a series of simluation tests that check the estimates have realistic confidence intervals, and the Davies test gives realistic p-values. These can be found in the folder "tests"
+There are also a series of simulation tests that check the estimates have realistic confidence intervals, and the Davies test gives realistic p-values. These can be found in the folder "tests".
 
 Documentation
 ==============
