@@ -106,7 +106,7 @@ There are also tools for plotting data: ::
 	plt.show()
 	plt.close()
 
-.. image:: paper/example.png
+.. image:: ../paper/example.png
     :alt: example-plot
 
 How It Works

@@ -5,7 +5,7 @@ import setuptools
 HERE = pathlib.Path(__file__).parent
 
 def readme():
-    with open('README.rst') as f:
+    with open('docs/README.rst') as f:
         return f.read()
 
 # This call to setup() does all the work
