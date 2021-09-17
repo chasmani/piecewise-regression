@@ -106,8 +106,8 @@ There are also tools for plotting data: ::
 	plt.show()
 	plt.close()
 
-.. image:: https://raw.githubusercontent.com/chasmani/piecewise-regression/master/paper/example.png
-    :alt: fit-example-plot
+.. image:: ../paper/example.png
+    :alt: example-plot
 
 How It Works
 ======================
