@@ -22,40 +22,40 @@ The package requires some x and y data to fit. You also need to specify either a
 Example
 ========================
 
-Here is a more detailed example. We start off genreating some data with 3 breakpoints, for demonstration purposes: ::
+Here is a more detailed example. We start off generating some data with 3 breakpoints, for demonstration purposes: ::
 
 	import piecewise_regression
 	import numpy as np
 
 	np.random.seed(1)
 
-    alpha = 4
-    beta_1 = -8
-    beta_2 = -2
-    beta_3 = 5
-    intercept = 100
-    breakpoint_1 = 5
-    breakpoint_2 = 11
-    breakpoint_3 = 16
-    n_points = 200
-    noise=3
+	alpha = 4
+	beta_1 = -8
+	beta_2 = -2
+	beta_3 = 5
+	intercept = 100
+	breakpoint_1 = 5
+	breakpoint_2 = 11
+	breakpoint_3 = 16
+	n_points = 200
+	noise=3
 
-    xx = np.linspace(0, 20, n_points)
+	xx = np.linspace(0, 20, n_points)
 
-    yy = intercept + alpha*xx 
-    yy += beta_1 * np.maximum(xx - breakpoint_1, 0) 
-    yy += beta_2 * np.maximum(xx - breakpoint_2, 0)  
-    yy += beta_3 * np.maximum(xx - breakpoint_3, 0)
-    yy += np.random.normal(size=n_points) * noise
+	yy = intercept + alpha*xx 
+	yy += beta_1 * np.maximum(xx - breakpoint_1, 0) 
+	yy += beta_2 * np.maximum(xx - breakpoint_2, 0)  
+	yy += beta_3 * np.maximum(xx - breakpoint_3, 0)
+	yy += np.random.normal(size=n_points) * noise
 
 
 Now we fit the model: ::
 
-    # Given some data, fit the model
-    bp_fit = piecewise_regression.Fit(xx, yy, start_values=[3,7,10])
+	# Given some data, fit the model
+	bp_fit = piecewise_regression.Fit(xx, yy, start_values=[3,7,10])
 
-    # Print a summary of the fit
-    bp_fit.summary()
+	# Print a summary of the fit
+	bp_fit.summary()
 
 Example output: ::
 
