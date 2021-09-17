@@ -22,25 +22,37 @@ The package requires some x and y data to fit. You also need to specify either a
 Example
 ========================
 
-Here is a more detailed example. We start off genreating some data with a breakpoint, for demonstration purposes: ::
+Here is a more detailed example. We start off genreating some data with 3 breakpoints, for demonstration purposes: ::
 
 	import piecewise_regression
 	import numpy as np
 
-	alpha_1 = -4    
-	alpha_2 = -2
-	intercept = 100
-	breakpoint_1 = 7
-	n_points = 200
-	np.random.seed(0)
-	xx = np.linspace(0, 20, n_points)
-	yy = intercept + alpha_1*xx + (alpha_2-alpha_1) * np.maximum(xx - breakpoint_1, 0) + np.random.normal(size=n_points)
+	np.random.seed(1)
+
+    alpha = 4
+    beta_1 = -8
+    beta_2 = -2
+    beta_3 = 5
+    intercept = 100
+    breakpoint_1 = 5
+    breakpoint_2 = 11
+    breakpoint_3 = 16
+    n_points = 200
+    noise=3
+
+    xx = np.linspace(0, 20, n_points)
+
+    yy = intercept + alpha*xx 
+    yy += beta_1 * np.maximum(xx - breakpoint_1, 0) 
+    yy += beta_2 * np.maximum(xx - breakpoint_2, 0)  
+    yy += beta_3 * np.maximum(xx - breakpoint_3, 0)
+    yy += np.random.normal(size=n_points) * noise
 
 
 Now we fit the model: ::
 
     # Given some data, fit the model
-    bp_fit = Fit(xx, yy, start_values=[5], n_breakpoints=1)
+    bp_fit = piecewise_regression.Fit(xx, yy, start_values=[3,7,10])
 
     # Print a summary of the fit
     bp_fit.summary()
@@ -50,28 +62,34 @@ Example output: ::
 	                    Breakpoint Regression Results                     
 	====================================================================================================
 	No. Observations                      200
-	No. Model Parameters                    4
-	Degrees of Freedom                    196
-	Res. Sum of Squares               193.264
-	Total Sum of Squares              46201.8
-	R Squared                        0.995817
-	Adjusted R Squared               0.995731
+	No. Model Parameters                    8
+	Degrees of Freedom                    192
+	Res. Sum of Squares               1448.83
+	Total Sum of Squares              77195.4
+	R Squared                        0.981232
+	Adjusted R Squared               0.980446
 	Converged:                           True
 	====================================================================================================
 	====================================================================================================
 	                    Estimate      Std Err            t        P>|t|       [0.025       0.975]
 	----------------------------------------------------------------------------------------------------
-	const                100.726        0.244       413.63     3.1e-290       100.25       101.21
-	alpha1              -4.21998       0.0653      -64.605    4.37e-134      -4.3488      -4.0912
-	beta1                2.18914       0.0689       31.788            -       2.0533        2.325
-	breakpoint1          6.48706        0.137            -            -       6.2168       6.7573
+	const                99.3134        0.765       129.77    5.73e-189       97.804       100.82
+	alpha1               4.24777        0.268       15.861      9.3e-37       3.7196        4.776
+	beta1               -8.26555        0.347      -23.848            -      -8.9492      -7.5819
+	beta2               -1.80202        0.325      -5.5523            -      -2.4422      -1.1619
+	beta3                5.21108        0.456       11.423            -       4.3113       6.1109
+	breakpoint1          4.99612        0.129            -            -       4.7419       5.2503
+	breakpoint2           10.573        0.581            -            -        9.428       11.718
+	breakpoint3          16.0829        0.223            -            -       15.644       16.522
 	----------------------------------------------------------------------------------------------------
 	These alphas(gradients of segments) are estimated from betas(change in gradient)
 	----------------------------------------------------------------------------------------------------
-	alpha2              -2.03084       0.0218      -93.068    3.66e-164      -2.0739      -1.9878
+	alpha2              -4.01778         0.22      -18.262     7.58e-44      -4.4517      -3.5838
+	alpha3              -5.81981        0.239      -24.391     1.02e-60      -6.2904      -5.3492
+	alpha4             -0.608729        0.389      -1.5656        0.119      -1.3756      0.15816
 	====================================================================================================
 
-	Davies test for existence of at least 1 breakpoint: p=5.13032e-295 (e.g. p<0.05 means reject null hypothesis of no breakpoints at 5% significance)
+	Davies test for existence of at least 1 breakpoint: p=0.0 (e.g. p<0.05 means reject null hypothesis of no breakpoints at 5% significance)
 
 There are also tools for plotting data: ::
 
@@ -88,7 +106,7 @@ There are also tools for plotting data: ::
 	plt.show()
 	plt.close()
 
-.. image:: https://raw.githubusercontent.com/chasmani/piecewise-regression/master/paper/example2.png
+.. image:: https://raw.githubusercontent.com/chasmani/piecewise-regression/master/paper/example.png
     :alt: fit-example-plot
 
 How It Works

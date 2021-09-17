@@ -18,7 +18,7 @@ def plot_basic_example():
     alpha = 4
     beta_1 = -8
     beta_2 = -2
-    beta_3 = 3
+    beta_3 = 5
     intercept = 100
     breakpoint_1 = 5
     breakpoint_2 = 11
@@ -35,10 +35,7 @@ def plot_basic_example():
     yy += beta_3 * np.maximum(xx - breakpoint_3, 0)
     yy += np.random.normal(size=n_points) * noise
 
-    print(xx, yy)
-
-
-    bp_fit = Fit(xx, yy, start_values=[7])
+    bp_fit = Fit(xx, yy, start_values=[3,7,10])
 
     bp_fit.summary()
 
@@ -49,8 +46,6 @@ def plot_basic_example():
     
     plt.xlabel("x")
     plt.ylabel("y")
-
-    print("BIC is :", bp_fit.calculate_bayesian_information_criterion())
 
     plt.savefig("example.png", dpi=300)
     
@@ -105,4 +100,4 @@ def model_selection_basic_example():
     ms = ModelSelection(xx, yy, max_breakpoints=6)
 
 if __name__=="__main__":
-    model_selection_basic_example()
+    plot_basic_example()
