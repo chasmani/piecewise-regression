@@ -2,7 +2,7 @@ Easy to use piecewise (aka segmented) regression in Python. For fitting straight
 
 For example: ::
 
-.. image:: paper/example.png
+.. image:: ../paper/example.png
     :alt: basic-example-plot
 
 
@@ -93,7 +93,7 @@ There are also tools for plotting data: ::
 	plt.show()
 	plt.close()
 
-.. image:: paper/example2.png
+.. image:: ../paper/example2.png
     :alt: fit-example-plot
 
 You can extract data as well: ::
