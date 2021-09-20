@@ -13,3 +13,9 @@ To make new docs:
 5. Push it all to github
 6. On readthedocs.org - add github repo
 7. It might take a few hours to propogate to read the docs.
+
+Images:
+If including an image in readme.rst. It needs to display in 3 places:
+- Github. Can use relative or absolute link to github hosted image
+- PyPI. Needs absolute link to github hosted image
+- ReadTheDocs. 
