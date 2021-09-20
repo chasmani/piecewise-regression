@@ -4,7 +4,7 @@ API
 
 Main
 ----------
-The main module includes the Fit function, which rus the bootstrap restarting algorithm.
+The main module includes the Fit function, which runs the bootstrap restarting algorithm.
 
 .. automodule:: piecewise_regression.main
 	:members:

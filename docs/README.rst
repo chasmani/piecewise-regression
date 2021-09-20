@@ -93,8 +93,9 @@ There are also tools for plotting data: ::
 	plt.show()
 	plt.close()
 
-.. image:: ../paper/example2.png
-    :alt: fit-example-plot
+.. image:: https://raw.githubusercontent.com/chasmani/piecewise-regression/master/paper/example2.png
+    :alt: fit-example-plot-github
+
 
 You can extract data as well: ::
 
@@ -115,7 +116,7 @@ If you don't have good guesses for inital breakpoints, you can just set the numb
 Model Selection
 ==========================
 
-in addition to the main Fit tool, the package also offers a `ModelSelection` option based on the Bayesian Information Criterion. This is experimental and not as thorough as the main Fit tool: ::
+In addition to the main Fit tool, the package also offers a `ModelSelection` option based on the Bayesian Information Criterion. This is experimental and not as thorough as the main Fit tool: ::
 
 	ms = ModelSelection(x, y, max_breakpoints=6)
 
