@@ -16,7 +16,7 @@ The package was developed and tested on Python 3.7.
 Getting started
 ========================
 
-The package requires some x and y data to fit. You also need to specify either a) some initial breakpoint guesses as `start_values` or b) how many breakpoints you want to fit as `n_breakpoints` (or both). Here is a very simple example, assuming we alreayd have some data `x` and `y`: ::
+The package requires some x and y data to fit. You also need to specify either a) some initial breakpoint guesses as `start_values` or b) how many breakpoints you want to fit as `n_breakpoints` (or both). Here is a very simple example, assuming we already have some data `x` and `y`: ::
 
 	import piecewise_regression
 	pw_fit = piecewise_regression.Fit(x, y, n_breakpoints=2)
@@ -25,7 +25,7 @@ The package requires some x and y data to fit. You also need to specify either a
 Example
 ========================
 
-Here is a more detailed example. We start off genreating some data with a breakpoint. This is for demonstration purposes, normally you will have your own data to fit: ::
+Here is a more detailed example. We start off generating some data with a breakpoint. This is for demonstration purposes, normally you will have your own data to fit: ::
 
 	import piecewise_regression
 	import numpy as np
@@ -75,6 +75,8 @@ Example output: ::
 	====================================================================================================
 
 	Davies test for existence of at least 1 breakpoint: p=5.13032e-295 (e.g. p<0.05 means reject null hypothesis of no breakpoints at 5% significance)
+
+This includes estimates for all the model variables, along with confidence intervals. The Davies test is a hypothesis test for the existence of at least one breakpoint, against the null hypothesis of no breakpoints.  
 
 There are also tools for plotting data: ::
 
@@ -148,7 +150,7 @@ Note: This requires nosetests, can be downloaded from apt with: ::
 
 	sudo apt install python3-nose
 
-There are also a series of simluation tests that check the estimates have realistic confidence intervals, and the Davies test gives realistic p-values. These can be found in the folder "tests"
+There are also a series of simulation tests that check the estimates have realistic confidence intervals, and the Davies test gives realistic p-values. These can be found in the folder "tests". 
 
 Documentation
 ==============
