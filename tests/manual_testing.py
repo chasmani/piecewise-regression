@@ -26,10 +26,20 @@ def on_data_1():
 
 		
 
-	bp_fit = Fit(xx, yy, start_values=[5])
+	pw_fit = Fit(xx, yy, start_values=[5])
 
 
-	print("p-value is ", bp_fit.davies)
+	print("p-value is ", pw_fit.davies)
+
+	pw_results = pw_fit.get_results()
+	pw_estimates = pw_results["estimates"]
+	print(pw_results)
+
+	print(pw_estimates)
+
+	pw_bootstrap_history = pw_fit.bootstrap_history
+	print(pw_bootstrap_history)
+
 
 
 	#print(bp_fit.breakpoint_history)
@@ -319,4 +329,4 @@ def model_comparision_straight_line():
 
 if __name__=="__main__":
 
-	model_comparision_straight_line()
+	on_data_1()

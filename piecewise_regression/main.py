@@ -603,6 +603,7 @@ class Fit:
 
 		self.davies = davies.davies_test(self.xx, self.yy)
 
+
 	
 	def get_results(self):
 		"""
@@ -622,6 +623,9 @@ class Fit:
 			results["converged"] = True
 		else:
 			results["converged"] = False
+			results["estimates"] = None
+			results["bic"] = None
+			results["rss"] = None
 		return results
 
 	def bootstrap_restarting(self):
