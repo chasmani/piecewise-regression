@@ -67,11 +67,12 @@
              
   <section id="piecewise-regression">
 <h1>piecewise-regression<a class="headerlink" href="#piecewise-regression" title="Permalink to this headline"></a></h1>
-<p>Piecewise (aka segmented) regression in Python. Simultaneously find breakpoints and fit straightline segments between those breakpoints. Based on Muggeo “Estimating regression models with unknown break-points” (2003).</p>
+<p>Easy to use piecewise (aka segmented) regression in Python. For fitting straight lines to data where there is one or more changes in gradient (known as breakpoints). Based on Muggeo “Estimating regression models with unknown break-points” (2003). For example:</p>
+<img alt="basic-example-plot" src="_images/example.png" />
 </section>
 <section id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h1>
-<p>You can install piecewise-regression from <a class="reference external" href="https://pypi.org/project/piecewise-regression/">PyPI</a></p>
+<p>You can install piecewise-regression using python’s <a class="reference external" href="https://pypi.org/project/piecewise-regression/">pip package index</a></p>
 <blockquote>
 <div><p>pip install piecewise-regression</p>
 </div></blockquote>
@@ -79,7 +80,7 @@
 </section>
 <section id="getting-started">
 <h1>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline"></a></h1>
-<p>The package requires some x and y data to fit. You also need to specify either a) some initial breakpoint guesses as <cite>start_values</cite> or b) how many breakpoints you want to fit as <cite>n_breakpoints</cite> (or both). Here is a very simple example:</p>
+<p>The package requires some x and y data to fit. You also need to specify either a) some initial breakpoint guesses as <cite>start_values</cite> or b) how many breakpoints you want to fit as <cite>n_breakpoints</cite> (or both). Here is a very simple example, assuming we already have some data <cite>x</cite> and <cite>y</cite>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">piecewise_regression</span>
 <span class="n">pw_fit</span> <span class="o">=</span> <span class="n">piecewise_regression</span><span class="o">.</span><span class="n">Fit</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">n_breakpoints</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">pw_fit</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
@@ -88,95 +89,84 @@
 </section>
 <section id="example">
 <h1>Example<a class="headerlink" href="#example" title="Permalink to this headline"></a></h1>
-<p>Here is a more detailed example. We start off generating some data with 3 breakpoints, for demonstration purposes:</p>
+<p>Here is a more detailed example. We start off generating some data with a breakpoint. This is for demonstration purposes, normally you will have your own data to fit:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">piecewise_regression</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-
-<span class="n">alpha</span> <span class="o">=</span> <span class="mi">4</span>
-<span class="n">beta_1</span> <span class="o">=</span> <span class="o">-</span><span class="mi">8</span>
-<span class="n">beta_2</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span>
-<span class="n">beta_3</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">alpha_1</span> <span class="o">=</span> <span class="o">-</span><span class="mi">4</span>
+<span class="n">alpha_2</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span>
 <span class="n">intercept</span> <span class="o">=</span> <span class="mi">100</span>
-<span class="n">breakpoint_1</span> <span class="o">=</span> <span class="mi">5</span>
-<span class="n">breakpoint_2</span> <span class="o">=</span> <span class="mi">11</span>
-<span class="n">breakpoint_3</span> <span class="o">=</span> <span class="mi">16</span>
+<span class="n">breakpoint_1</span> <span class="o">=</span> <span class="mi">7</span>
 <span class="n">n_points</span> <span class="o">=</span> <span class="mi">200</span>
-<span class="n">noise</span><span class="o">=</span><span class="mi">3</span>
-
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="n">xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">n_points</span><span class="p">)</span>
-
-<span class="n">yy</span> <span class="o">=</span> <span class="n">intercept</span> <span class="o">+</span> <span class="n">alpha</span><span class="o">*</span><span class="n">xx</span>
-<span class="n">yy</span> <span class="o">+=</span> <span class="n">beta_1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">xx</span> <span class="o">-</span> <span class="n">breakpoint_1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-<span class="n">yy</span> <span class="o">+=</span> <span class="n">beta_2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">xx</span> <span class="o">-</span> <span class="n">breakpoint_2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-<span class="n">yy</span> <span class="o">+=</span> <span class="n">beta_3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">xx</span> <span class="o">-</span> <span class="n">breakpoint_3</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-<span class="n">yy</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">n_points</span><span class="p">)</span> <span class="o">*</span> <span class="n">noise</span>
+<span class="n">yy</span> <span class="o">=</span> <span class="n">intercept</span> <span class="o">+</span> <span class="n">alpha_1</span><span class="o">*</span><span class="n">xx</span> <span class="o">+</span> <span class="p">(</span><span class="n">alpha_2</span><span class="o">-</span><span class="n">alpha_1</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">xx</span> <span class="o">-</span> <span class="n">breakpoint_1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">n_points</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Now we fit the model:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Given some data, fit the model</span>
-<span class="n">bp_fit</span> <span class="o">=</span> <span class="n">piecewise_regression</span><span class="o">.</span><span class="n">Fit</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">start_values</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">10</span><span class="p">])</span>
+<span class="n">pw_fit</span> <span class="o">=</span> <span class="n">Fit</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">start_values</span><span class="o">=</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">n_breakpoints</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="c1"># Print a summary of the fit</span>
-<span class="n">bp_fit</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
+<span class="n">pw_fit</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>Example output:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                    <span class="n">Breakpoint</span> <span class="n">Regression</span> <span class="n">Results</span>
 <span class="o">====================================================================================================</span>
 <span class="n">No</span><span class="o">.</span> <span class="n">Observations</span>                      <span class="mi">200</span>
-<span class="n">No</span><span class="o">.</span> <span class="n">Model</span> <span class="n">Parameters</span>                    <span class="mi">8</span>
-<span class="n">Degrees</span> <span class="n">of</span> <span class="n">Freedom</span>                    <span class="mi">192</span>
-<span class="n">Res</span><span class="o">.</span> <span class="n">Sum</span> <span class="n">of</span> <span class="n">Squares</span>               <span class="mf">1448.83</span>
-<span class="n">Total</span> <span class="n">Sum</span> <span class="n">of</span> <span class="n">Squares</span>              <span class="mf">77195.4</span>
-<span class="n">R</span> <span class="n">Squared</span>                        <span class="mf">0.981232</span>
-<span class="n">Adjusted</span> <span class="n">R</span> <span class="n">Squared</span>               <span class="mf">0.980446</span>
+<span class="n">No</span><span class="o">.</span> <span class="n">Model</span> <span class="n">Parameters</span>                    <span class="mi">4</span>
+<span class="n">Degrees</span> <span class="n">of</span> <span class="n">Freedom</span>                    <span class="mi">196</span>
+<span class="n">Res</span><span class="o">.</span> <span class="n">Sum</span> <span class="n">of</span> <span class="n">Squares</span>               <span class="mf">193.264</span>
+<span class="n">Total</span> <span class="n">Sum</span> <span class="n">of</span> <span class="n">Squares</span>              <span class="mf">46201.8</span>
+<span class="n">R</span> <span class="n">Squared</span>                        <span class="mf">0.995817</span>
+<span class="n">Adjusted</span> <span class="n">R</span> <span class="n">Squared</span>               <span class="mf">0.995731</span>
 <span class="n">Converged</span><span class="p">:</span>                           <span class="kc">True</span>
 <span class="o">====================================================================================================</span>
 <span class="o">====================================================================================================</span>
                     <span class="n">Estimate</span>      <span class="n">Std</span> <span class="n">Err</span>            <span class="n">t</span>        <span class="n">P</span><span class="o">&gt;|</span><span class="n">t</span><span class="o">|</span>       <span class="p">[</span><span class="mf">0.025</span>       <span class="mf">0.975</span><span class="p">]</span>
 <span class="o">----------------------------------------------------------------------------------------------------</span>
-<span class="n">const</span>                <span class="mf">99.3134</span>        <span class="mf">0.765</span>       <span class="mf">129.77</span>    <span class="mf">5.73e-189</span>       <span class="mf">97.804</span>       <span class="mf">100.82</span>
-<span class="n">alpha1</span>               <span class="mf">4.24777</span>        <span class="mf">0.268</span>       <span class="mf">15.861</span>      <span class="mf">9.3e-37</span>       <span class="mf">3.7196</span>        <span class="mf">4.776</span>
-<span class="n">beta1</span>               <span class="o">-</span><span class="mf">8.26555</span>        <span class="mf">0.347</span>      <span class="o">-</span><span class="mf">23.848</span>            <span class="o">-</span>      <span class="o">-</span><span class="mf">8.9492</span>      <span class="o">-</span><span class="mf">7.5819</span>
-<span class="n">beta2</span>               <span class="o">-</span><span class="mf">1.80202</span>        <span class="mf">0.325</span>      <span class="o">-</span><span class="mf">5.5523</span>            <span class="o">-</span>      <span class="o">-</span><span class="mf">2.4422</span>      <span class="o">-</span><span class="mf">1.1619</span>
-<span class="n">beta3</span>                <span class="mf">5.21108</span>        <span class="mf">0.456</span>       <span class="mf">11.423</span>            <span class="o">-</span>       <span class="mf">4.3113</span>       <span class="mf">6.1109</span>
-<span class="n">breakpoint1</span>          <span class="mf">4.99612</span>        <span class="mf">0.129</span>            <span class="o">-</span>            <span class="o">-</span>       <span class="mf">4.7419</span>       <span class="mf">5.2503</span>
-<span class="n">breakpoint2</span>           <span class="mf">10.573</span>        <span class="mf">0.581</span>            <span class="o">-</span>            <span class="o">-</span>        <span class="mf">9.428</span>       <span class="mf">11.718</span>
-<span class="n">breakpoint3</span>          <span class="mf">16.0829</span>        <span class="mf">0.223</span>            <span class="o">-</span>            <span class="o">-</span>       <span class="mf">15.644</span>       <span class="mf">16.522</span>
+<span class="n">const</span>                <span class="mf">100.726</span>        <span class="mf">0.244</span>       <span class="mf">413.63</span>     <span class="mf">3.1e-290</span>       <span class="mf">100.25</span>       <span class="mf">101.21</span>
+<span class="n">alpha1</span>              <span class="o">-</span><span class="mf">4.21998</span>       <span class="mf">0.0653</span>      <span class="o">-</span><span class="mf">64.605</span>    <span class="mf">4.37e-134</span>      <span class="o">-</span><span class="mf">4.3488</span>      <span class="o">-</span><span class="mf">4.0912</span>
+<span class="n">beta1</span>                <span class="mf">2.18914</span>       <span class="mf">0.0689</span>       <span class="mf">31.788</span>            <span class="o">-</span>       <span class="mf">2.0533</span>        <span class="mf">2.325</span>
+<span class="n">breakpoint1</span>          <span class="mf">6.48706</span>        <span class="mf">0.137</span>            <span class="o">-</span>            <span class="o">-</span>       <span class="mf">6.2168</span>       <span class="mf">6.7573</span>
 <span class="o">----------------------------------------------------------------------------------------------------</span>
 <span class="n">These</span> <span class="n">alphas</span><span class="p">(</span><span class="n">gradients</span> <span class="n">of</span> <span class="n">segments</span><span class="p">)</span> <span class="n">are</span> <span class="n">estimated</span> <span class="kn">from</span> <span class="nn">betas</span><span class="p">(</span><span class="n">change</span> <span class="ow">in</span> <span class="n">gradient</span><span class="p">)</span>
 <span class="o">----------------------------------------------------------------------------------------------------</span>
-<span class="n">alpha2</span>              <span class="o">-</span><span class="mf">4.01778</span>         <span class="mf">0.22</span>      <span class="o">-</span><span class="mf">18.262</span>     <span class="mf">7.58e-44</span>      <span class="o">-</span><span class="mf">4.4517</span>      <span class="o">-</span><span class="mf">3.5838</span>
-<span class="n">alpha3</span>              <span class="o">-</span><span class="mf">5.81981</span>        <span class="mf">0.239</span>      <span class="o">-</span><span class="mf">24.391</span>     <span class="mf">1.02e-60</span>      <span class="o">-</span><span class="mf">6.2904</span>      <span class="o">-</span><span class="mf">5.3492</span>
-<span class="n">alpha4</span>             <span class="o">-</span><span class="mf">0.608729</span>        <span class="mf">0.389</span>      <span class="o">-</span><span class="mf">1.5656</span>        <span class="mf">0.119</span>      <span class="o">-</span><span class="mf">1.3756</span>      <span class="mf">0.15816</span>
+<span class="n">alpha2</span>              <span class="o">-</span><span class="mf">2.03084</span>       <span class="mf">0.0218</span>      <span class="o">-</span><span class="mf">93.068</span>    <span class="mf">3.66e-164</span>      <span class="o">-</span><span class="mf">2.0739</span>      <span class="o">-</span><span class="mf">1.9878</span>
 <span class="o">====================================================================================================</span>
 
-<span class="n">Davies</span> <span class="n">test</span> <span class="k">for</span> <span class="n">existence</span> <span class="n">of</span> <span class="n">at</span> <span class="n">least</span> <span class="mi">1</span> <span class="n">breakpoint</span><span class="p">:</span> <span class="n">p</span><span class="o">=</span><span class="mf">0.0</span> <span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="n">p</span><span class="o">&lt;</span><span class="mf">0.05</span> <span class="n">means</span> <span class="n">reject</span> <span class="n">null</span> <span class="n">hypothesis</span> <span class="n">of</span> <span class="n">no</span> <span class="n">breakpoints</span> <span class="n">at</span> <span class="mi">5</span><span class="o">%</span> <span class="n">significance</span><span class="p">)</span>
+<span class="n">Davies</span> <span class="n">test</span> <span class="k">for</span> <span class="n">existence</span> <span class="n">of</span> <span class="n">at</span> <span class="n">least</span> <span class="mi">1</span> <span class="n">breakpoint</span><span class="p">:</span> <span class="n">p</span><span class="o">=</span><span class="mf">5.13032e-295</span> <span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="n">p</span><span class="o">&lt;</span><span class="mf">0.05</span> <span class="n">means</span> <span class="n">reject</span> <span class="n">null</span> <span class="n">hypothesis</span> <span class="n">of</span> <span class="n">no</span> <span class="n">breakpoints</span> <span class="n">at</span> <span class="mi">5</span><span class="o">%</span> <span class="n">significance</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>This includes estimates for all the model variables, along with confidence intervals. The Davies test is a hypothesis test for the existence of at least one breakpoint, against the null hypothesis of no breakpoints.</p>
 <p>There are also tools for plotting data:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <span class="c1"># Plot the data, fit, breakpoints and confidence intervals</span>
-<span class="n">bp_fit</span><span class="o">.</span><span class="n">plot_data</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;grey&quot;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">pw_fit</span><span class="o">.</span><span class="n">plot_data</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;grey&quot;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
 <span class="c1"># Pass in standard matplotlib keywords to control any of the plots</span>
-<span class="n">bp_fit</span><span class="o">.</span><span class="n">plot_fit</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-<span class="n">bp_fit</span><span class="o">.</span><span class="n">plot_breakpoints</span><span class="p">()</span>
-<span class="n">bp_fit</span><span class="o">.</span><span class="n">plot_breakpoint_confidence_intervals</span><span class="p">()</span>
+<span class="n">pw_fit</span><span class="o">.</span><span class="n">plot_fit</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">pw_fit</span><span class="o">.</span><span class="n">plot_breakpoints</span><span class="p">()</span>
+<span class="n">pw_fit</span><span class="o">.</span><span class="n">plot_breakpoint_confidence_intervals</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="example-plot" src="_images/example.png" />
+<img alt="fit-example-plot" src="_images/example2.png" />
+<p>You can extract data as well:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get the key results of the fit</span>
+<span class="n">pw_results</span> <span class="o">=</span> <span class="n">pw_fit</span><span class="o">.</span><span class="n">get_results</span><span class="p">()</span>
+<span class="n">pw_estimates</span> <span class="o">=</span> <span class="n">pw_results</span><span class="p">[</span><span class="s2">&quot;estimates&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
 </section>
 <section id="how-it-works">
 <h1>How It Works<a class="headerlink" href="#how-it-works" title="Permalink to this headline"></a></h1>
-<p>The package implements Muggeo’s iterative algorithm (Muggeo “Estimating regression models with unknown break-points” (2003)), to quickly find breakpoints.</p>
-<p>This iteartive method does not always converge to a global optimal solution, and can instead converge to a local optima or not converge at all. For this reason the Fit method also implements a non-parametric bootstrap restarting to escape local minima, this can be controlled with <cite>n_boot</cite>. To run the Fit without bootstrap restarting, set <cite>n_boot=0</cite>. If Muggeo’s algorthm has not converged, the Fit method will keep trying to find a fit using bootstrap restarting <cite>n_boot</cite> times.</p>
+<p>The package implements Muggeo’s iterative algorithm (Muggeo “Estimating regression models with unknown break-points” (2003)), to quickly find breakpoints. That method simultaneously fits breakpoint positions and the linear models for the different segments of the fit. This method is quick and it gives confidence intervals for all the model estimates. See the accompanying paper for more details.</p>
+<p>Muggeo’s method doesn’t always converge on the best solution - sometimes it finds a locally optimal solution or doesn’t converge at all. For this reason the Fit method also implements a process called bootstrap restarting. This involves taking a bootstrap resample of the data, then using this bootstrapped data to try and find a better solution. The number of times this runs can be controlled with <cite>n_boot</cite>. To run the Fit without bootstrap restarting, set <cite>n_boot=0</cite>.</p>
 <p>If you don’t have good guesses for inital breakpoints, you can just set the number of e.g. <cite>n_breakpoints=3</cite>. in this case the algorithm will randomly generate starting breakpoints until it finds a solution that converges (up to <cite>n_boot</cite> times). This is a good option if the algorithm is otherwise not converging.</p>
 </section>
 <section id="model-selection">

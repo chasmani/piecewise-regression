@@ -120,13 +120,11 @@ Return bootstrapped data of same length as oriignal data.</p>
 <dd><p>The main fitting algorithm. Begins by doing a fit based on Muggeo’s algorithm. 
 if n_boot = 0 we stop there. Otherwise we do some bootstrap restarting.  
 Bootstrap Restarting escapes local minima.
-Each bootstrap restart:</p>
-<blockquote>
-<div><p>We take the best current breakpoints, and get new data by running a non-parametric bootstrap by resampling data. 
-Then run a Muggeo fit on the new data and best current breakpoints. This gives new breakpoint values. 
-Then run a Muggeo fit again with the original data and these new breakpoint values. 
-Throughout, keep track of the history of fits and the best_muggeo fit that converged - defined as the lowest residual sum of squares.</p>
-</div></blockquote>
+Each bootstrap restart: 
+- We take the best current breakpoints, and get new data by running a non-parametric bootstrap by resampling data. 
+- Then run a Muggeo fit on the new data and best current breakpoints. This gives new breakpoint values. 
+- Then run a Muggeo fit again with the original data and these new breakpoint values. 
+- Throughout, keep track of the history of fits and the best_muggeo fit that converged - defined as the lowest residual sum of squares.</p>
 </dd></dl>
 
 <dl class="py method">

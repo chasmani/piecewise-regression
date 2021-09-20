@@ -630,10 +630,10 @@ class Fit:
 		if n_boot = 0 we stop there. Otherwise we do some bootstrap restarting.  
 		Bootstrap Restarting escapes local minima.
 		Each bootstrap restart: 
-			We take the best current breakpoints, and get new data by running a non-parametric bootstrap by resampling data. 
-			Then run a Muggeo fit on the new data and best current breakpoints. This gives new breakpoint values. 
-			Then run a Muggeo fit again with the original data and these new breakpoint values. 
-			Throughout, keep track of the history of fits and the best_muggeo fit that converged - defined as the lowest residual sum of squares.
+		- We take the best current breakpoints, and get new data by running a non-parametric bootstrap by resampling data. 
+		- Then run a Muggeo fit on the new data and best current breakpoints. This gives new breakpoint values. 
+		- Then run a Muggeo fit again with the original data and these new breakpoint values. 
+		- Throughout, keep track of the history of fits and the best_muggeo fit that converged - defined as the lowest residual sum of squares.
 		"""			
 		muggeo_fit = Muggeo(xx=self.xx, yy=self.yy, start_values=self.start_values, n_breakpoints = self.n_breakpoints,
 			max_iterations=self.max_iterations, tolerance = self.tolerance, verbose=self.verbose, 
