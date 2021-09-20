@@ -1,7 +1,5 @@
 Easy to use piecewise (aka segmented) regression in Python. For fitting straight lines to data where there is one or more changes in gradient (known as breakpoints). Based on Muggeo "Estimating regression models with unknown break-points" (2003). 
 
-For example: ::
-
 .. image:: ../paper/example.png
     :alt: basic-example-plot
 
