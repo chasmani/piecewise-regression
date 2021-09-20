@@ -603,15 +603,11 @@ class Fit:
 
 		self.davies = davies.davies_test(self.xx, self.yy)
 
-
-	
 	def get_results(self):
 		"""
 		Return a small dictionary with key results form the fit.
 		Useful for using this code in a larger analysis. E.g. ModelSelection
-		
 		"""
-
 		results = {
 			"davies":self.davies,
 		}

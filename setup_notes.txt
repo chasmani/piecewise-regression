@@ -12,3 +12,4 @@ To make new docs:
 4. you might need to update the theme. Can be set in conf.py. Might also need to install 'sudo pip3 install sphinx-rtd-theme'
 5. Push it all to github
 6. On readthedocs.org - add github repo
+7. It might take a few hours to propogate to read the docs.
