@@ -32,18 +32,18 @@ Here is a more detailed example. We start off generating some data with a breakp
 
 	alpha_1 = -4    
 	alpha_2 = -2
-	intercept = 100
+	constant = 100
 	breakpoint_1 = 7
 	n_points = 200
 	np.random.seed(0)
 	xx = np.linspace(0, 20, n_points)
-	yy = intercept + alpha_1*xx + (alpha_2-alpha_1) * np.maximum(xx - breakpoint_1, 0) + np.random.normal(size=n_points)
+	yy = constant + alpha_1*xx + (alpha_2-alpha_1) * np.maximum(xx - breakpoint_1, 0) + np.random.normal(size=n_points)
 
 
 Now we fit the model: ::
 
     # Given some data, fit the model
-    pw_fit = Fit(xx, yy, start_values=[5], n_breakpoints=1)
+    pw_fit = piecewise_regression.Fit(xx, yy, start_values=[5], n_breakpoints=1)
 
     # Print a summary of the fit
     pw_fit.summary()
@@ -118,7 +118,7 @@ Model Selection
 
 In addition to the main Fit tool, the package also offers a `ModelSelection` option based on the Bayesian Information Criterion. This is experimental and not as thorough as the main Fit tool: ::
 
-	ms = ModelSelection(x, y, max_breakpoints=6)
+	ms = piecewise_regression.ModelSelection(x, y, max_breakpoints=6)
 
 This gives the following example output: ::
 

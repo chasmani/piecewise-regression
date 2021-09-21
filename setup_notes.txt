@@ -13,6 +13,7 @@ To make new docs:
 5. Push it all to github
 6. On readthedocs.org - add github repo
 7. It might take a few hours to propogate to read the docs.
+8. You might need to add a requirements.txt, and maybe add it in the Advances Settings on readthedocs.org
 
 Images:
 If including an image in readme.rst. It needs to display in 3 places:
