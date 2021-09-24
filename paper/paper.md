@@ -35,7 +35,7 @@ An example fit is shown in \autoref{fig:example}.
 
 # How It Works
 
-It is not necessary to know the underlying mathematics to use the package. We follow here the derivation by Muggeo [@muggeo2003estimating]. The general form of the model with one breakpoint is
+It is not necessary to know the underlying theory in order to to use the package. We follow here the derivation by Muggeo [@muggeo2003estimating]. The general form of the model with one breakpoint is
 
 \begin{equation}
     y = \alpha x + c + \beta (x-\psi) H(x-\psi) + \zeta \,,
