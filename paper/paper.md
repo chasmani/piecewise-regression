@@ -47,25 +47,25 @@ where given some data, $x$, $y$, we are trying to estimate the gradient of the f
     y \approx \alpha x + c + \beta (x - \psi^{(0)}) H (x - \psi^{(0)}) - \beta (\psi - \psi^{(0)}) H(x - \psi^{(0)}) + \zeta \,.
 \end{equation}
 
-This is a linear relationship and we can find a new breakpoint estimate, $\psi^{(1)}$, through linear regression. We iterate in this way until the breakpoint estimate converges, at which point we stop the algorithm. The same method is used with multiple breakpoints, taking a multivarite Taylor expansion around initial guesses for each of the breakpoints. 
+This is now a linear relationship and we can find a new breakpoint estimate, $\psi^{(1)}$, through linear regression. We iterate in this way until the breakpoint estimate converges, at which point we stop the algorithm. The same method is used with multiple breakpoints, taking a multivarite Taylor expansion around initial guesses for each of the breakpoints. 
 
-Muggeo's iterative algorithm is not guaranteed to converge on a globally optimal solution. Instead, it can converge to local optima or diverge. To address this limitation we also implement bootstrap restarting [wood2001minimizing], again following Muggeo's approach [@muggeo2008segmented]. The bootstrap restarting algorihtm generates a non-parametric bootstrap of the data through resampling, which is then used to find new breakpoint values that may be a better global solution.
+Muggeo's iterative algorithm is not guaranteed to converge on a globally optimal solution. Instead, it can converge to local optima or diverge. To address this limitation we also implement bootstrap restarting [@wood2001minimizing], again following Muggeo's approach [@muggeo2008segmented]. The bootstrap restarting algorithm generates a non-parametric bootstrap of the data through resampling, which is then used to find new breakpoint values that may find a better global solution. This is repeated several times to escape local optima.  
 
 # Features
 
 The package includes the following features:
 
-- Standard fit using the iterative method described by Muggeo.  
-- Bootstrap restarting to avoid local minima. 
+- Standard fit using the iterative method described by Muggeo.
+- Bootstrap restarting to avoid local minima.
 - Bootstrap restarting with randomised initial breakpoint guesses. 
-- Calculation of Standard Errors and confidence intervals.
+- Calculation of standard errors and confidence intervals.
 - Davies hypothesis test for the existence of a breakpoint. 
 - Customisable plots of fits.
 - Customisable plots of algorithm iterations.
 - Printable summary.
 - Summary data output.
 - Comprehensive tests.
-- Model comparision with an unknown number of breakpoints, with the best fit based on the Bayesian Information Criterion.  
+- Model comparision with an unknown number of breakpoints, with the best fit based on the Bayesian information criterion.  
 
 The package can be downloaded through the [Python Package Index](https://pypi.org/project/piecewise-regression/). The full code is publicly available on [github](https://github.com/chasmani/piecewise-regression). Documentation, including an API reference, can be found at [Read The Docs](https://piecewise-regression.readthedocs.io/en/latest/).
 
