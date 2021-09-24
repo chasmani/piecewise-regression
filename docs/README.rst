@@ -9,7 +9,7 @@ Installation
 
 You can install piecewise-regression using python's `pip package index <https://pypi.org/project/piecewise-regression/>`_
 
-    pip install piecewise-regression
+    sudo pip3 install piecewise-regression
 
 The package was developed and tested on Python 3.7.
 
