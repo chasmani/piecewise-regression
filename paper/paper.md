@@ -20,11 +20,11 @@ bibliography: paper.bib
 
 # Summary
 
-Piecewise regression (also known as segmented regression, broken-line regression or breakpoint analysis) fits continuous straight lines to data with one or more breakpoints where the gradient changes. The approach here is as described by Muggeo [@muggeo2003estimating], where the breakpoint positions and the straight line models are simultaneously fit using an iterative method. This easy to use package includes an automatic comprehensive statistical analysis that gives confidence intervals for all model variables, and hypothesis testing for the existence of breakpoints. 
+Piecewise regression (also known as segmented regression, broken-line regression or breakpoint analysis) fits a linear regression model to data that includes one or more breakpoints where the gradient changes. The approach here is as described by Muggeo [@muggeo2003estimating], where the breakpoint positions and the straight line models are simultaneously fit using an iterative method. This easy to use package includes an automatic comprehensive statistical analysis that gives confidence intervals for all model variables, and hypothesis testing for the existence of breakpoints. 
 
 # Statement of need
 
-A common problem is to fit a linear regression model that includes some change(s) in gradient. One approach would be numerical minimisation of the sum of squared errors via a grid search for the breakpoint position(s). Muggeo [@muggeo2003estimating] derived an altearnative method to grid search, with the advantages of being more computationally efficient and allowing for more robust statistical analysis. There are many R packages that implement this method including the segmented R package written by Muggeo himself [@muggeo2008segmented]. However, at the time of writing there are not comparable resources in Python. 
+A common problem in many fields is to fit a straight line model to data that includes some change(s) in gradient. One approach would be numerical minimisation of the sum of squared errors via a grid search for the breakpoint position(s). Muggeo [@muggeo2003estimating] derived an altearnative method to grid search, with the advantages of being more computationally efficient and allowing for more robust statistical analysis. There are many R packages that implement this method including the segmented R package written by Muggeo himself [@muggeo2008segmented]. However, at the time of writing there are not comparable resources in Python. 
 
 # Examples
 
@@ -55,7 +55,7 @@ Muggeo's iterative algorithm is not guaranteed to converge on a globally optimal
 The package includes the following features:
 
 - Standard fit using the iterative method described by Muggeo.
-- Bootstrap restarting to avoid local minima.
+- Bootstrap restarting to escape local optima.
 - Bootstrap restarting with randomised initial breakpoint guesses. 
 - Calculation of standard errors and confidence intervals.
 - Davies hypothesis test for the existence of a breakpoint. 
