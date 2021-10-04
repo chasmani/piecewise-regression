@@ -28,9 +28,22 @@ A common problem in many fields is to fit a straight line model to data that inc
 
 # Examples
 
+Given some data in $x$ and $y$ arrays, the package makes fitting easy. 
+
+  import piecewise_regression
+  import matplotlib.pyplot as plt
+
+  # Fit the data
+  pw_fit = piecewise_regression.Fit(x, y, n_breakpoints=1)
+  # Plot the fit
+  pw_fit.plot()
+  plt.show()
+
 An example fit is shown in \autoref{fig:example}. 
 
 ![An example model fit (red line) to data (grey markers). The estimated breakpoint positions (blue lines) and confidence intervals (shaded blue regions) are shown. \label{fig:example}](example.png)
+
+
 
 # How It Works
 
