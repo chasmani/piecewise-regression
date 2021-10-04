@@ -13,7 +13,7 @@ authors:
 affiliations:
  - name: Centre for Doctoral Training in Mathematics for Real-World Systems, University of Warwick 
    index: 1
-date: 17 September 2021
+date: 4 October 2021
 bibliography: paper.bib
 
 ---
@@ -26,24 +26,11 @@ Piecewise regression (also known as segmented regression, broken-line regression
 
 A common problem in many fields is to fit a straight line model to data that includes some change(s) in gradient. One approach would be numerical minimisation of the sum of squared errors via a grid search for the breakpoint position(s). Muggeo [@muggeo2003estimating] derived an altearnative method to grid search, with the advantages of being more computationally efficient and allowing for more robust statistical analysis. There are many R packages that implement this method including the segmented R package written by Muggeo himself [@muggeo2008segmented]. However, at the time of writing there are not comparable resources in Python. 
 
-# Examples
+# Example
 
-Given some data in $x$ and $y$ arrays, the package makes fitting easy. 
-
-  import piecewise_regression
-  import matplotlib.pyplot as plt
-
-  # Fit the data
-  pw_fit = piecewise_regression.Fit(x, y, n_breakpoints=1)
-  # Plot the fit
-  pw_fit.plot()
-  plt.show()
-
-An example fit is shown in \autoref{fig:example}. 
+An example plot is shown in \autoref{fig:example}. 
 
 ![An example model fit (red line) to data (grey markers). The estimated breakpoint positions (blue lines) and confidence intervals (shaded blue regions) are shown. \label{fig:example}](example.png)
-
-
 
 # How It Works
 
@@ -59,7 +46,7 @@ where given some data, $x$, $y$, we are trying to estimate the gradient of the f
     y \approx \alpha x + c + \beta (x - \psi^{(0)}) H (x - \psi^{(0)}) - \beta (\psi - \psi^{(0)}) H(x - \psi^{(0)}) + \zeta \,.
 \end{equation}
 
-This is now a linear relationship and we can find a new breakpoint estimate, $\psi^{(1)}$, through linear regression. We iterate in this way until the breakpoint estimate converges, at which point we stop the algorithm. The same method is used with multiple breakpoints, taking a multivarite Taylor expansion around initial guesses for each of the breakpoints. 
+This is now a linear relationship and we can find a new breakpoint estimate, $\psi^{(1)}$, through linear regression. We iterate in this way until the breakpoint estimate converges, at which point we stop the algorithm. The same method is used with multiple breakpoints, taking a multivariate Taylor expansion around initial guesses for each of the breakpoints. 
 
 Muggeo's iterative algorithm is not guaranteed to converge on a globally optimal solution. Instead, it can converge to local optima or diverge. To address this limitation we also implement bootstrap restarting [@wood2001minimizing], again following Muggeo's approach [@muggeo2008segmented]. The bootstrap restarting algorithm generates a non-parametric bootstrap of the data through resampling, which is then used to find new breakpoint values that may find a better global solution. This is repeated several times to escape local optima.  
 
