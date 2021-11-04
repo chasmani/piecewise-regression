@@ -20,11 +20,11 @@ bibliography: paper.bib
 
 # Summary
 
-Piecewise regression (also known as segmented regression, broken-line regression or breakpoint analysis) fits a linear regression model to data that includes one or more breakpoints where the gradient changes. The approach here is as described by Muggeo [@muggeo2003estimating], where the breakpoint positions and the straight line models are simultaneously fit using an iterative method. This easy to use package includes an automatic comprehensive statistical analysis that gives confidence intervals for all model variables, and hypothesis testing for the existence of breakpoints. 
+Piecewise regression (also known as segmented regression, broken-line regression, or breakpoint analysis) fits a linear regression model to data that includes one or more breakpoints where the gradient changes. The approach here is as described by Muggeo [@muggeo2003estimating], where the breakpoint positions and the straight line models are simultaneously fit using an iterative method. This easy-to-use package includes an automatic comprehensive statistical analysis that gives confidence intervals for all model variables and hypothesis testing for the existence of breakpoints. 
 
 # Statement of need
 
-A common problem in many fields is to fit a straight line model to data that includes some change(s) in gradient. One approach would be numerical minimisation of the sum of squared errors via a grid search for the breakpoint position(s). Muggeo [@muggeo2003estimating] derived an altearnative method to grid search, with the advantages of being more computationally efficient and allowing for more robust statistical analysis. There are many R packages that implement this method including the segmented R package written by Muggeo himself [@muggeo2008segmented]. However, at the time of writing there are not comparable resources in Python. 
+A common problem in many fields is to fit a straight line model to data that includes some change(s) in gradient. One approach would be numerical minimisation of the sum of squared errors via a grid search for the breakpoint position(s). Muggeo [@muggeo2003estimating] derived an alternative method to grid search, with the advantages of being more computationally efficient and allowing for more robust statistical analysis. Many R packages implement this method including the segmented R package written by Muggeo himself [@muggeo2008segmented]. However, at the time of writing, there are not comparable resources in Python. 
 
 # Example
 
@@ -34,7 +34,7 @@ An example plot is shown in \autoref{fig:example}.
 
 # How It Works
 
-It is not necessary to know the underlying theory in order to to use the package. We follow here the derivation by Muggeo [@muggeo2003estimating]. The general form of the model with one breakpoint is
+It is not necessary to know the underlying theory to use the package. We follow here the derivation by Muggeo [@muggeo2003estimating]. The general form of the model with one breakpoint is
 
 \begin{equation}
     y = \alpha x + c + \beta (x-\psi) H(x-\psi) + \zeta \,,
@@ -46,9 +46,10 @@ where given some data, $x$, $y$, we are trying to estimate the gradient of the f
     y \approx \alpha x + c + \beta (x - \psi^{(0)}) H (x - \psi^{(0)}) - \beta (\psi - \psi^{(0)}) H(x - \psi^{(0)}) + \zeta \,.
 \end{equation}
 
-This is now a linear relationship and we can find a new breakpoint estimate, $\psi^{(1)}$, through linear regression. We iterate in this way until the breakpoint estimate converges, at which point we stop the algorithm. The same method is used with multiple breakpoints, taking a multivariate Taylor expansion around initial guesses for each of the breakpoints. 
 
-Muggeo's iterative algorithm is not guaranteed to converge on a globally optimal solution. Instead, it can converge to local optima or diverge. To address this limitation we also implement bootstrap restarting [@wood2001minimizing], again following Muggeo's approach [@muggeo2008segmented]. The bootstrap restarting algorithm generates a non-parametric bootstrap of the data through resampling, which is then used to find new breakpoint values that may find a better global solution. This is repeated several times to escape local optima.  
+This is now a linear relationship and we can find a new breakpoint estimate, $\psi^{(1)}$, through linear regression. We iterate in this way until the breakpoint estimate converges, at which point we stop the algorithm. This is the derivation for a single breakpoint. If considering multiple breakpoints, the same derivation is followed but instead using a multivariate Taylor expanstion around the initial guesses for the breakpoints. 
+
+Muggeo's iterative algorithm is not guaranteed to converge on a globally optimal solution. Instead, it can converge to local optima or diverge. To address this limitation, we also implement bootstrap restarting [@wood2001minimizing], again following Muggeo's approach [@muggeo2008segmented]. The bootstrap restarting algorithm generates a non-parametric bootstrap of the data through resampling, which is then used to find new breakpoint values that may find a better global solution. This is repeated several times to escape local optima.  
 
 # Features
 
