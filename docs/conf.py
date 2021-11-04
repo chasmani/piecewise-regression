@@ -17,6 +17,8 @@
 
 # -- Project information -----------------------------------------------------
 
+import sys
+import os
 project = 'piecewise-regression'
 copyright = '2021, Charlie Pilgrim'
 author = 'Charlie Pilgrim'
@@ -31,7 +33,7 @@ release = '1'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-	'sphinx.ext.duration',
+    'sphinx.ext.duration',
     'sphinx.ext.doctest',
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
@@ -65,7 +67,5 @@ html_theme = 'sphinx_rtd_theme'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = []
 
-import os
-import sys
 
 sys.path.insert(0, os.path.abspath('..'))
