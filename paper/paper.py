@@ -24,7 +24,7 @@ def plot_basic_example():
     breakpoint_3 = 16
 
     n_points = 200
-    noise = 3
+    noise = 5
 
     xx = np.linspace(0, 20, n_points)
 
@@ -47,6 +47,10 @@ def plot_basic_example():
     plt.ylabel("y")
 
     plt.savefig("example.png", dpi=300)
+
+    # Given some data, fit the model
+    ms = ModelSelection(xx, yy, max_breakpoints=6)
+    print(ms)
 
     plt.show()
 

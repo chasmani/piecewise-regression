@@ -310,4 +310,4 @@ def model_comparision_straight_line():
 
 if __name__ == "__main__":
 
-    on_data_1()
+    model_comparision_straight_line()

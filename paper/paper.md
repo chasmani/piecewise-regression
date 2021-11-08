@@ -24,11 +24,11 @@ Piecewise regression (also known as segmented regression, broken-line regression
 
 # Statement of need
 
-A common problem in many fields is to fit a straight line model to data that includes some change(s) in gradient. One approach would be numerical minimisation of the sum of squared errors via a grid search for the breakpoint position(s). Muggeo [@muggeo2003estimating] derived an alternative method to grid search, with the advantages of being more computationally efficient and allowing for more robust statistical analysis. Many R packages implement this method including the segmented R package written by Muggeo himself [@muggeo2008segmented]. However, at the time of writing, there are not comparable resources in Python. 
+A common problem in many fields is to fit a straight line model to data that includes some change(s) in gradient. One approach would be to perform a numerical optmisation over breakpoint position(s) to minimise the sum of squared errors, as implemented in the pwlf python package [@jekel2019pwlf]. Muggeo [@muggeo2003estimating] derived an alternative method, with the advantages of being computationally efficient and allowing for robust statistical analysis. Many R packages implement this method including the segmented R package written by Muggeo himself [@muggeo2008segmented]. However, at the time of writing, there are not comparable resources in Python. 
 
 # Example
 
-An example plot is shown in \autoref{fig:example}. 
+An example plot is shown in \autoref{fig:example}. Data was generated with 3 breakpoints and some noise, and a model was then fit to that data with 3 breakpoints. The plot shows the maximum likelihood estimators for the straight line segments and breakpoint positions. The package automatically carries out a Davies hypothesis test [@davies1987hypothesis, muggeo2008segmented] for the existence of at least 1 breakpoint, here finding strong evidence for breakpoints with $p<0.001$.
 
 ![An example model fit (red line) to data (grey markers). The estimated breakpoint positions (blue lines) and confidence intervals (shaded blue regions) are shown. \label{fig:example}](example.png)
 
@@ -50,6 +50,10 @@ where given some data, $x$, $y$, we are trying to estimate the gradient of the f
 This is now a linear relationship and we can find a new breakpoint estimate, $\psi^{(1)}$, through linear regression. We iterate in this way until the breakpoint estimate converges, at which point we stop the algorithm. This is the derivation for a single breakpoint. If considering multiple breakpoints, the same derivation is followed but instead using a multivariate Taylor expanstion around the initial guesses for the breakpoints. 
 
 Muggeo's iterative algorithm is not guaranteed to converge on a globally optimal solution. Instead, it can converge to local optima or diverge. To address this limitation, we also implement bootstrap restarting [@wood2001minimizing], again following Muggeo's approach [@muggeo2008segmented]. The bootstrap restarting algorithm generates a non-parametric bootstrap of the data through resampling, which is then used to find new breakpoint values that may find a better global solution. This is repeated several times to escape local optima.  
+
+# Model Selection
+
+The standard algorithm finds a good fit with a given number of breakpoints. In some instances we might not know how many breakpoints to expect in the data. We provide a tool to compare models with different numbers of breakpoints based on minimising the Bayesian Information Criterion [@wit2012all], which takes into account the value of the likelihood function while including a penalty for the number of model parameters, to avoid overfitting. When applied to the example in Figure \autoref{fig:example}, a model with 3 breakpoints is the preferred choice.
 
 # Features
 
