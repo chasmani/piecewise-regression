@@ -24,7 +24,6 @@ class ModelSelection:
             ):
 
         self.models = []
-        self.full_models_data = []
 
         self.stop = False
 
@@ -45,7 +44,6 @@ class ModelSelection:
             fit_summary = bootstrapped_fit.get_results()
             fit_summary["n_breakpoints"] = k
             self.models.append(fit_summary)
-            self.full_models_data.append(bootstrapped_fit)
 
         self.summary()
 
@@ -116,7 +114,6 @@ class ModelSelection:
         fit_data["estimates"]["alpha1"] = results.params[1]
 
         self.models.append(fit_data)
-        self.full_models_data.append(fit_data)
 
 
 if __name__ == "__main__":

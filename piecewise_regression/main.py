@@ -6,7 +6,6 @@ import scipy.stats
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
 
-
 try:
     import piecewise_regression.davies as davies
     import piecewise_regression.r_squared_calc as r_squared_calc
@@ -934,7 +933,7 @@ class Fit:
         History of the bootstrap restarting procedure.
 
         """
-        if not self.best_muggeo.converged:
+        if not self.best_muggeo:
             print("Algorithm didn't converge. Plotting breakpoint history")
 
         # Get the data from the best_muggeo in a form for plotting
@@ -999,15 +998,20 @@ class Fit:
         """
 
         if not self.best_muggeo:
-            print(
-                "Algorithm did not converge. Try different n_breakpoints,"
-                "different start_values, or start_values=None")
+            summary = (
+                "Algorithm did not converge. Try different n_breakpoints, "
+                "different start_values, or start_values=None\n")
 
-            print("Summary of why the algorithm did not converge:")
+            summary += "Summary of why the algorithm did not converge:\n"
             run_count = 1
             for muggeo_fit in self.bootstrap_history:
-                print("Run {}: {}".format(run_count, muggeo_fit.stop_reason))
+                summary += "Run {}: {} \n".format(
+                    run_count,
+                    muggeo_fit.stop_reason)
                 run_count += 1
+            print(summary)
+            return summary
+
         else:
             header = "\n{:^70}\n".format("Breakpoint Regression Results")
 
@@ -1097,13 +1101,17 @@ class Fit:
 
             table = double_line + table_header + single_line + table_contents
 
-            print(header + overview + table)
-
-            print(
-                "Davies test for existence of at least 1 breakpoint: p={:.6} "
-                "(e.g. p<0.05 means reject null hypothesis of no breakpoints "
+            davies_result = (
+                "Davies test for existence of at least "
+                "1 breakpoint: p={:.6} (e.g. p<0.05 means reject null "
+                "hypothesis of no breakpoints "
                 " at 5% significance)".format(self.davies))
-            print("\n\n")
+
+            summary = header + overview + table + davies_result + "\n\n"
+
+            print(summary)
+
+            return summary
 
 
 if __name__ == "__main__":

@@ -45,7 +45,6 @@ def validate_list_of_numbers(var, var_name, min_length):
             List of integers of floats
             Numpy array of integers or floats
     """
-    print(var)
     value_error_text = "{} must be a list of numbers with minimum length {}"
     value_error_text = value_error_text.format(var_name, min_length)
 

@@ -149,11 +149,11 @@ The package includes comprehensive tests.
 
 To run all tests, from the main directory run: ::
 	
-	python3 -m "nose"
+	nosetests
 
-Note: This requires nosetests, can be downloaded from apt with: ::
+To get code coverage, run:
 
-	sudo apt install python3-nose
+	nosetests --with-coverage --cover-erase --cover-package=piecewise_regression/
 
 There are also a series of simulation tests that check the estimates have realistic confidence intervals, and the Davies test gives realistic p-values. These can be found in the folder "tests". 
 
