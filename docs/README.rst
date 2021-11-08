@@ -1,4 +1,24 @@
-# piecewise-regression
+==========================================================
+piecewise-regression (aka segmented regression) in python
+==========================================================
+:piecewise-regression: nested sampling visualisation
+:Author: Charlie Pilgrim
+:Version: 
+:Github: https://github.com/chasmani/piecewise-regression
+:Documentation: https://readthedocs.org/projects/piecewise-regression/
+
+.. image:: https://codecov.io/gh/chasmani/piecewise-regression/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/chasmani/piecewise-regression
+   :alt: Test Coverage Status
+.. image:: https://readthedocs.org/projects/piecewise-regression/badge/?version=latest
+   :target: https://piecewise-regression.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status
+.. image:: https://badge.fury.io/py/piecewise-regression.svg
+   :target: https://badge.fury.io/py/piecewise-regression
+   :alt: PyPi location
+.. image:: https://img.shields.io/badge/license-MIT-blue.svg
+   :target: https://github.com/chasmani/piecewise-regresssion/blob/master/LICENSE
+   :alt: License information
 
 Easy-to-use piecewise regression (aka segmented regression) in Python. For fitting straight lines to data where there is one or more changes in gradient (known as breakpoints). Based on Muggeo "Estimating regression models with unknown break-points" (2003). 
 
