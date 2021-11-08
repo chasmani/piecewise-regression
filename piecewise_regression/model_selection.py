@@ -117,18 +117,4 @@ class ModelSelection:
 
 
 if __name__ == "__main__":
-    np.random.seed(0)
-
-    alpha = 10
-    intercept = 100
-
-    n_points = 200
-
-    xx = np.linspace(0, 20, n_points)
-
-    yy = intercept + alpha*xx
-    yy += np.random.normal(size=n_points)
-
-    
-
-    ModelSelection(xx, yy, max_breakpoints=6)
+    pass

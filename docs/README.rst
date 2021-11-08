@@ -1,9 +1,9 @@
 ==========================================================
 piecewise-regression (aka segmented regression) in python
 ==========================================================
-:piecewise-regression: nested sampling visualisation
+:piecewise-regression: fitting straight line models with breakpoints
 :Author: Charlie Pilgrim
-:Version: 
+:Version: 1.0.4
 :Github: https://github.com/chasmani/piecewise-regression
 :Documentation: https://readthedocs.org/projects/piecewise-regression/
 
