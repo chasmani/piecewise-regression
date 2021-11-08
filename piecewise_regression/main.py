@@ -2,9 +2,10 @@
 import warnings
 
 import numpy as np
-import statsmodels.api as sm
 import scipy.stats
 import matplotlib.pyplot as plt
+import statsmodels.api as sm
+
 
 try:
     import piecewise_regression.davies as davies

@@ -11,6 +11,8 @@ def validate_boolean(var, var_name):
 
 
 def validate_positive_integer(var, var_name):
+    if isinstance(var, bool):
+        raise ValueError("{} must be a positive Integer".format(var_name))
     if isinstance(var, int) and var > 0:
         return var
     else:
@@ -18,13 +20,19 @@ def validate_positive_integer(var, var_name):
 
 
 def validate_non_negative_integer(var, var_name):
+
+    if isinstance(var, bool):
+        raise ValueError("{} must be a non-negative Integer".format(var_name))
+
     if isinstance(var, int) and var >= 0:
         return var
     else:
-        raise ValueError("{} must be a positive Integer".format(var_name))
+        raise ValueError("{} must be a non-negative Integer".format(var_name))
 
 
 def validate_positive_number(var, var_name):
+    if isinstance(var, bool):
+        raise ValueError("{} must be a Float".format(var_name))
     if (isinstance(var, float) or isinstance(var, int)) and var > 0:
         return var
     else:
@@ -37,6 +45,7 @@ def validate_list_of_numbers(var, var_name, min_length):
             List of integers of floats
             Numpy array of integers or floats
     """
+    print(var)
     value_error_text = "{} must be a list of numbers with minimum length {}"
     value_error_text = value_error_text.format(var_name, min_length)
 
