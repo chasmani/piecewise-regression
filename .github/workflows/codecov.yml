@@ -1,14 +1,15 @@
 name: codecov
 on: [push]
-jobs:
+jobs:  
   run:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        python-version: ["3.7", "3.8", "3.9"]
     env:
-      OS: ${{ matrix.os }}
-      PYTHON: '3.7'
+      OS: ubuntu-latest
+      PYTHON: ${{ matrix.python-version }}
     steps:
     - uses: actions/checkout@master
     - name: Setup Python
