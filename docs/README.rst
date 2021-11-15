@@ -19,6 +19,9 @@ piecewise-regression (aka segmented regression) in python
 .. image:: https://badge.fury.io/py/piecewise-regression.svg
    :target: https://badge.fury.io/py/piecewise-regression
    :alt: PyPi location
+. image:: https://joss.theoj.org/papers/b64e5e7d746efc5d91462a51b3fc5bf8/status.svg
+   :target: https://joss.theoj.org/papers/b64e5e7d746efc5d91462a51b3fc5bf8
+   :alt: Review Status
 .. image:: https://img.shields.io/badge/license-MIT-blue.svg
    :target: https://github.com/chasmani/piecewise-regresssion/blob/master/LICENSE
    :alt: License information
