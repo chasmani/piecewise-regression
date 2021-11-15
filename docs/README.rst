@@ -7,9 +7,6 @@ piecewise-regression (aka segmented regression) in python
 :Github: https://github.com/chasmani/piecewise-regression
 :Documentation: https://readthedocs.org/projects/piecewise-regression/
 
-
-[![Python package](https://github.com/chasmani/piecewise-regression/actions/workflows/python-package.yml/badge.svg)](https://github.com/chasmani/piecewise-regression/actions/workflows/python-package.yml)
-
 .. image:: https://github.com/chasmani/piecewise-regression/actions/workflows/python-package.yml/badge.svg
    :target: https://github.com/chasmani/piecewise-regression/actions/workflows/python-package.yml
    :alt: Build Status
