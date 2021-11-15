@@ -7,8 +7,11 @@ piecewise-regression (aka segmented regression) in python
 :Github: https://github.com/chasmani/piecewise-regression
 :Documentation: https://readthedocs.org/projects/piecewise-regression/
 
-.. image:: https://github.com/chasmani/pieicewise-regression/workflows/CI/badge.svg?branch=master
-   :target: https://github.com/chasmani/pieicewise-regression/actions?query=workflow%3ACI+branch%3Amaster
+
+[![Python package](https://github.com/chasmani/piecewise-regression/actions/workflows/python-package.yml/badge.svg)](https://github.com/chasmani/piecewise-regression/actions/workflows/python-package.yml)
+
+.. image:: https://github.com/chasmani/piecewise-regression/actions/workflows/python-package.yml/badge.svg
+   :target: https://github.com/chasmani/piecewise-regression/actions/workflows/python-package.yml
    :alt: Build Status
 .. image:: https://codecov.io/gh/chasmani/piecewise-regression/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/chasmani/piecewise-regression
