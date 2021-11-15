@@ -167,7 +167,6 @@ This gives the following example output: ::
 	Minimum BIC (Bayesian Information Criterion) suggests the best model 
 
 
-
 Testing
 ============
 
@@ -182,6 +181,16 @@ To get code coverage, run (requires pytest and pytest-cov libraries): ::
 	pytest --cov=./
 
 There are also a series of simulation tests that check the estimates have realistic confidence intervals, and the Davies test gives realistic p-values. These can be found in the folder "tests-manual". 
+
+Requirements
+=============
+
+See requirements.txt for specific version numbers. Required packages, and their uses are:
+
+- matplotlib for plotting.
+- numpy for simple data handling and data transformations.  
+- scipy for statistical tests including using t-distributions and Gaussians. 
+- statsmodels for performing ordinary least squares.
 
 Community Guidelines and Contributing
 ===================================================

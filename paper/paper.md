@@ -24,7 +24,15 @@ Piecewise regression (also known as segmented regression, broken-line regression
 
 # Statement of need
 
-A common problem in many fields is to fit a straight line model to data that includes some change(s) in gradient. One approach would be to perform a numerical optmisation over breakpoint position(s) to minimise the sum of squared errors, as implemented in the pwlf python package [@jekel2019pwlf]. Muggeo [@muggeo2003estimating] derived an alternative method, with the advantages of being computationally efficient and allowing for robust statistical analysis. Many R packages implement this method including the segmented R package written by Muggeo himself [@muggeo2008segmented]. However, at the time of writing, there are not comparable resources in Python. 
+A common problem in many fields is to fit a straight line model to data that includes some change(s) in gradient. 
+
+Examples include investigating medical interventions [@wagner2002segmented], ecological thresholds [@toms2003piecewise], and geological phase transitions [@ryan2002defining]. 
+
+
+
+One approach would be to perform a numerical optmisation over breakpoint position(s) to minimise the sum of squared errors, as implemented in the pwlf python package [@jekel2019pwlf]. 
+
+Muggeo [@muggeo2003estimating] derived a method that is computationally efficient and allows for robust statistical analysis. Many R packages implement this method including the segmented R package written by Muggeo himself [@muggeo2008segmented]. However, at the time of writing, there are not comparable resources in Python. 
 
 # Example
 
@@ -47,7 +55,7 @@ where given some data, $x$, $y$, we are trying to estimate the gradient of the f
 \end{equation}
 
 
-This is now a linear relationship and we can find a new breakpoint estimate, $\psi^{(1)}$, through linear regression. We iterate in this way until the breakpoint estimate converges, at which point we stop the algorithm. \autoref{eqn:expansion} is the linear approximation for one breakpoint. If considering multiple breakpoints, the same approach is followed but instead using a multivariate Taylor expansion around an initial guess for each of the breakpoints. 
+This is now a linear relationship and we can find a new breakpoint estimate, $\psi^{(1)}$, through ordinary linear regression using statsmodels [@seabold2010statsmodels]. We iterate in this way until the breakpoint estimate converges, at which point we stop the algorithm. \autoref{eqn:expansion} is the linear approximation for one breakpoint. If considering multiple breakpoints, the same approach is followed but instead using a multivariate Taylor expansion around an initial guess for each of the breakpoints. 
 
 Muggeo's iterative algorithm is not guaranteed to converge on a globally optimal solution. Instead, it can converge to local optima or diverge. To address this limitation, we also implement bootstrap restarting [@wood2001minimizing], again following Muggeo's approach [@muggeo2008segmented]. The bootstrap restarting algorithm generates a non-parametric bootstrap of the data through resampling, which is then used to find new breakpoint values that may find a better global solution. This is repeated several times to escape local optima.  
 
