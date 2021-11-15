@@ -28,7 +28,7 @@ A common problem in many fields is to fit a straight line model to data that inc
 
 # Example
 
-An example plot is shown in \autoref{fig:example}. Data was generated with 3 breakpoints and some noise, and a model was then fit to that data with 3 breakpoints. The plot shows the maximum likelihood estimators for the straight line segments and breakpoint positions. The package automatically carries out a Davies hypothesis test [@davies1987hypothesis, @muggeo2008segmented] for the existence of at least 1 breakpoint, in this example finding strong evidence for breakpoints with $p<0.001$.
+An example plot is shown in \autoref{fig:example}. Data was generated with 3 breakpoints and some noise, and a model was then fit to that data with 3 breakpoints. The plot shows the maximum likelihood estimators for the straight line segments and breakpoint positions. The package automatically carries out a Davies hypothesis test [@davies1987hypothesis] for the existence of at least 1 breakpoint, in this example finding strong evidence for breakpoints with $p<0.001$.
 
 ![An example model fit (red line) to data (grey markers). The estimated breakpoint positions (blue lines) and confidence intervals (shaded blue regions) are shown. \label{fig:example}](example.png)
 
