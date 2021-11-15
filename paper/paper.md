@@ -28,13 +28,13 @@ A common problem in many fields is to fit a straight line model to data that inc
 
 # Example
 
-An example plot is shown in \autoref{fig:example}. Data was generated with 3 breakpoints and some noise, and a model was then fit to that data with 3 breakpoints. The plot shows the maximum likelihood estimators for the straight line segments and breakpoint positions. The package automatically carries out a Davies hypothesis test [@davies1987hypothesis, muggeo2008segmented] for the existence of at least 1 breakpoint, here finding strong evidence for breakpoints with $p<0.001$.
+An example plot is shown in \autoref{fig:example}. Data was generated with 3 breakpoints and some noise, and a model was then fit to that data with 3 breakpoints. The plot shows the maximum likelihood estimators for the straight line segments and breakpoint positions. The package automatically carries out a Davies hypothesis test [@davies1987hypothesis, @muggeo2008segmented] for the existence of at least 1 breakpoint, in this example finding strong evidence for breakpoints with $p<0.001$.
 
 ![An example model fit (red line) to data (grey markers). The estimated breakpoint positions (blue lines) and confidence intervals (shaded blue regions) are shown. \label{fig:example}](example.png)
 
 # How It Works
 
-It is not necessary to know the underlying theory to use the package. We follow here the derivation by Muggeo [@muggeo2003estimating]. The general form of the model with one breakpoint is
+We follow here the derivation by Muggeo [@muggeo2003estimating]. The general form of the model with one breakpoint is
 
 \begin{equation}
     y = \alpha x + c + \beta (x-\psi) H(x-\psi) + \zeta \,,
@@ -53,7 +53,7 @@ Muggeo's iterative algorithm is not guaranteed to converge on a globally optimal
 
 # Model Selection
 
-The standard algorithm finds a good fit with a given number of breakpoints. In some instances we might not know how many breakpoints to expect in the data. We provide a tool to compare models with different numbers of breakpoints based on minimising the Bayesian Information Criterion [@wit2012all], which takes into account the value of the likelihood function while including a penalty for the number of model parameters, to avoid overfitting. When applied to the example in Figure \autoref{fig:example}, a model with 3 breakpoints is the preferred choice.
+The standard algorithm finds a good fit with a given number of breakpoints. In some instances we might not know how many breakpoints to expect in the data. We provide a tool to compare models with different numbers of breakpoints based on minimising the Bayesian Information Criterion [@wit2012all], which takes into account the value of the likelihood function while including a penalty for the number of model parameters, to avoid overfitting. When applied to the example in \autoref{fig:example}, a model with 3 breakpoints is the preferred choice.
 
 # Features
 
