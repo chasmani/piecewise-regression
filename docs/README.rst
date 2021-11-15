@@ -39,9 +39,9 @@ Installation
 
 You can install piecewise-regression using python's `pip package index <https://pypi.org/project/piecewise-regression/>`_
 
-    pip3 install piecewise-regression
+    pip install piecewise-regression
 
-The package was developed and tested on Python 3.7.
+The package is tested on Python 3.7, 3.8 and 3.9.
 
 Getting started
 ========================
@@ -173,15 +173,15 @@ Testing
 
 The package includes comprehensive tests.
 
-To run all tests, from the main directory run: ::
+To run all tests, from the main directory run (requires the pytest library): ::
 	
-	nosetests
+	pytest
 
-To get code coverage, run:
+To get code coverage, run (requires pytest and pytest-cov libraries): ::
 
-	nosetests --with-coverage --cover-erase --cover-package=piecewise_regression/
+	pytest --cov=./
 
-There are also a series of simulation tests that check the estimates have realistic confidence intervals, and the Davies test gives realistic p-values. These can be found in the folder "tests". 
+There are also a series of simulation tests that check the estimates have realistic confidence intervals, and the Davies test gives realistic p-values. These can be found in the folder "tests-manual". 
 
 Community Guidelines and Contributing
 ===================================================
@@ -195,7 +195,7 @@ I welcome community participation:
 Installing From Source
 ===========================
 
-To install form source:
+To install form source: ::
 
 	git clone https://github.com/chasmani/piecewise-regression
 	cd piecewise_regression
