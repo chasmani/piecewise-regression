@@ -146,7 +146,7 @@ If you don't have good guesses for inital breakpoints, you can just set the numb
 Model Selection
 ==========================
 
-In addition to the main Fit tool, the package also offers a `ModelSelection` option based on the Bayesian Information Criterion. This is experimental and not as thorough as the main Fit tool: ::
+In addition to the main Fit tool, the package also offers a `ModelSelection` option based on the Bayesian Information Criterion. ::
 
 	ms = piecewise_regression.ModelSelection(x, y, max_breakpoints=6)
 

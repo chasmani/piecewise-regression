@@ -9,16 +9,20 @@ Requirements:
 **Done**
 
 2. I think the statement of need should include some more concrete examples. What are common use cases for piecewise linear fits? When are they more appropriate than curve fits (or simple linear regression)?
-
+**Done**
 
 3. I mentioned pwlf at the top of this review, I think you should at least mention its existence since it is closely related and is a Python option unlike the R packages you currently mention. It might also be nice to include a rough comparison of the different methodologies. IIRC that package uses Lagrange multipliers for local solutions, combined with a differential evolution algorithm for global optimization, but I haven't looked at it in a long time. Perhaps there are others as well, and I think the paper would benefit from a survey to see if such packages exist.
 
 
-4. The first sentence of "How it works" seems out of place. Stating that we don't need to know the theory seems like a better fit for the summary by stating something like "this package hides the mathematical complexities of constructing a piecewise fit behind a simple interface" or so.
+4a. The first sentence of "How it works" seems out of place. 
+**Done**
+
+4b. Stating that we don't need to know the theory seems like a better fit for the summary by stating something like "this package hides the mathematical complexities of constructing a piecewise fit behind a simple interface" or so.
 
 
 5. The example presents a raw plot with no context. Please give some description of the generating model, hopefully in the context of some realistic process that it may represent.
-
+**Agreed. I explained the data generation process as a pieceiwise linear model with Gaussian noise. I gave the example of observations of a physical process with noise due to sampling errors, so the noise could reasonably be expected to be Gaussian and constant.**
+**That is quite an abstract example I know. I think that is best because it represents the general nature of the fitting algorithm. If I generate data based on a very specific real process then that could require specific caveats that would detract from the general nature of the algorithm, and I do not have deep domain expertise in a suitable area to talk authoritatively about the forms of data.**
 
 6. We need to see a few more references for the Davies and BIC tests.
 **Done**

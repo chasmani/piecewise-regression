@@ -24,21 +24,13 @@ Piecewise regression (also known as segmented regression, broken-line regression
 
 # Statement of need
 
-A common problem in many fields is to fit a straight line model to data that includes some change(s) in gradient. 
-
-Examples include investigating medical interventions [@wagner2002segmented], ecological thresholds [@toms2003piecewise], and geological phase transitions [@ryan2002defining]. 
-
-
-
-One approach would be to perform a numerical optmisation over breakpoint position(s) to minimise the sum of squared errors, as implemented in the pwlf python package [@jekel2019pwlf]. 
-
-Muggeo [@muggeo2003estimating] derived a method that is computationally efficient and allows for robust statistical analysis. Many R packages implement this method including the segmented R package written by Muggeo himself [@muggeo2008segmented]. However, at the time of writing, there are not comparable resources in Python. 
+A common problem in many fields is to fit a continuous straight line model to data that includes some change(s) in gradient known as breakpoint(s). Examples include investigating medical interventions [@wagner2002segmented], ecological thresholds [@toms2003piecewise], and geological phase transitions [@ryan2002defining]. Fitting such models involves the global problem of finding estimates for the breakpoint positions and the local problem of fitting line segments given breakpoints. Common approaches involve using local linear regression together with a global optimisation algorithm such as non linear least squares using scipy.optimise.curve_fit or the lmfit python package, or a global evolutionary algorithm as in the pwlf python package.  Muggeo [@muggeo2003estimating] derived a method whereby the breakpoint positions and the line segment models are fitted simultaneously using an iterative method, which is computationally efficient and allows for robust statistical analysis. Many R packages implement this method including the segmented R package written by Muggeo himself [@muggeo2008segmented]. However, at the time of writing, there are not comparable resources in Python. 
 
 # Example
 
 An example plot is shown in \autoref{fig:example}. Data was generated with 3 breakpoints and some noise, and a model was then fit to that data with 3 breakpoints. The plot shows the maximum likelihood estimators for the straight line segments and breakpoint positions. The package automatically carries out a Davies hypothesis test [@davies1987hypothesis] for the existence of at least 1 breakpoint, in this example finding strong evidence for breakpoints with $p<0.001$.
 
-![An example model fit (red line) to data (grey markers). The estimated breakpoint positions (blue lines) and confidence intervals (shaded blue regions) are shown. \label{fig:example}](example.png)
+![An example model fit (red line) to data (grey markers). The estimated breakpoint positions (blue lines) and confidence intervals (shaded blue regions) are shown. The data was generated using a piecewise linear model with a constant level of Gaussian noise, this could represent e.g. observations of some physical process that undergoes a phase transition with noise due to sampling errors. \label{fig:example}](example.png)
 
 # How It Works
 
