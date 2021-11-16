@@ -12,12 +12,14 @@ Requirements:
 **Done**
 
 3. I mentioned pwlf at the top of this review, I think you should at least mention its existence since it is closely related and is a Python option unlike the R packages you currently mention. It might also be nice to include a rough comparison of the different methodologies. IIRC that package uses Lagrange multipliers for local solutions, combined with a differential evolution algorithm for global optimization, but I haven't looked at it in a long time. Perhaps there are others as well, and I think the paper would benefit from a survey to see if such packages exist.
+**Done, good call.**
 
 
 4a. The first sentence of "How it works" seems out of place. 
 **Done**
 
 4b. Stating that we don't need to know the theory seems like a better fit for the summary by stating something like "this package hides the mathematical complexities of constructing a piecewise fit behind a simple interface" or so.
+**I;ve removed the lone from "How It Works". I decided not to add anythig to the summary for conciseness, I think "easy-to-use" covers it**
 
 
 5. The example presents a raw plot with no context. Please give some description of the generating model, hopefully in the context of some realistic process that it may represent.
@@ -33,6 +35,7 @@ Nice to have:
 **Done**
 
 8. Have you considered supporting conda-forge? For a pure Python package like yours it should be relatively trivial, you just need to create a feedstock. Not critical, just something to consider since it's a popular installation method these days.
+**TO DO ** 
 
 
 9. While your tests run fine, I would recommend switching away from nose to either raw unittest. nose has not been supported for >5 years last I checked. pytest would be a more modern alternative, but it would require more effort to restructure your tests.
@@ -45,8 +48,8 @@ Nice to have:
 **Done**
 
 12. It would be nice to indicate how your package uses statsmodel internally for ordinary least squares (and potentially what you're using numpy for if it's anything more than just standard numpy ops, which could be mentioned in a single sentence).
-**statsmodels is used to perform OLS. Added to the How It Works section.**
-**Also added details of all required packages and what theya re used for in the readme.**
+**statsmodels is used to perform ordinary least squares. Added to the How It Works section.**
+**Also added details of all required packages and what they are used for in the readme.**
 **Numpy is used for normal standard ops. The most unusual use is np.heaviside, which is used to transform data prior to fitting (could easily be implemented as my own function). That is shown in the example code as well.**
 
 13. You could embed your examples along with the code to generate them on your ReadTheDocs. If you're feeling adventurous, nbsphinx would let you create a notebook with the example and embed that directly.
