@@ -5,7 +5,7 @@ piecewise-regression (aka segmented regression) in python
 :Author: Charlie Pilgrim
 :Version: 1.0.4
 :Github: https://github.com/chasmani/piecewise-regression
-:Documentation: https://readthedocs.org/projects/piecewise-regression/
+:Documentation: https://piecewise-regression.readthedocs.io/en/master/index.html
 
 .. image:: https://github.com/chasmani/piecewise-regression/actions/workflows/python-package.yml/badge.svg
    :target: https://github.com/chasmani/piecewise-regression/actions/workflows/python-package.yml
@@ -34,6 +34,11 @@ For example:
 
 .. image:: https://raw.githubusercontent.com/chasmani/piecewise-regression/master/paper/example.png
     :alt: basic-example-plot-github
+
+There are some code examples below, and more in this 'Google Colab Notebook'_
+
+.. _'Google Colab Notebook': https://colab.research.google.com/drive/1Pwv6LqwZU8Zbl0VZH6cwOTwoRzm3CPPC#offline=true&sandboxMode=true
+
 
 
 Installation
@@ -143,12 +148,12 @@ The package implements Muggeo's iterative algorithm (Muggeo "Estimating regressi
 
 Muggeo's method doesn't always converge on the best solution - sometimes it finds a locally optimal solution or doesn't converge at all. For this reason the Fit method also implements a process called bootstrap restarting. This involves taking a bootstrap resample of the data, then using this bootstrapped data to try and find a better solution. The number of times this runs can be controlled with `n_boot`. To run the Fit without bootstrap restarting, set `n_boot=0`.  
 
-If you don't have good guesses for inital breakpoints, you can just set the number of e.g. `n_breakpoints=3`. in this case the algorithm will randomly generate starting breakpoints until it finds a solution that converges (up to `n_boot` times). This is a good option if the algorithm is otherwise not converging. 
+If you don't have good guesses for inital breakpoints, you can just set the number of e.g. `n_breakpoints=3`. in this case the algorithm will randomly generate start_values for breakpoints until it finds a solution that converges (up to `n_boot` times). This is a good option if the algorithm is otherwise not converging. Be aware that the start_values can influence the final converged model, so setting them randomly in this way may give different results on different runs, epecially if the breakpoint positions are not very clear from the data. 
 
 Model Selection
 ==========================
 
-In addition to the main Fit tool, the package also offers a `ModelSelection` option based on the Bayesian Information Criterion. ::
+In addition to the main Fit tool, the package also offers a `ModelSelection` option based on the Bayesian Information Criterion. This is experimental and is not as thorough as the main Fit function. In particular, the models are generated with random start_values which can influence the model fit and give different values for the BIC. The tool can be useful for exploring posisble models, but should not at this point be used to choose the best model. ::
 
 	ms = piecewise_regression.ModelSelection(x, y, max_breakpoints=6)
 
@@ -167,6 +172,12 @@ This gives the following example output: ::
 	6                                   False              
 
 	Minimum BIC (Bayesian Information Criterion) suggests the best model 
+
+The data of the model fits can be accessed in ::
+
+    ms.models 
+
+For a robust comparision, one could run the ModelSelection tools many times and take the lowest BIC for each model. 
 
 
 Testing
@@ -206,7 +217,7 @@ I welcome community participation:
 Installing From Source
 ===========================
 
-To install form source: ::
+To install from source: ::
 
 	git clone https://github.com/chasmani/piecewise-regression
 	cd piecewise_regression
