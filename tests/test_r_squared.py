@@ -1,7 +1,7 @@
 import piecewise_regression.r_squared_calc as r_squared_calc
 import numpy as np
 import unittest
-import imp
+from importlib.machinery import SourceFileLoader
 
 import os
 import sys
@@ -31,7 +31,7 @@ class TestRSquared(unittest.TestCase):
         r_2_from_sklearn = -6.405023255813953
         self.assertEqual(r_2_from_sklearn, r_2)
 
-        data = imp.load_source('data', DATA_SOURCE)
+        data = SourceFileLoader('data', DATA_SOURCE).load_module()
 
         ff = np.array(data.BP_1_FF)
         yy = np.array(data.BP_1_YY)

@@ -3,7 +3,7 @@ from piecewise_regression.model_selection import ModelSelection
 
 import numpy as np
 import unittest
-import imp
+from importlib.machinery import SourceFileLoader
 
 import os
 import sys
@@ -24,7 +24,7 @@ class TestFit(unittest.TestCase):
         # working)
         np.random.seed(2)
 
-        data = imp.load_source('data', DATA_SOURCE)
+        data = SourceFileLoader('data', DATA_SOURCE).load_module()
 
         xx = np.array(data.MUGGEO_1_XX)
         yy = np.array(data.MUGGEO_1_YY)

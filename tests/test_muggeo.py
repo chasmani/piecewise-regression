@@ -2,7 +2,7 @@ from piecewise_regression.main import Muggeo
 
 import numpy as np
 import unittest
-import imp
+from importlib.machinery import SourceFileLoader
 
 import os
 import sys
@@ -22,7 +22,7 @@ class TestMuggeo(unittest.TestCase):
         getting in some local minima
         """
 
-        data = imp.load_source('data', DATA_SOURCE)
+        data = SourceFileLoader('data', DATA_SOURCE).load_module()
 
         xx = np.array(data.MUGGEO_1_XX)
         yy = np.array(data.MUGGEO_1_YY)
@@ -118,7 +118,7 @@ class TestMuggeo(unittest.TestCase):
         getting in some local minima
         """
 
-        data = imp.load_source('data', DATA_SOURCE)
+        data = SourceFileLoader('data', DATA_SOURCE).load_module()
 
         xx = np.array(data.MUGGEO_2_XX)
         yy = np.array(data.MUGGEO_2_YY)
