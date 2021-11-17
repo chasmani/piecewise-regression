@@ -35,9 +35,7 @@ For example:
 .. image:: https://raw.githubusercontent.com/chasmani/piecewise-regression/master/paper/example.png
     :alt: basic-example-plot-github
 
-There are some code examples below, and more in this 'Google Colab Notebook'_
-
-.. _'Google Colab Notebook': https://colab.research.google.com/drive/1Pwv6LqwZU8Zbl0VZH6cwOTwoRzm3CPPC#offline=true&sandboxMode=true
+There are some code examples below, and more in this `Google Colab Jupyter Notebook <https://colab.research.google.com/drive/1Pwv6LqwZU8Zbl0VZH6cwOTwoRzm3CPPC#offline=true&sandboxMode=true>`_.
 
 
 
