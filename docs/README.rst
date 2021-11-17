@@ -35,23 +35,12 @@ For example:
 .. image:: https://raw.githubusercontent.com/chasmani/piecewise-regression/master/paper/example.png
     :alt: basic-example-plot-github
 
-There are some code examples below, and more in this |colab_link|.
-
-.. |colab_link| raw:: html
-
-   <a href="https://colab.research.google.com/drive/1Pwv6LqwZU8Zbl0VZH6cwOTwoRzm3CPPC#offline=true&sandboxMode=true" target="_blank">Google Colab Jupyter Notebook</a>
-
+There are some code examples below, and more in this `Google Colab Jupyter Notebook <https://colab.research.google.com/drive/1Pwv6LqwZU8Zbl0VZH6cwOTwoRzm3CPPC#offline=true&sandboxMode=true/>`.
 
 Installation
 ========================
 
-You can install piecewise-regression using python's |pip_link|
-
-.. |pip_link| raw:: html
-
-   <a href="https://pypi.org/project/piecewise-regression" target="_blank">pip package index</a>
-
-::
+You can install piecewise-regression using python's `pip package index <https://pypi.org/project/piecewise-regression/>`_ ::
 
     pip install piecewise-regression
 
