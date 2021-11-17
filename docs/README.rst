@@ -35,8 +35,11 @@ For example:
 .. image:: https://raw.githubusercontent.com/chasmani/piecewise-regression/master/paper/example.png
     :alt: basic-example-plot-github
 
-There are some code examples below, and more in this `Google Colab Jupyter Notebook <https://colab.research.google.com/drive/1Pwv6LqwZU8Zbl0VZH6cwOTwoRzm3CPPC#offline=true&sandboxMode=true>`_.
+There are some code examples below, and more in this |colab_link|.
 
+.. |colab_link| raw:: html
+
+   <a href="https://colab.research.google.com/drive/1Pwv6LqwZU8Zbl0VZH6cwOTwoRzm3CPPC#offline=true&sandboxMode=true" target="_blank">Google Colab Jupyter Notebook</a>ß
 
 
 Installation
