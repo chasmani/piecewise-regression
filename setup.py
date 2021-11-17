@@ -13,7 +13,7 @@ def readme():
 # This call to setup() does all the work
 setuptools.setup(
     name="piecewise-regression",
-    version="1.0.7",
+    version="1.0.8",
     description="piecewise (segmented) regression in python",
     long_description=readme(),
     long_description_content_type="text/markdown",
