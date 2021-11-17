@@ -6,7 +6,7 @@ HERE = pathlib.Path(__file__).parent
 
 
 def readme():
-    with open('docs/README.rst') as f:
+    with open('docs/PIP_DOC.rst') as f:
         return f.read()
 
 
