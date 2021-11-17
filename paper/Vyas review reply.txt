@@ -51,3 +51,4 @@ Nice to have:
 
 13. You could embed your examples along with the code to generate them on your ReadTheDocs. If you're feeling adventurous, nbsphinx would let you create a notebook with the example and embed that directly.
 **Done**
+**I also added a link to a Google Colab jupyter notebook with code examples**

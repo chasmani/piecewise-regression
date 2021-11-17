@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation &mdash; piecewise-regression 1 documentation</title>
+  <title>piecewise-regression (aka segmented regression) in python &mdash; piecewise-regression 1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -54,7 +54,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Installation</li>
+      <li>piecewise-regression (aka segmented regression) in python</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/README.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -64,18 +64,48 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <p>Easy to use piecewise regression (aka segmented regression) in Python. For fitting straight lines to data where there is one or more changes in gradient (known as breakpoints). Based on Muggeo “Estimating regression models with unknown break-points” (2003). For example:</p>
+  <section id="piecewise-regression-aka-segmented-regression-in-python">
+<h1>piecewise-regression (aka segmented regression) in python<a class="headerlink" href="#piecewise-regression-aka-segmented-regression-in-python" title="Permalink to this headline"></a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">piecewise-regression</dt>
+<dd class="field-odd"><p>fitting straight line models with breakpoints</p>
+</dd>
+<dt class="field-even">Author</dt>
+<dd class="field-even"><p>Charlie Pilgrim</p>
+</dd>
+<dt class="field-odd">Version</dt>
+<dd class="field-odd"><p>1.0.4</p>
+</dd>
+<dt class="field-even">Github</dt>
+<dd class="field-even"><p><a class="reference external" href="https://github.com/chasmani/piecewise-regression">https://github.com/chasmani/piecewise-regression</a></p>
+</dd>
+<dt class="field-odd">Documentation</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://piecewise-regression.readthedocs.io/en/master/index.html">https://piecewise-regression.readthedocs.io/en/master/index.html</a></p>
+</dd>
+</dl>
+<a class="reference external image-reference" href="https://github.com/chasmani/piecewise-regression/actions/workflows/python-package.yml"><img alt="Build Status" src="https://github.com/chasmani/piecewise-regression/actions/workflows/python-package.yml/badge.svg" /></a>
+<a class="reference external image-reference" href="https://codecov.io/gh/chasmani/piecewise-regression"><img alt="Test Coverage Status" src="https://codecov.io/gh/chasmani/piecewise-regression/branch/master/graph/badge.svg" /></a>
+<a class="reference external image-reference" href="https://piecewise-regression.readthedocs.io/en/latest/?badge=latest"><img alt="Documentation Status" src="https://readthedocs.org/projects/piecewise-regression/badge/?version=latest" /></a>
+<a class="reference external image-reference" href="https://badge.fury.io/py/piecewise-regression"><img alt="PyPi location" src="https://badge.fury.io/py/piecewise-regression.svg" /></a>
+<a class="reference external image-reference" href="https://joss.theoj.org/papers/b64e5e7d746efc5d91462a51b3fc5bf8"><img alt="Review Status" src="https://joss.theoj.org/papers/b64e5e7d746efc5d91462a51b3fc5bf8/status.svg" /></a>
+<a class="reference external image-reference" href="https://github.com/chasmani/piecewise-regresssion/blob/master/LICENSE"><img alt="License information" src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Easy-to-use piecewise regression (aka segmented regression) in Python. For fitting straight lines to data where there is one or more changes in gradient (known as breakpoints). Based on Muggeo “Estimating regression models with unknown break-points” (2003).</p>
+<p>For example:</p>
 <img alt="basic-example-plot-github" src="https://raw.githubusercontent.com/chasmani/piecewise-regression/master/paper/example.png" />
+<p>There are some code examples below, and more in this <a href="https://colab.research.google.com/drive/1Pwv6LqwZU8Zbl0VZH6cwOTwoRzm3CPPC#offline=true&sandboxMode=true" target="_blank">Google Colab Jupyter Notebook</a>.</p>
 <section id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h1>
-<p>You can install piecewise-regression using python’s <a class="reference external" href="https://pypi.org/project/piecewise-regression/">pip package index</a></p>
-<blockquote>
-<div><p>pip install piecewise-regression</p>
-</div></blockquote>
-<p>The package was developed and tested on Python 3.7.</p>
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h2>
+<p>You can install piecewise-regression using python’s <a href="https://pypi.org/project/piecewise-regression" target="_blank">pip package index</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">piecewise</span><span class="o">-</span><span class="n">regression</span>
+</pre></div>
+</div>
+<p>The package is tested on Python 3.7, 3.8 and 3.9.</p>
 </section>
 <section id="getting-started">
-<h1>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline"></a></h1>
+<h2>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline"></a></h2>
 <p>The package requires some x and y data to fit. You also need to specify either a) some initial breakpoint guesses as <cite>start_values</cite> or b) how many breakpoints you want to fit as <cite>n_breakpoints</cite> (or both). Here is a very simple example, assuming we already have some data <cite>x</cite> and <cite>y</cite>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">piecewise_regression</span>
 <span class="n">pw_fit</span> <span class="o">=</span> <span class="n">piecewise_regression</span><span class="o">.</span><span class="n">Fit</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">n_breakpoints</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
@@ -84,7 +114,7 @@
 </div>
 </section>
 <section id="example">
-<h1>Example<a class="headerlink" href="#example" title="Permalink to this headline"></a></h1>
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline"></a></h2>
 <p>Here is a more detailed example. We start off generating some data with a breakpoint. This is for demonstration purposes, normally you will have your own data to fit:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">piecewise_regression</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -160,14 +190,14 @@
 </div>
 </section>
 <section id="how-it-works">
-<h1>How It Works<a class="headerlink" href="#how-it-works" title="Permalink to this headline"></a></h1>
+<h2>How It Works<a class="headerlink" href="#how-it-works" title="Permalink to this headline"></a></h2>
 <p>The package implements Muggeo’s iterative algorithm (Muggeo “Estimating regression models with unknown break-points” (2003)), to quickly find breakpoints. That method simultaneously fits breakpoint positions and the linear models for the different segments of the fit. This method is quick and it gives confidence intervals for all the model estimates. See the accompanying paper for more details.</p>
 <p>Muggeo’s method doesn’t always converge on the best solution - sometimes it finds a locally optimal solution or doesn’t converge at all. For this reason the Fit method also implements a process called bootstrap restarting. This involves taking a bootstrap resample of the data, then using this bootstrapped data to try and find a better solution. The number of times this runs can be controlled with <cite>n_boot</cite>. To run the Fit without bootstrap restarting, set <cite>n_boot=0</cite>.</p>
-<p>If you don’t have good guesses for inital breakpoints, you can just set the number of e.g. <cite>n_breakpoints=3</cite>. in this case the algorithm will randomly generate starting breakpoints until it finds a solution that converges (up to <cite>n_boot</cite> times). This is a good option if the algorithm is otherwise not converging.</p>
+<p>If you don’t have good guesses for inital breakpoints, you can just set the number of e.g. <cite>n_breakpoints=3</cite>. in this case the algorithm will randomly generate start_values for breakpoints until it finds a solution that converges (up to <cite>n_boot</cite> times). This is a good option if the algorithm is otherwise not converging. Be aware that the start_values can influence the final converged model, so setting them randomly in this way may give different results on different runs, epecially if the breakpoint positions are not very clear from the data.</p>
 </section>
 <section id="model-selection">
-<h1>Model Selection<a class="headerlink" href="#model-selection" title="Permalink to this headline"></a></h1>
-<p>In addition to the main Fit tool, the package also offers a <cite>ModelSelection</cite> option based on the Bayesian Information Criterion. This is experimental and not as thorough as the main Fit tool:</p>
+<h2>Model Selection<a class="headerlink" href="#model-selection" title="Permalink to this headline"></a></h2>
+<p>In addition to the main Fit tool, the package also offers a <cite>ModelSelection</cite> option based on the Bayesian Information Criterion. This is experimental and is not as thorough as the main Fit function. In particular, the models are generated with random start_values which can influence the model fit and give different values for the BIC. The tool can be useful for exploring posisble models, but should not at this point be used to choose the best model.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ms</span> <span class="o">=</span> <span class="n">piecewise_regression</span><span class="o">.</span><span class="n">ModelSelection</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">max_breakpoints</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -187,23 +217,57 @@
 <span class="n">Minimum</span> <span class="n">BIC</span> <span class="p">(</span><span class="n">Bayesian</span> <span class="n">Information</span> <span class="n">Criterion</span><span class="p">)</span> <span class="n">suggests</span> <span class="n">the</span> <span class="n">best</span> <span class="n">model</span>
 </pre></div>
 </div>
+<p>The data of the model fits can be accessed in</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ms</span><span class="o">.</span><span class="n">models</span>
+</pre></div>
+</div>
+<p>For a robust comparision, one could run the ModelSelection tools many times and take the lowest BIC for each model.</p>
 </section>
 <section id="testing">
-<h1>Testing<a class="headerlink" href="#testing" title="Permalink to this headline"></a></h1>
+<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline"></a></h2>
 <p>The package includes comprehensive tests.</p>
-<p>To run all tests, from the main directory run:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="s2">&quot;nose&quot;</span>
+<p>To run all tests, from the main directory run (requires the pytest library):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pytest</span>
 </pre></div>
 </div>
-<p>Note: This requires nosetests, can be downloaded from apt with:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span> <span class="n">install</span> <span class="n">python3</span><span class="o">-</span><span class="n">nose</span>
+<p>To get code coverage, run (requires pytest and pytest-cov libraries):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pytest</span> <span class="o">--</span><span class="n">cov</span><span class="o">=./</span>
 </pre></div>
 </div>
-<p>There are also a series of simulation tests that check the estimates have realistic confidence intervals, and the Davies test gives realistic p-values. These can be found in the folder “tests”.</p>
+<p>There are also a series of simulation tests that check the estimates have realistic confidence intervals, and the Davies test gives realistic p-values. These can be found in the folder “tests-manual”.</p>
+</section>
+<section id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline"></a></h2>
+<p>See requirements.txt for specific version numbers. Required packages, and their uses are:</p>
+<ul class="simple">
+<li><p>matplotlib for plotting.</p></li>
+<li><p>numpy for simple data handling and data transformations.</p></li>
+<li><p>scipy for statistical tests including using t-distributions and Gaussians.</p></li>
+<li><p>statsmodels for performing ordinary least squares.</p></li>
+</ul>
+</section>
+<section id="community-guidelines-and-contributing">
+<h2>Community Guidelines and Contributing<a class="headerlink" href="#community-guidelines-and-contributing" title="Permalink to this headline"></a></h2>
+<p>I welcome community participation:</p>
+<ul class="simple">
+<li><p>Open an issue on github if you want to suggest a new feature or report a bug</p></li>
+<li><p>If you want to make changes yourself, that is welcome via a pull request.</p></li>
+<li><p>Ideally, open an issue first before making a pull request with major changes.</p></li>
+</ul>
+</section>
+<section id="installing-from-source">
+<h2>Installing From Source<a class="headerlink" href="#installing-from-source" title="Permalink to this headline"></a></h2>
+<p>To install from source:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">chasmani</span><span class="o">/</span><span class="n">piecewise</span><span class="o">-</span><span class="n">regression</span>
+<span class="n">cd</span> <span class="n">piecewise_regression</span>
+<span class="n">python3</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">install</span> <span class="o">--</span><span class="n">user</span>
+</pre></div>
+</div>
 </section>
 <section id="documentation">
-<h1>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline"></a></h1>
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline"></a></h2>
 <p><a class="reference external" href="https://piecewise-regression.readthedocs.io/en/latest/">Full docs, including an API reference.</a></p>
+</section>
 </section>
 
 

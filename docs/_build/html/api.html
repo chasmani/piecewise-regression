@@ -77,32 +77,39 @@
 <p>The main module includes the Fit function, which runs the bootstrap restarting algorithm.</p>
 <span class="target" id="module-piecewise_regression.main"></span><dl class="py class">
 <dt class="sig sig-object py" id="piecewise_regression.main.Fit">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">piecewise_regression.main.</span></span><span class="sig-name descname"><span class="pre">Fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_breakpoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_boot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_distance_between_breakpoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_distance_to_edge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.02</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Fit" title="Permalink to this definition"></a></dt>
-<dd><p>Fit a peicewise (segmented) regression model to data. 
-Uses bootstrap restarting to avoid local minima. 
-Requires either n_breakpoints of start_values. 
-if no start_vaues are given, they are instead uniformly randomly generated across range of data.
-This is the main user facing object and input data is validated mainly at this level.</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">piecewise_regression.main.</span></span><span class="sig-name descname"><span class="pre">Fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_breakpoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_boot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_distance_between_breakpoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_distance_to_edge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.02</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit a peicewise (segmented) regression model to data.
+Uses bootstrap restarting to avoid local minima.
+Requires either n_breakpoints of start_values.
+if no start_vaues are given, they are instead uniformly randomly
+generated across range of data.
+This is the main user facing object and input data is validated mainly
+at this level.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>xx</strong> (<em>list of floats</em>) – Data series in x-axis for fitting (same axis as the breakpoints).</p></li>
+<li><p><strong>xx</strong> (<em>list of floats</em>) – Data series in x-axis for fitting (same axis as the breakpoints)</p></li>
 <li><p><strong>yy</strong> (<em>list of floats</em>) – Data series in y-axis for fitting.</p></li>
 <li><p><strong>n_breakpoints</strong> (<em>positive int</em>) – The number of breakpoints to fit.</p></li>
 <li><p><strong>start_values</strong> (<em>list floats</em>) – A list of initial guesses for the breakpoints.</p></li>
-<li><p><strong>n_boot</strong> (<em>non-negative int</em>) – How many times to run the bootstrap restarting procedure. Set to zero for no bootstrap restarting.</p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – If True, prints out updates to the terminal.</p></li>
-<li><p><strong>max_iterations</strong> (<em>positive int</em>) – How many iterations before stopping if not converged, in the Muggeo iterative procedure.</p></li>
-<li><p><strong>tolerance</strong> (<em>positive float</em>) – How close breakpoints from pervious iterations must be to consider converged.</p></li>
-<li><p><strong>min_distance_between_breakpoints</strong> (<em>positive float</em>) – The minimum allowed distance between breakpoints, as a proportion of the data range.</p></li>
-<li><p><strong>min_distance_between_breakpoints</strong> – The minimum allowed distance from the edge of data to a breakpoint, as a proportion of the data range.</p></li>
+<li><p><strong>n_boot</strong> (<em>non-negative int</em>) – How many times to run the bootstrap restarting procedure.
+Set to zero for no bootstrap restarting.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – If True, prints out updates to the terminal.</p></li>
+<li><p><strong>max_iterations</strong> (<em>positive int</em>) – How many iterations before stopping if not
+converged, in the Muggeo iterative procedure.</p></li>
+<li><p><strong>tolerance</strong> (<em>positive float</em>) – How close breakpoints from pervious iterations must
+be to consider converged.</p></li>
+<li><p><strong>min_distance_between_breakpoints</strong> (<em>positive float</em>) – The minimum allowed distance
+between breakpoints, as a proportion of the data range.</p></li>
+<li><p><strong>min_distance_between_breakpoints</strong> – The minimum allowed distance from
+the edge of data to a breakpoint, as a proportion of the data range.</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="piecewise_regression.main.Fit.bootstrap_data">
 <span class="sig-name descname"><span class="pre">bootstrap_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Fit.bootstrap_data" title="Permalink to this definition"></a></dt>
-<dd><p>Non parametric bootstrap, randomly sample data points with replacement. 
+<dd><p>Non parametric bootstrap, randomly sample data points with replacement.
 Return bootstrapped data of same length as oriignal data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -117,14 +124,32 @@ Return bootstrapped data of same length as oriignal data.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="piecewise_regression.main.Fit.bootstrap_restarting">
 <span class="sig-name descname"><span class="pre">bootstrap_restarting</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Fit.bootstrap_restarting" title="Permalink to this definition"></a></dt>
-<dd><p>The main fitting algorithm. Begins by doing a fit based on Muggeo’s algorithm. 
-if n_boot = 0 we stop there. Otherwise we do some bootstrap restarting.  
+<dd><p>The main fitting algorithm. Begins by doing a fit based on
+Muggeo’s algorithm.
+if n_boot = 0 we stop there. Otherwise we do some bootstrap restarting.
 Bootstrap Restarting escapes local minima.
-Each bootstrap restart: 
-- We take the best current breakpoints, and get new data by running a non-parametric bootstrap by resampling data. 
-- Then run a Muggeo fit on the new data and best current breakpoints. This gives new breakpoint values. 
-- Then run a Muggeo fit again with the original data and these new breakpoint values. 
-- Throughout, keep track of the history of fits and the best_muggeo fit that converged - defined as the lowest residual sum of squares.</p>
+Each bootstrap restart:
+- We take the best current breakpoints, and get new data by running a</p>
+<blockquote>
+<div><p>non-parametric bootstrap by resampling data.</p>
+</div></blockquote>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Then run a Muggeo fit on the new data and best current breakpoints.</dt><dd><p>This gives new breakpoint values.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Then run a Muggeo fit again with the original data and these new</dt><dd><p>breakpoint values.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Throughout, keep track of the history of fits and the best_muggeo</dt><dd><p>fit that converged - defined as the lowest residual sum of squares.</p>
+</dd>
+</dl>
+</li>
+</ul>
 </dd></dl>
 
 <dl class="py method">
@@ -137,28 +162,29 @@ Useful for using this code in a larger analysis. E.g. ModelSelection</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="piecewise_regression.main.Fit.plot">
 <span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Fit.plot" title="Permalink to this definition"></a></dt>
-<dd><p>Plot the full fit including the data, fitted model, breakpoint positions and breakpoint confidence intervals.
+<dd><p>Plot the full fit including the data, fitted model, breakpoint
+positions and breakpoint confidence intervals.
 Doesn’t allow control of matplotlib kwargs for style changes.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="piecewise_regression.main.Fit.plot_best_muggeo_breakpoint_history">
 <span class="sig-name descname"><span class="pre">plot_best_muggeo_breakpoint_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Fit.plot_best_muggeo_breakpoint_history" title="Permalink to this definition"></a></dt>
-<dd><p>Plot the history of the breakpoints as they iterate. 
+<dd><p>Plot the history of the breakpoints as they iterate.
 History of the best_muggeo fit.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="piecewise_regression.main.Fit.plot_bootstrap_restarting_history">
 <span class="sig-name descname"><span class="pre">plot_bootstrap_restarting_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Fit.plot_bootstrap_restarting_history" title="Permalink to this definition"></a></dt>
-<dd><p>Plot the history of the breakpoint values as they iterate. 
+<dd><p>Plot the history of the breakpoint values as they iterate.
 History of the bootstrap restarting procedure.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="piecewise_regression.main.Fit.plot_bootstrap_restarting_rss_history">
 <span class="sig-name descname"><span class="pre">plot_bootstrap_restarting_rss_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Fit.plot_bootstrap_restarting_rss_history" title="Permalink to this definition"></a></dt>
-<dd><p>Plot the history of the residual sum of squares. 
+<dd><p>Plot the history of the residual sum of squares.
 History of the bootstrap restarting algorithm.</p>
 </dd></dl>
 
@@ -172,39 +198,42 @@ Passes kwargs to the matplotlib function, e.g. color=”red”.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="piecewise_regression.main.Fit.plot_breakpoints">
 <span class="sig-name descname"><span class="pre">plot_breakpoints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Fit.plot_breakpoints" title="Permalink to this definition"></a></dt>
-<dd><p>Plot the breakpoint locations as vertical lines. 
+<dd><p>Plot the breakpoint locations as vertical lines.
 Passes kwargs to the matplotlib function, e.g. color=”red”.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="piecewise_regression.main.Fit.plot_data">
 <span class="sig-name descname"><span class="pre">plot_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Fit.plot_data" title="Permalink to this definition"></a></dt>
-<dd><p>Plot the data as a scatter plot. 
+<dd><p>Plot the data as a scatter plot.
 Passes any kwargs to the matplotlib scatter function, e.g. color=”red”.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="piecewise_regression.main.Fit.plot_fit">
 <span class="sig-name descname"><span class="pre">plot_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Fit.plot_fit" title="Permalink to this definition"></a></dt>
-<dd><p>Plot the fitted model as a series of straight lines. 
+<dd><p>Plot the fitted model as a series of straight lines.
 Passes any kwargs to the matplotlib plot function, e.g. color=”red”.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="piecewise_regression.main.Fit.summary">
 <span class="sig-name descname"><span class="pre">summary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Fit.summary" title="Permalink to this definition"></a></dt>
-<dd><p>Print a summary of the best fit, along the lines of the summary given by python’s statsmodels OLS fit.</p>
+<dd><p>Print a summary of the best fit, along the lines of the summary
+given by python’s statsmodels OLS fit.</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="piecewise_regression.main.Muggeo">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">piecewise_regression.main.</span></span><span class="sig-name descname"><span class="pre">Muggeo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_breakpoints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_distance_between_breakpoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_distance_to_edge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.02</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Muggeo" title="Permalink to this definition"></a></dt>
-<dd><p>Muggeo’s iterative segmented regression method. This is a simple version. 
-Errors are handled at a higher level in the Fit object. See Muggeo (2003) for more information.
-If the breakpoints get too close together, or get outside (or near the edge) of the data range, 
-the algorithm is stopped because this is likely to be a local minimum that is difficult to escape, as well
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">piecewise_regression.main.</span></span><span class="sig-name descname"><span class="pre">Muggeo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_breakpoints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_distance_between_breakpoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_distance_to_edge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.02</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Muggeo" title="Permalink to this definition"></a></dt>
+<dd><p>Muggeo’s iterative segmented regression method. This is a simple version.
+Errors are handled at a higher level in the Fit object. See Muggeo (2003).
+If the breakpoints get too close together, or get outside
+(or near the edge) of the data range,
+the algorithm is stopped because this is likely to be a local
+minimum that is difficult to escape, as well
 as possibly generating errors in the iterative procedue.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -213,11 +242,14 @@ as possibly generating errors in the iterative procedue.</p>
 <li><p><strong>yy</strong> (<em>list of floats</em>) – Data series in y-axis for fitting</p></li>
 <li><p><strong>n_breakpoints</strong> (<em>positive int</em>) – The number of breakpoints to fit</p></li>
 <li><p><strong>start_values</strong> (<em>list floats</em>) – A list of initial guesses for the breakpoints</p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – If True, prints out updates to the terminal</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – If True, prints out updates to the terminal</p></li>
 <li><p><strong>max_iterations</strong> (<em>positive int</em>) – How many iterations before stopping if not converged</p></li>
-<li><p><strong>tolerance</strong> (<em>positive float</em>) – How close breakpoints from pervious iterations must be to consider converged.</p></li>
-<li><p><strong>min_distance_between_breakpoints</strong> (<em>positive float</em>) – The minimum allowed distance between breakpoints, as a proportion of the data range.</p></li>
-<li><p><strong>min_distance_between_breakpoints</strong> – The minimum allowed distance from the edge of data to a breakpoint, as a proportion of the data range.</p></li>
+<li><p><strong>tolerance</strong> (<em>positive float</em>) – How close breakpoints from pervious iterations must be
+to consider converged.</p></li>
+<li><p><strong>min_distance_between_breakpoints</strong> (<em>positive float</em>) – The minimum allowed distance
+between breakpoints, as a proportion of the data range.</p></li>
+<li><p><strong>min_distance_between_breakpoints</strong> – The minimum allowed distance from
+the edge of data to a breakpoint, as a proportion of the data range.</p></li>
 </ul>
 </dd>
 </dl>
@@ -230,8 +262,9 @@ as possibly generating errors in the iterative procedue.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="piecewise_regression.main.Muggeo.stop_or_not">
 <span class="sig-name descname"><span class="pre">stop_or_not</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Muggeo.stop_or_not" title="Permalink to this definition"></a></dt>
-<dd><p>Test to see if the iterative procedure should stop. 
-Stop if it’s converged, if max_iterations reached, of the breakpoints fall into values that
+<dd><p>Test to see if the iterative procedure should stop.
+Stop if it’s converged, if max_iterations reached, of the breakpoints
+fall into values that
 are too close together or outside of the allowed rance.</p>
 </dd></dl>
 
@@ -239,42 +272,47 @@ are too close together or outside of the allowed rance.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="piecewise_regression.main.NextBreakpoints">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">piecewise_regression.main.</span></span><span class="sig-name descname"><span class="pre">NextBreakpoints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_breakpoints</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.NextBreakpoints" title="Permalink to this definition"></a></dt>
-<dd><p>One iteration of Muggeo’s segmented regression algorithm. Gets the next breakpoints. 
-Also calculates interesting statistics. This expects data validation and error 
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">piecewise_regression.main.</span></span><span class="sig-name descname"><span class="pre">NextBreakpoints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_breakpoints</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.NextBreakpoints" title="Permalink to this definition"></a></dt>
+<dd><p>One iteration of Muggeo’s segmented regression algorithm. Gets
+the next breakpoints.
+Also calculates interesting statistics. This expects data validation
+and error
 handling are done at a higher level.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>xx</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – Data series in x-axis for fitting (same axis as the breakpoints)</p></li>
-<li><p><strong>yy</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – Data series in y-axis for fitting</p></li>
-<li><p><strong>current_breakpoints</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – The starting breakpoints for this iteration</p></li>
+<li><p><strong>xx</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – Data series in x-axis for fitting (same axis as the breakpoints)</p></li>
+<li><p><strong>yy</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – Data series in y-axis for fitting</p></li>
+<li><p><strong>current_breakpoints</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – The starting breakpoints for this iteration</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="piecewise_regression.main.NextBreakpoints.breakpoint_fit">
 <span class="sig-name descname"><span class="pre">breakpoint_fit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.NextBreakpoints.breakpoint_fit" title="Permalink to this definition"></a></dt>
-<dd><p>Fit the linear approximation given the current breakpoint guesses. Sets the next breakpoints 
-and the params from the fit. The params are of the form [c, a, beta_hats, gamma_hats]</p>
+<dd><p>Fit the linear approximation given the current breakpoint guesses.
+Sets the next breakpoints
+and the params from the fit. The params are of the form [c, a,
+beta_hats, gamma_hats]</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="piecewise_regression.main.NextBreakpoints.calculate_all_confidence_intervals">
 <span class="sig-name descname"><span class="pre">calculate_all_confidence_intervals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.NextBreakpoints.calculate_all_confidence_intervals" title="Permalink to this definition"></a></dt>
-<dd><p>Calculate all confidence intervals, based on t-distribution and standard errors.</p>
+<dd><p>Calculate all confidence intervals, based on t-distribution and
+standard errors.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="piecewise_regression.main.NextBreakpoints.calculate_all_estimates">
 <span class="sig-name descname"><span class="pre">calculate_all_estimates</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.NextBreakpoints.calculate_all_estimates" title="Permalink to this definition"></a></dt>
-<dd><p>Extract estiamtes from the params and saves in the self.estimates dictionary</p>
+<dd><p>Extract estiamtes from the params and saves in self.estimates</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="piecewise_regression.main.NextBreakpoints.calculate_all_standard_errors">
 <span class="sig-name descname"><span class="pre">calculate_all_standard_errors</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.NextBreakpoints.calculate_all_standard_errors" title="Permalink to this definition"></a></dt>
-<dd><p>Calculate standard errors for all the variables of interest. 
+<dd><p>Calculate standard errors for all the variables of interest.
 Save to the self.estimates dictionary</p>
 </dd></dl>
 
@@ -287,11 +325,14 @@ Save to the self.estimates dictionary</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="piecewise_regression.main.NextBreakpoints.calculate_bayesian_information_criterion">
 <span class="sig-name descname"><span class="pre">calculate_bayesian_information_criterion</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.NextBreakpoints.calculate_bayesian_information_criterion" title="Permalink to this definition"></a></dt>
-<dd><p>Calculates the Bayesian Information Criterion of the fitted model. 
-Assuming normal noise, uses the standard version for OLS models. 
-This should hold for breakpoint regression models, because the BIC is based on the likelihood of the data
-given the model. That likelihood function doesn’t involve the breakpoint values - it just depends on distances 
-of the data to the fitted model predictions. Also depends on the error in the noise term being constant.</p>
+<dd><p>Calculates the Bayesian Information Criterion of the fitted model.
+Assuming normal noise, uses the standard version for OLS models.
+This should hold for breakpoint regression models, because the BIC
+is based on the likelihood of the data
+given the model. That likelihood function doesn’t involve the
+breakpoint values - it just depends on distances
+of the data to the fitted model predictions. Also depends on the error
+in the noise term being constant.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -315,8 +356,10 @@ of the data to the fitted model predictions. Also depends on the error in the no
 <dl class="py method">
 <dt class="sig sig-object py" id="piecewise_regression.main.NextBreakpoints.get_bp_standard_errors">
 <span class="sig-name descname"><span class="pre">get_bp_standard_errors</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.NextBreakpoints.get_bp_standard_errors" title="Permalink to this definition"></a></dt>
-<dd><p>Get the standard errors of the breakpoints. Considering bp = gamma/beta + bp_0, the 
-standard error of the breakpoint estaimtes can be found using the ratio/delta method. 
+<dd><p>Get the standard errors of the breakpoints.
+Considering bp = gamma/beta + bp_0, the
+standard error of the breakpoint estaimtes can be found using the
+ratio/delta method.
 See e.g. Muggeo (2003) for clarification</p>
 </dd></dl>
 
@@ -340,7 +383,7 @@ See e.g. Muggeo (2003) for clarification</p>
 <p>The model selection module is experimental. It compares models with different <cite>n_breakpoints</cite> using the Bayesian Information Criterion.</p>
 <span class="target" id="module-piecewise_regression.model_selection"></span><dl class="py class">
 <dt class="sig sig-object py" id="piecewise_regression.model_selection.ModelSelection">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">piecewise_regression.model_selection.</span></span><span class="sig-name descname"><span class="pre">ModelSelection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_breakpoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_boot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_distance_between_breakpoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_distance_to_edge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.02</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.model_selection.ModelSelection" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">piecewise_regression.model_selection.</span></span><span class="sig-name descname"><span class="pre">ModelSelection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_breakpoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_boot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_distance_between_breakpoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_distance_to_edge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.02</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.model_selection.ModelSelection" title="Permalink to this definition"></a></dt>
 <dd><p>Experimental - uses simple BIC based on simple linear model.</p>
 </dd></dl>
 
@@ -352,18 +395,25 @@ See e.g. Muggeo (2003) for clarification</p>
 <dt class="sig sig-object py" id="piecewise_regression.davies.davies_test">
 <span class="sig-prename descclassname"><span class="pre">piecewise_regression.davies.</span></span><span class="sig-name descname"><span class="pre">davies_test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alternative</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'two_sided'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.davies.davies_test" title="Permalink to this definition"></a></dt>
 <dd><p>Significance test for the existence of a breakpoint
-Null hypothesis is that there is no breakpoint, or that the change in gradient is zero.
-Alternative hypothesis is that there is a breakpoint, with a non-zero change in gradient.
+Null hypothesis is that there is no breakpoint, or that the change in
+gradient is zero.
+Alternative hypothesis is that there is a breakpoint, with a non-zero
+change in gradient.
 The change is gradient is a function of the breakpoint position.
-The breakpoint posiition is a nuisannce parameter that only exists in the alternative hypothesis.
-Based on Davies (1987), “Hypothesis Testing when a nuisance parameter is present only under the alternative”.</p>
+The breakpoint posiition is a nuisannce parameter that only exists in the
+alternative hypothesis.
+Based on Davies (1987), “Hypothesis Testing when a nuisance parameter is
+present only under the alternative”.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>xx</strong> (<em>list of floats</em>) – Data series in x-axis (same axis as the breakpoints).</p></li>
 <li><p><strong>yy</strong> (<em>list of floats</em>) – Data series in y-axis.</p></li>
-<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – A control parameter that determines the number of points to consider within the xx range.</p></li>
-<li><p><strong>alternative</strong> (<em>str. One of &quot;two_sided&quot;</em><em>, </em><em>&quot;less&quot;</em><em>, </em><em>&quot;greater&quot;</em>) – Whether to consider a two-sided hypothesis test, or a one sided test with change of gradient greater or less than zero. For existence of a breakpoint, use “two-sided”.</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – A control parameter that determines the number of points to
+consider within the xx range.</p></li>
+<li><p><strong>alternative</strong> (<em>str. One of &quot;two_sided&quot;</em><em>, </em><em>&quot;less&quot;</em><em>, </em><em>&quot;greater&quot;</em>) – Whether to consider a two-sided hypothesis test,
+or a one sided test with change of gradient greater or less than zero.
+For existence of a breakpoint, use “two-sided”.</p></li>
 </ul>
 </dd>
 </dl>
@@ -372,15 +422,17 @@ Based on Davies (1987), “Hypothesis Testing when a nuisance parameter is prese
 <dl class="py function">
 <dt class="sig sig-object py" id="piecewise_regression.davies.get_test_statistic">
 <span class="sig-prename descclassname"><span class="pre">piecewise_regression.davies.</span></span><span class="sig-name descname"><span class="pre">get_test_statistic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xx_davies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yy_davies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.davies.get_test_statistic" title="Permalink to this definition"></a></dt>
-<dd><p>Compute a test statistic for the Davies test for the p-value of existence of a breakpoint.
-Based on Davies(1987) “Hypothesis Testing when a nuisance parameter is present only under the alternative”.
-All the variables in this function are as named and described in that paper.</p>
+<dd><p>Compute a test statistic for the Davies test for the p-value of existence
+of a breakpoint. Based on Davies(1987) “Hypothesis Testing when a nuisance
+parameter is present only under the alternative”.
+All the variables in this function are as named and described in that
+paper.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>xx_davies</strong> (<em>list of floats</em>) – Data series in x-axis (same axis as the breakpoints).</p></li>
 <li><p><strong>yy_davies</strong> (<em>list of floats</em>) – Data series in y-axis.</p></li>
-<li><p><strong>theta</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – A test value from within the range of data in xx</p></li>
+<li><p><strong>theta</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – A test value from within the range of data in xx</p></li>
 </ul>
 </dd>
 </dl>
