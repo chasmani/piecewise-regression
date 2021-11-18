@@ -640,7 +640,7 @@ class Fit:
                  # int. If not start_values, the number of breakpoints to fit.
                  # REQUIRED if no start_values
                  n_breakpoints=None,
-                 n_boot=20,  # Positive int. The number of times to run the
+                 n_boot=100,  # Positive int. The number of times to run the
                  # bootstrap restarting. n_boot=0 runs the Muggeo algorithm
                  # with no bootstrap
                  # Boolean. whether to print progress to terminal.

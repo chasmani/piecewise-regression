@@ -46,7 +46,7 @@ class TestFit(unittest.TestCase):
         bps = np.array([7, 13])
 
         np.random.seed(1)
-        fit = Fit(xx, yy, start_values=bps, verbose=False)
+        fit = Fit(xx, yy, start_values=bps, verbose=False, n_boot=10)
 
         best_fit = fit.best_muggeo.best_fit
 
@@ -55,7 +55,7 @@ class TestFit(unittest.TestCase):
         muggeo_rss = 190.02
 
         self.assertAlmostEqual(
-            muggeo_rss, best_fit.residual_sum_squares, places=1)
+            muggeo_rss, best_fit.residual_sum_squares, places=0)
 
         muggeo_c = 100.64655
         muggeo_c_se = 0.23081

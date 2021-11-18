@@ -29,14 +29,16 @@ class TestFit(unittest.TestCase):
         xx = np.array(data.MUGGEO_1_XX)
         yy = np.array(data.MUGGEO_1_YY)
 
-        ms = ModelSelection(xx, yy)
+        ms = ModelSelection(xx, yy, n_boot=20)
 
         # For each n_breakpoints, chekc the ModelSelection vs fit results
         for n_breakpoints in range(1,10):
-            fit = Fit(xx, yy, n_breakpoints=n_breakpoints, verbose=False)
+            fit = Fit(xx, yy, n_breakpoints=n_breakpoints, verbose=False, n_boot=20)
 
             fit_converged = fit.get_results()["converged"]
-            ms_converged = ms.models[n_breakpoints]["converged"]
+            ms_converged = ms.model_summaries[n_breakpoints]["converged"]
+            print(n_breakpoints, fit_converged, ms_converged)
+            
 
             self.assertEqual(fit_converged, ms_converged)
 
