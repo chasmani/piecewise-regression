@@ -764,7 +764,7 @@ class Fit:
 
             # Best breakpoints are either from best converged muggeo so far,
             # or start values, or randomly generated
-            if self.best_muggeo:
+            if self.best_muggeo and np.random.uniform()<0.5:
                 best_bps = self.best_muggeo.best_fit.next_breakpoints
             else:
                 best_bps = self.start_values
@@ -1115,5 +1115,4 @@ class Fit:
 
 
 if __name__ == "__main__":
-
     pass
