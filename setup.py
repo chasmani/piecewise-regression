@@ -3,15 +3,15 @@ import setuptools
 # This call to setup() does all the work
 setuptools.setup(
     name="piecewise-regression",
-    version="1.1.1",
+    version="1.1.2",
     description="piecewise (segmented) regression in python",
-    long_description="""
-        piecewise-regression provides tools for fitting continuous straight line \
-        models to data with breakpoint(s) where the gradient changes. 
-
-        For docs and more information, visit the Github repo at \
-        https://github.com/chasmani/piecewise-regression.
-        """,
+    long_description=   "piecewise-regression provides tools for fitting " 
+                        "continuous straight line models to data with "
+                        "breakpoint(s) where the gradient changes. "
+                        ""
+                        "For docs and more information, "
+                        "visit the Github repo at "
+                        "https://github.com/chasmani/piecewise-regression.",
     long_description_content_type="text/markdown",
     url="https://github.com/chasmani/piecewise-regression",
     author="Charlie Pilgrim",
