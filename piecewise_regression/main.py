@@ -1010,7 +1010,6 @@ class Fit:
                     muggeo_fit.stop_reason)
                 run_count += 1
             print(summary)
-            return summary
 
         else:
             header = "\n{:^70}\n".format("Breakpoint Regression Results")
@@ -1110,8 +1109,6 @@ class Fit:
             summary = header + overview + table + davies_result + "\n\n"
 
             print(summary)
-
-            return summary
 
 
 if __name__ == "__main__":
