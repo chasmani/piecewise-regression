@@ -17,13 +17,16 @@ class ModelSelection:
     """
 
     def __init__(
-            self, xx, yy, max_breakpoints=10, n_boot=20,
+            self, xx, yy, max_breakpoints=10, n_boot=100,
             max_iterations=30, tolerance=10**-5,
             min_distance_between_breakpoints=0.01, min_distance_to_edge=0.02,
             verbose=True
             ):
 
+        # The actual fit model objects
         self.models = []
+        # The model summary data
+        self.model_summaries = []
 
         self.stop = False
 
@@ -43,7 +46,8 @@ class ModelSelection:
                 min_distance_to_edge=min_distance_to_edge)
             fit_summary = bootstrapped_fit.get_results()
             fit_summary["n_breakpoints"] = k
-            self.models.append(fit_summary)
+            self.model_summaries.append(fit_summary)
+            self.models.append(bootstrapped_fit)
 
         self.summary()
 
@@ -66,15 +70,18 @@ class ModelSelection:
         table_contents += table_header
         table_contents += single_line
 
-        for model in self.models:
+        for model_summary in self.model_summaries:
 
-            if model["converged"]:
+            if model_summary["converged"]:
                 model_row = table_row_template.format(
-                    model["n_breakpoints"], model["bic"],
-                    str(model["converged"]), model["rss"])
+                    model_summary["n_breakpoints"], 
+                    model_summary["bic"],
+                    str(model_summary["converged"]), 
+                    model_summary["rss"])
             else:
                 model_row = table_row_template.format(
-                    model["n_breakpoints"], "", str(model["converged"]), "")
+                    model_summary["n_breakpoints"], "", 
+                    str(model_summary["converged"]), "")
 
             table_contents += model_row
 
@@ -113,8 +120,11 @@ class ModelSelection:
         fit_data["estimates"]["const"] = results.params[0]
         fit_data["estimates"]["alpha1"] = results.params[1]
 
-        self.models.append(fit_data)
+        self.model_summaries.append(fit_data)
 
 
 if __name__ == "__main__":
+    
     pass
+
+
