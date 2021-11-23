@@ -33,22 +33,22 @@ def get_test_statistic(xx_davies, yy_davies, theta):
         s_0 += x**2
 
         if x > theta:
-            s_1 += x*(x-theta)
+            s_1 += x * (x - theta)
             s_3 += x - theta
 
         elif x < theta:
-            s_2 += x*(x-theta)
+            s_2 += x * (x - theta)
             s_4 += x - theta
 
-    a_hat = np.sum(yy_davies)/n
-    b_hat = np.sum(xx_davies*yy_davies)/s_0
-    V = s_1*s_2/s_0 + s_3*s_4/n
+    a_hat = np.sum(yy_davies) / n
+    b_hat = np.sum(xx_davies * yy_davies) / s_0
+    V = s_1 * s_2 / s_0 + s_3 * s_4 / n
     S = 0
     for i in range(n):
         if xx_davies[i] > theta:
-            S += (yy_davies[i] - a_hat - b_hat*xx_davies[i]) * \
+            S += (yy_davies[i] - a_hat - b_hat * xx_davies[i]) * \
                 (xx_davies[i] - theta)
-    S = S/(np.sqrt(np.abs(V)))
+    S = S / (np.sqrt(np.abs(V)))
     return S
 
 
@@ -109,13 +109,13 @@ def davies_test(xx, yy, k=10, alternative="two_sided"):
 
     # Use formulas from Davies
     V = 0
-    for i in range(len(thetas)-1):
-        V += np.abs(test_stats[i+1]-test_stats[i])
+    for i in range(len(thetas) - 1):
+        V += np.abs(test_stats[i + 1] - test_stats[i])
 
-    p = scipy.stats.norm.cdf(-M) + V * np.exp(-.5*M **
-                                              2) * 1/(np.sqrt(8*math.pi))
+    p = scipy.stats.norm.cdf(-M) + V * np.exp(-.5 * M **
+                                              2) * 1 / (np.sqrt(8 * math.pi))
 
     if alternative == "two_sided":
-        return p*2
+        return p * 2
     else:
         return p

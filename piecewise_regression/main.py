@@ -15,7 +15,7 @@ try:
         validate_positive_integer,
         validate_list_of_numbers,
         validate_non_negative_integer
-        )
+    )
 except ImportError:
     import davies
     import r_squared_calc
@@ -25,7 +25,7 @@ except ImportError:
         validate_positive_integer,
         validate_list_of_numbers,
         validate_non_negative_integer
-        )
+    )
 
 
 class NextBreakpoints:
@@ -114,11 +114,12 @@ class NextBreakpoints:
 
         # First two params are a and c in the line equation
         # Beta hats are the next group of params, same length as breakpoints
-        beta_hats = results.params[2:2+len(self.current_breakpoints)]
+        beta_hats = results.params[2:2 + len(self.current_breakpoints)]
         # Gamma hats are the last group of params, same length as breakpoints
-        gamma_hats = results.params[2+len(self.current_breakpoints):]
+        gamma_hats = results.params[2 + len(self.current_breakpoints):]
         # The next breakpoints are calculated iteratively
-        self.next_breakpoints = self.current_breakpoints - gamma_hats/beta_hats
+        self.next_breakpoints = self.current_breakpoints \
+            - gamma_hats / beta_hats
 
     def calculate_all_estimates(self):
         """
@@ -128,20 +129,20 @@ class NextBreakpoints:
 
         # Extract the exstimates form the correct locations in the params
         const_estimate = params[0]
-        beta_estimates = params[2:self.n_breakpoints+2]
+        beta_estimates = params[2:self.n_breakpoints + 2]
         breakpoint_estimates = self.next_breakpoints
 
         self.estimates["const"] = {"estimate": const_estimate}
         for bp_i in range(self.n_breakpoints):
             self.estimates["beta{}".format(
-                bp_i+1)] = {"estimate": beta_estimates[bp_i]}
+                bp_i + 1)] = {"estimate": beta_estimates[bp_i]}
             self.estimates["breakpoint{}".format(
-                bp_i+1)] = {"estimate": breakpoint_estimates[bp_i]}
+                bp_i + 1)] = {"estimate": breakpoint_estimates[bp_i]}
         # Also calculate alphas
         for alpha_i in range(self.n_breakpoints + 1):
-            alpha_estimate = np.sum(params[1:alpha_i+2])
+            alpha_estimate = np.sum(params[1:alpha_i + 2])
             self.estimates["alpha{}".format(
-                alpha_i+1)] = {"estimate": alpha_estimate}
+                alpha_i + 1)] = {"estimate": alpha_estimate}
 
     def get_alpha_standard_errors(self):
         """
@@ -158,7 +159,7 @@ class NextBreakpoints:
         # var(alpha_k) = sum_{i, j} cov(alpha and betas)
         alpha_vars = []
         for alpha_n in range(self.n_breakpoints + 1):
-            alpha_cov_matrix = cov_matrix[1:alpha_n+2, 1:alpha_n+2]
+            alpha_cov_matrix = cov_matrix[1:alpha_n + 2, 1:alpha_n + 2]
             alpha_vars.append(np.sum(alpha_cov_matrix))
 
         alpha_ses = np.sqrt(alpha_vars)
@@ -192,8 +193,8 @@ class NextBreakpoints:
             # opposite to Muggeo, this is because the gamma is defined with
             # the opposite sign
             # The calculation is equivalent to Muggeos.
-            bp_var = (gamma_var + beta_var * (gamma/beta)**2 -
-                      2*(gamma/beta)*gamma_beta_covar)/(beta**2)
+            bp_var = (gamma_var + beta_var * (gamma / beta)**2 -
+                      2 * (gamma / beta) * gamma_beta_covar) / (beta**2)
             bp_vars.append(bp_var)
 
         bp_ses = np.sqrt(bp_vars)
@@ -217,7 +218,7 @@ class NextBreakpoints:
         # Beta variances are along the diagonal of the covariance matrix
         cov_matrix = self.covariance_matrix
         cov_diagonal = np.diagonal(cov_matrix)
-        beta_vars = cov_diagonal[2:self.n_breakpoints+2]
+        beta_vars = cov_diagonal[2:self.n_breakpoints + 2]
         return np.sqrt(beta_vars)
 
     def calculate_all_standard_errors(self):
@@ -231,12 +232,13 @@ class NextBreakpoints:
         beta_ses = self.get_beta_standard_errors()
         bp_ses = self.get_bp_standard_errors()
         for bp_i in range(self.n_breakpoints):
-            self.estimates["beta{}".format(bp_i+1)]["se"] = beta_ses[bp_i]
-            self.estimates["breakpoint{}".format(bp_i+1)]["se"] = bp_ses[bp_i]
+            self.estimates["beta{}".format(bp_i + 1)]["se"] = beta_ses[bp_i]
+            self.estimates["breakpoint{}".format(
+                bp_i + 1)]["se"] = bp_ses[bp_i]
         alpha_ses = self.get_alpha_standard_errors()
         for alpha_i in range(self.n_breakpoints + 1):
             self.estimates["alpha{}".format(
-                alpha_i+1)]["se"] = alpha_ses[alpha_i]
+                alpha_i + 1)]["se"] = alpha_ses[alpha_i]
 
     def calculate_all_confidence_intervals(self):
         """
@@ -244,22 +246,22 @@ class NextBreakpoints:
         standard errors.
         """
         # Estimates
-        dof = len(self.xx) - 2 - 2*self.n_breakpoints
+        dof = len(self.xx) - 2 - 2 * self.n_breakpoints
         t_const = scipy.stats.t.ppf(0.975, dof)
 
         # Iterate over the estimate dictionary, add confidence intervals
         # to all estimators
         for estimator_name, details in self.estimates.items():
             confidence_interval = (
-                details["estimate"] - t_const*details["se"],
-                details["estimate"] + t_const*details["se"])
+                details["estimate"] - t_const * details["se"],
+                details["estimate"] + t_const * details["se"])
             details["confidence_interval"] = confidence_interval
 
     def calculate_all_t_stats(self):
         """
         Get t stats for all the estimators
         """
-        dof = len(self.xx) - 2 - 2*self.n_breakpoints
+        dof = len(self.xx) - 2 - 2 * self.n_breakpoints
         for estimator_name, details in self.estimates.items():
             # Breakpoint t stats don't make sense
             # Don't exist in the null model - nuisance parameter
@@ -268,8 +270,8 @@ class NextBreakpoints:
                 details["t_stat"] = "-"
                 details["p_t"] = "-"
             else:
-                t_stat = details["estimate"]/details["se"]
-                p_t = scipy.stats.t.sf(np.abs(t_stat), dof)*2
+                t_stat = details["estimate"] / details["se"]
+                p_t = scipy.stats.t.sf(np.abs(t_stat), dof) * 2
                 details["t_stat"] = t_stat
                 if "beta" in estimator_name:
                     details["p_t"] = "-"
@@ -285,11 +287,11 @@ class NextBreakpoints:
         # Extract what we need from params etc
         intercept_hat = params[0]
         alpha_hat = params[1]
-        beta_hats = params[2:2+len(breakpoints)]
+        beta_hats = params[2:2 + len(breakpoints)]
 
         yy_predicted = []
 
-        yy_predicted = intercept_hat + alpha_hat*self.xx
+        yy_predicted = intercept_hat + alpha_hat * self.xx
         for bp_count in range(len(breakpoints)):
             yy_predicted += beta_hats[bp_count] * \
                 np.maximum(self.xx - breakpoints[bp_count], 0)
@@ -325,9 +327,9 @@ class NextBreakpoints:
         in the noise term being constant.
         """
         n = len(self.xx)  # No. data points
-        k = 2 + 2*self.n_breakpoints  # No. model parameters
+        k = 2 + 2 * self.n_breakpoints  # No. model parameters
         rss = self.residual_sum_squares
-        self.bic = n * np.log(rss/n) + k * np.log(n)
+        self.bic = n * np.log(rss / n) + k * np.log(n)
 
 
 class Muggeo:
@@ -405,7 +407,8 @@ class Muggeo:
         self.yy = yy
 
         self.n_breakpoints = n_breakpoints
-        self.min_distance_between_breakpoints = min_distance_between_breakpoints
+        self.min_distance_between_breakpoints = \
+            min_distance_between_breakpoints
         self.min_distance_to_edge = min_distance_to_edge
 
         if start_values is None:
@@ -478,11 +481,13 @@ class Muggeo:
             self.stop_reason = "Algorithm stopped as max iterations reached"
             self.stop = True
 
-        if not self._are_breakpoint_values_far_apart(self.fit_history[-1].next_breakpoints):
+        if not self._are_breakpoint_values_far_apart(
+                self.fit_history[-1].next_breakpoints):
             self.stop_reason = "Breakpoint values too close together"
             self.stop = True
 
-        if not self._are_breakpoint_values_within_range(self.fit_history[-1].next_breakpoints):
+        if not self._are_breakpoint_values_within_range(
+                self.fit_history[-1].next_breakpoints):
             self.stop_reason = "Breakpoint values outside range"
             self.stop = True
 
@@ -499,9 +504,11 @@ class Muggeo:
         # Stop if the algorithm is iterating back to previous values, within
         # tolerance
         if len(self.fit_history) > 2:
-            breakpoint_two_step_differences = self.fit_history[-3].next_breakpoints - \
+            breakpoint_two_step_differences = \
+                self.fit_history[-3].next_breakpoints - \
                 self.fit_history[-1].next_breakpoints
-            if np.max(np.abs(breakpoint_two_step_differences)) <= self.tolerance:
+            if np.max(np.abs(breakpoint_two_step_differences)) \
+                    <= self.tolerance:
                 self.stop_reason = "Algorithm converged on breakpoint values"
                 self.stop = True
                 self.converged = True
@@ -529,7 +536,8 @@ class Muggeo:
         if not self._are_breakpoint_values_far_apart(start_values):
             self.stop = True
             self.stop_reason = ("start_values are too close together."
-                                "Try changing min_distance_between_breakpoints")
+                                "Try changing "
+                                "min_distance_between_breakpoints")
         return start_values
 
     def _are_breakpoint_values_within_range(self, breakpoints):
@@ -542,7 +550,7 @@ class Muggeo:
 
         """
         min_allowed_bp = np.quantile(self.xx, self.min_distance_to_edge)
-        max_allowed_bp = np.quantile(self.xx, 1-self.min_distance_to_edge)
+        max_allowed_bp = np.quantile(self.xx, 1 - self.min_distance_to_edge)
 
         for bp in breakpoints:
             if bp <= min_allowed_bp or bp >= max_allowed_bp:
@@ -574,7 +582,7 @@ class Muggeo:
         """
         # Get breakpoints within allowed range
         min_allowed_bp = np.quantile(self.xx, self.min_distance_to_edge)
-        max_allowed_bp = np.quantile(self.xx, 1-self.min_distance_to_edge)
+        max_allowed_bp = np.quantile(self.xx, 1 - self.min_distance_to_edge)
         start_values = np.random.uniform(
             low=min_allowed_bp, high=max_allowed_bp, size=self.n_breakpoints)
         if self.verbose:
@@ -742,6 +750,7 @@ class Fit:
         - Throughout, keep track of the history of fits and the best_muggeo
             fit that converged - defined as the lowest residual sum of squares.
         """
+        min_d_between_bps = self.min_distance_between_breakpoints
         muggeo_fit = Muggeo(
             xx=self.xx,
             yy=self.yy,
@@ -750,7 +759,7 @@ class Fit:
             max_iterations=self.max_iterations,
             tolerance=self.tolerance,
             verbose=self.verbose,
-            min_distance_between_breakpoints=self.min_distance_between_breakpoints,
+            min_distance_between_breakpoints=min_d_between_bps,
             min_distance_to_edge=self.min_distance_to_edge)
 
         self.bootstrap_history.append(muggeo_fit)
@@ -764,7 +773,7 @@ class Fit:
 
             # Best breakpoints are either from best converged muggeo so far,
             # or start values, or randomly generated
-            if self.best_muggeo and np.random.uniform()<0.5:
+            if self.best_muggeo and np.random.uniform() < 0.5:
                 best_bps = self.best_muggeo.best_fit.next_breakpoints
             else:
                 best_bps = self.start_values
@@ -779,7 +788,7 @@ class Fit:
                 max_iterations=self.max_iterations,
                 tolerance=self.tolerance,
                 verbose=self.verbose,
-                min_distance_between_breakpoints=self.min_distance_between_breakpoints,
+                min_distance_between_breakpoints=min_d_between_bps,
                 min_distance_to_edge=self.min_distance_to_edge)
             if bootstrap_fit.converged:
                 bootstrap_bps = bootstrap_fit.best_fit.next_breakpoints
@@ -798,7 +807,7 @@ class Fit:
                 max_iterations=self.max_iterations,
                 tolerance=self.tolerance,
                 verbose=self.verbose,
-                min_distance_between_breakpoints=self.min_distance_between_breakpoints,
+                min_distance_between_breakpoints=min_d_between_bps,
                 min_distance_to_edge=self.min_distance_to_edge)
             self.bootstrap_history.append(next_muggeo)
 
@@ -807,7 +816,8 @@ class Fit:
                 # If there is already a converged best_muggeo, see if this one
                 # is better
                 if self.best_muggeo:
-                    if next_muggeo.best_fit.residual_sum_squares < self.best_muggeo.best_fit.residual_sum_squares:
+                    if next_muggeo.best_fit.residual_sum_squares \
+                            < self.best_muggeo.best_fit.residual_sum_squares:
                         self.best_muggeo = next_muggeo
                 # If there is not already a converged best_muggeo, use this
                 # fit instead
@@ -859,13 +869,13 @@ class Fit:
             # Extract what we need from params etc
             intercept_hat = final_params[0]
             alpha_hat = final_params[1]
-            beta_hats = final_params[2:2+len(breakpoints)]
+            beta_hats = final_params[2:2 + len(breakpoints)]
 
             xx_plot = np.linspace(min(self.xx), max(self.xx), 100)
 
             # Build the fit plot segment by segment. Betas are defined as
             # difference in gradient from previous section
-            yy_plot = intercept_hat + alpha_hat*xx_plot
+            yy_plot = intercept_hat + alpha_hat * xx_plot
             for bp_count in range(len(breakpoints)):
                 yy_plot += beta_hats[bp_count] * \
                     np.maximum(xx_plot - breakpoints[bp_count], 0)
@@ -900,7 +910,7 @@ class Fit:
 
             for bp_i in range(self.best_muggeo.n_breakpoints):
                 bp_ci = estimates["breakpoint{}".format(
-                    bp_i+1)]["confidence_interval"]
+                    bp_i + 1)]["confidence_interval"]
                 plt.axvspan(bp_ci[0], bp_ci[1], alpha=0.1)
 
     def plot_best_muggeo_breakpoint_history(self, **kwargs):
@@ -1022,7 +1032,7 @@ class Fit:
 
             # Overview
             n_obs = len(self.xx)
-            n_model_params = 2 + 2*self.n_breakpoints
+            n_model_params = 2 + 2 * self.n_breakpoints
             dof = n_obs - n_model_params
             no_obs_text = "{:<20} {:>20}\n".format("No. Observations", n_obs)
             no_model_parameters_text = "{:<20} {:>20}\n".format(
@@ -1047,20 +1057,20 @@ class Fit:
                 converged_text + double_line
 
             # Table of results
-
-            table_header_template = "{:<15} {:>12} {:>12} {:>12} {:>12} {:>12} {:>12}\n"
+            table_header_template = ("{:<15} {:>12} {:>12} {:>12} "
+                                     "{:>12} {:>12} {:>12}\n")
 
             table_header = table_header_template.format(
                 "", "Estimate", "Std Err", "t", "P>|t|", "[0.025", "0.975]")
-            # print ("{:<8} {:<15} {:<10}".format( name, age, perc))
 
-            table_row_template = "{:<15} {:>12.6} {:>12.3} {:>12.5} {:>12.3} {:>12.5} {:>12.5}\n"
+            table_row_template = ("{:<15} {:>12.6} {:>12.3} {:>12.5} "
+                                  " {:>12.3} {:>12.5} {:>12.5}\n")
 
             table_contents = ""
 
-            beta_names = ["beta{}".format(i+1)
+            beta_names = ["beta{}".format(i + 1)
                           for i in range(self.n_breakpoints)]
-            bp_names = ["breakpoint{}".format(i+1)
+            bp_names = ["breakpoint{}".format(i + 1)
                         for i in range(self.n_breakpoints)]
 
             model_estimator_names = ["const", "alpha1"] + beta_names + bp_names
@@ -1085,7 +1095,7 @@ class Fit:
                 "from betas(change in gradient)\n")
 
             alpha_names = ["alpha{}".format(
-                alpha_i+1) for alpha_i in range(1, self.n_breakpoints+1)]
+                alpha_i + 1) for alpha_i in range(1, self.n_breakpoints + 1)]
 
             table_contents += single_line
 

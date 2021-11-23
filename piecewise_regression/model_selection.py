@@ -20,8 +20,7 @@ class ModelSelection:
             self, xx, yy, max_breakpoints=10, n_boot=100,
             max_iterations=30, tolerance=10**-5,
             min_distance_between_breakpoints=0.01, min_distance_to_edge=0.02,
-            verbose=True
-            ):
+            verbose=True):
 
         # The actual fit model objects
         self.models = []
@@ -35,14 +34,15 @@ class ModelSelection:
 
         self.no_breakpoint_fit(xx, yy)
 
-        for k in range(1, max_breakpoints+1):
+        min_d_between_bps = min_distance_between_breakpoints
+        for k in range(1, max_breakpoints + 1):
             if verbose:
                 print("Running fit with n_breakpoint = {} . . ".format(k))
             bootstrapped_fit = Fit(
                 xx, yy, n_breakpoints=k, verbose=False,
                 n_boot=n_boot, max_iterations=max_iterations,
                 tolerance=tolerance,
-                min_distance_between_breakpoints=min_distance_between_breakpoints,
+                min_distance_between_breakpoints=min_d_between_bps,
                 min_distance_to_edge=min_distance_to_edge)
             fit_summary = bootstrapped_fit.get_results()
             fit_summary["n_breakpoints"] = k
@@ -107,7 +107,7 @@ class ModelSelection:
         # Calcualte BIC
         n = len(xx)  # No. data points
         k = 2  # No. parameters
-        bic = n * np.log(rss/n) + k * np.log(n)
+        bic = n * np.log(rss / n) + k * np.log(n)
 
         fit_data = {
             "bic": bic,
