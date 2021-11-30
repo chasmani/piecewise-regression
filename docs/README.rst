@@ -28,7 +28,7 @@ piecewise-regression (aka segmented regression) in python
 
 |
 
-Easy-to-use piecewise regression (aka segmented regression) in Python based on Muggeo's paper "Estimating regression models with unknown break-points" (2003) for fitting straight lines to data where there are one or more gradient changes known as breakpoints.
+Easy-to-use piecewise regression (aka segmented regression) in Python. For fitting straight lines to data where there are one or more changes in gradient (known as breakpoints). Based on Muggeo's paper "Estimating regression models with unknown break-points" (2003).
 
 Example:
 
@@ -145,7 +145,7 @@ The package implements Muggeo's iterative algorithm (Muggeo "Estimating regressi
 
 Muggeo's method doesn't always converge on the best solution - sometimes, it finds a locally optimal solution or doesn't converge at all. For this reason, the Fit method also implements a process called bootstrap restarting which involves taking a bootstrapped resample of the data to try to find a better solution. The number of times this process runs can be controlled with n_boot. To run the Fit without bootstrap restarting, set ``n_boot=0``.
 
-When short for initial guesses for the number of breakpoints, you can set it to ``n_breakpoints=3``, and the algorithm will randomly generate start_values. With a 50% chance, the bootstrap restarting algorithm will either use the best currently converged breakpoints or randomly generate new ``start_values``, scaping the local optima in two ways and finally converging to a global optimum. 
+If you do not have (or do not want to use) initial guesses for the number of breakpoints, you can set it to ``n_breakpoints=3``, and the algorithm will randomly generate start_values. With a 50% chance, the bootstrap restarting algorithm will either use the best currently converged breakpoints or randomly generate new ``start_values``, escaping the local optima in two ways in order to find better global optima. 
 
 As is often the case with fitting non-linear models, even with these measures, the algorithm is not guaranteed to converge to a global optimum. However, increasing ``n_boot`` raises the probability of global convergence at the cost of computation time.
 
@@ -153,7 +153,7 @@ As is often the case with fitting non-linear models, even with these measures, t
 Model Selection
 ==========================
 
-In addition to the main Fit tool, the package also offers a ModelSelection option based on the Bayesian Information Criterion (BIC). This additional model is experimental and not as thorough as the main Fit function. In particular, the models are generated with random start_values, which can influence the model fit and give different values for the BIC. The tool can help explore other possible models but should not be used to choose the best model at this time. ::
+In addition to the main Fit tool, the package also offers a ModelSelection option based on the Bayesian Information Criterion (BIC). This additional tool is experimental and not as thorough as the main Fit function. In particular, the models are generated with random start_values, which can influence the model fit and give different values for the BIC. The tool can help explore other possible models but should not be used to choose the best model at this time. ::
 
 	ms = piecewise_regression.ModelSelection(x, y, max_breakpoints=6)
 
