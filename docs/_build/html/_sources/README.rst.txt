@@ -3,7 +3,7 @@ piecewise-regression (aka segmented regression) in python
 ==========================================================
 :piecewise-regression: fitting straight line models with breakpoints
 :Author: Charlie Pilgrim
-:Version: 1.1.3
+:Version: 1.2.0
 :Github: https://github.com/chasmani/piecewise-regression
 :Documentation: https://piecewise-regression.readthedocs.io/en/master/index.html
 
@@ -28,14 +28,14 @@ piecewise-regression (aka segmented regression) in python
 
 |
 
-Easy-to-use piecewise regression (aka segmented regression) in Python. For fitting straight lines to data where there is one or more changes in gradient (known as breakpoints). Based on Muggeo's paper "Estimating regression models with unknown break-points" (2003). 
+Easy-to-use piecewise regression (aka segmented regression) in Python. For fitting straight lines to data where there are one or more changes in gradient (known as breakpoints). Based on Muggeo's paper "Estimating regression models with unknown break-points" (2003).
 
-For example:
+Example:
 
 .. image:: https://raw.githubusercontent.com/chasmani/piecewise-regression/master/paper/example.png
     :alt: basic-example-plot-github
 
-There are some code examples below, and more in this `Google Colab Jupyter Notebook <https://colab.research.google.com/drive/1Pwv6LqwZU8Zbl0VZH6cwOTwoRzm3CPPC#offline=true&sandboxMode=true/>`_.
+Code examples below, and more in this `Google Colab Jupyter Notebook <https://colab.research.google.com/drive/1Pwv6LqwZU8Zbl0VZH6cwOTwoRzm3CPPC#offline=true&sandboxMode=true/>`_.
 
 Installation
 ========================
@@ -49,7 +49,7 @@ The package is tested on Python 3.7, 3.8 and 3.9.
 Getting started
 ========================
 
-The package requires some x and y data to fit. You also need to specify either a) some initial breakpoint guesses as `start_values` or b) how many breakpoints you want to fit as `n_breakpoints` (or both). Here is a very simple example, assuming we already have some data `x` and `y`: ::
+The package requires some x and y data to fit. You need to specify either a) some initial breakpoint guesses as `start_values` or b) how many breakpoints you want to fit as `n_breakpoints` (or both). Here is an elementary example, assuming we already have some data `x` and `y`: ::
 
 	import piecewise_regression
 	pw_fit = piecewise_regression.Fit(x, y, n_breakpoints=2)
@@ -57,8 +57,9 @@ The package requires some x and y data to fit. You also need to specify either a
 
 Example
 ========================
+*For demonstration purposes, substitute with your own data to fit.*
 
-Here is a more detailed example. We start off generating some data with a breakpoint. This is for demonstration purposes, normally you will have your own data to fit: ::
+1. Start-off generating some data with a breakpoint: ::
 
 	import piecewise_regression
 	import numpy as np
@@ -73,7 +74,7 @@ Here is a more detailed example. We start off generating some data with a breakp
 	yy = constant + alpha_1*xx + (alpha_2-alpha_1) * np.maximum(xx - breakpoint_1, 0) + np.random.normal(size=n_points)
 
 
-Now we fit the model: ::
+2. Fit the model: ::
 
     # Given some data, fit the model
     pw_fit = piecewise_regression.Fit(xx, yy, start_values=[5], n_breakpoints=1)
@@ -111,7 +112,7 @@ Example output: ::
 
 This includes estimates for all the model variables, along with confidence intervals. The Davies test is a hypothesis test for the existence of at least one breakpoint, against the null hypothesis of no breakpoints.  
 
-There are also tools for plotting data: ::
+3. Optional: Plotting the data and model results: ::
 
 	import matplotlib.pyplot as plt
 
@@ -140,20 +141,23 @@ You can extract data as well: ::
 How It Works
 ======================
 
-The package implements Muggeo's iterative algorithm (Muggeo "Estimating regression models with unknown break-points" (2003)), to quickly find breakpoints. That method simultaneously fits breakpoint positions and the linear models for the different segments of the fit. This method is quick and it gives confidence intervals for all the model estimates. See the accompanying paper for more details.
+The package implements Muggeo's iterative algorithm (Muggeo "Estimating regression models with unknown break-points" (2003)) to find breakpoints quickly. This method simultaneously fits breakpoint positions and the linear models for the different fit segments, and it gives confidence intervals for all the model estimates. See the accompanying paper for more details.
 
-Muggeo's method doesn't always converge on the best solution - sometimes it finds a locally optimal solution or doesn't converge at all. For this reason the Fit method also implements a process called bootstrap restarting. This involves taking a bootstrap resample of the data, then using this bootstrapped data to try and find a better solution. The number of times this runs can be controlled with `n_boot`. To run the Fit without bootstrap restarting, set `n_boot=0`.  
+Muggeo's method doesn't always converge on the best solution - sometimes, it finds a locally optimal solution or doesn't converge at all. For this reason, the Fit method also implements a process called bootstrap restarting which involves taking a bootstrapped resample of the data to try to find a better solution. The number of times this process runs can be controlled with n_boot. To run the Fit without bootstrap restarting, set ``n_boot=0``.
 
-If you don't have good guesses for inital breakpoints, you can just set the number of e.g. `n_breakpoints=3`. In this case the algorithm will randomly generate start_values. The bootstrap restarting algorithm will now, with a 50% chance, either use the best currently converged breakpoints or randomly generate new start_values. In this way local optima are escaped in two ways and the algorithm will usually converge to a global optima. Even with these measures the algorithm is not completely guranteed to converge to global optima, as is often the case with fitting non-linear models. Increasing 'n_boot' increases the probability of global convergence, at the cost of computation time.
+If you do not have (or do not want to use) initial guesses for the number of breakpoints, you can set it to ``n_breakpoints=3``, and the algorithm will randomly generate start_values. With a 50% chance, the bootstrap restarting algorithm will either use the best currently converged breakpoints or randomly generate new ``start_values``, escaping the local optima in two ways in order to find better global optima. 
+
+As is often the case with fitting non-linear models, even with these measures, the algorithm is not guaranteed to converge to a global optimum. However, increasing ``n_boot`` raises the probability of global convergence at the cost of computation time.
+
 
 Model Selection
 ==========================
 
-In addition to the main Fit tool, the package also offers a `ModelSelection` option based on the Bayesian Information Criterion. This is experimental and is not as thorough as the main Fit function. In particular, the models are generated with random start_values which can influence the model fit and give different values for the BIC. The tool can be useful for exploring posisble models, but should not at this point be used to choose the best model. ::
+In addition to the main Fit tool, the package also offers a ModelSelection option based on the Bayesian Information Criterion (BIC). This additional tool is experimental and not as thorough as the main Fit function. In particular, the models are generated with random start_values, which can influence the model fit and give different values for the BIC. The tool can help explore other possible models but should not be used to choose the best model at this time. ::
 
 	ms = piecewise_regression.ModelSelection(x, y, max_breakpoints=6)
 
-This gives the following example output: ::
+Example output: ::
 
 	                 Breakpoint Model Comparision Results                 
 	====================================================================================================
@@ -173,7 +177,7 @@ The data of the model fits can be accessed in ::
 
     ms.models 
 
-For a robust comparision, one could run the ModelSelection tools many times and take the lowest BIC for each model. 
+For a robust comparision, you could run the ModelSelection tools many times and take the lowest BIC for each model. 
 
 
 Testing
@@ -204,11 +208,33 @@ See requirements.txt for specific version numbers. Required packages, and their 
 Community Guidelines and Contributing
 ===================================================
 
-I welcome community participation:
+We welcome community participation!
 
-- Open an issue on github if you want to suggest a new feature or report a bug
-- If you want to make changes yourself, that is welcome via a pull request. 
-- Ideally, open an issue first before making a pull request with major changes. 
+Sourced from `Open Source Guide: How to contribute. <https://opensource.guide/how-to-contribute/>`_
+
+**Open an issue in the following situations:**
+
+- Report an error you can’t solve yourself
+- Discuss a high-level topic or idea (for example, community, vision or policies)
+- Propose a new feature or other project ideas
+
+**Tips for communicating on issues:**
+
+- If you see an open issue that you want to tackle, comment on the issue to let people know you’re on it. That way, people are less likely to duplicate your work.
+- If an issue was opened a while ago, it’s possible that it’s being addressed somewhere else, or has already been resolved, so comment to ask for confirmation before starting work.
+- If you opened an issue, but figured out the answer later on your own, comment on the issue to let people know, then close the issue. Even documenting that outcome is a contribution to the project.
+
+**Open a pull request in the following situations:**
+
+- Submit trivial fixes (for example, a typo, a broken link or an obvious error)
+- Start work on a contribution that was already asked for, or that you’ve already discussed, in an issue
+
+**Tips for submitting PRs:** 
+
+- Reference any relevant issues or supporting documentation in your PR (for example, “Closes #37.”)
+- Include screenshots of the before and after if your changes include differences in HTML/CSS. Drag and drop the images into the body of your pull request.
+- Test your changes by running them against any existing tests if they exist and create new ones when needed. Whether tests exist or not, make sure your changes don’t break the existing project.
+- Contribute in the style of the project to the best of your abilities.
 
 Installing From Source
 ===========================
