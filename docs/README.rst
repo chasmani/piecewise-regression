@@ -33,9 +33,6 @@ Easy-to-use piecewise regression (aka segmented regression) in Python. For fitti
 
 When using the package, please cite the `accompanying paper <https://joss.theoj.org/papers/10.21105/joss.03859>`_: 
 
-Pilgrim, C., (2021). piecewise-regression (aka segmented regression) in Python. *Journal of Open Source Software, 6(68)*, 3859
-	
-
 Example:
 
 .. image:: https://raw.githubusercontent.com/chasmani/piecewise-regression/master/paper/example.png
