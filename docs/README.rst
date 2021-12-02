@@ -31,8 +31,9 @@ piecewise-regression (aka segmented regression) in python
 
 Easy-to-use piecewise regression (aka segmented regression) in Python. For fitting straight lines to data where there are one or more changes in gradient (known as breakpoints). Based on Muggeo's paper "Estimating regression models with unknown break-points" (2003). 
 
-When using the package, please cite the `accompanying paper <https://joss.theoj.org/papers/10.21105/joss.03859>`_.  
-*Pilgrim, C., (2021). piecewise-regression (aka segmented regression) in Python. Journal of Open Source Software, 6(68), 3859, https://doi.org/10.21105/joss.03859*
+When using the package, please cite the `accompanying paper <https://joss.theoj.org/papers/10.21105/joss.03859>`_. : 
+
+Pilgrim, C., (2021). piecewise-regression (aka segmented regression) in Python. *Journal of Open Source Software, 6(68)*, 3859
 
 
 Example:
