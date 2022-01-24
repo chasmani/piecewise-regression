@@ -3,9 +3,10 @@ piecewise-regression (aka segmented regression) in python
 ==========================================================
 :piecewise-regression: fitting straight line models with breakpoints
 :Author: Charlie Pilgrim
-:Version: 1.2.0
+:Version: 1.2.1
 :Github: https://github.com/chasmani/piecewise-regression
 :Documentation: https://piecewise-regression.readthedocs.io/en/master/index.html
+:Paper: https://joss.theoj.org/papers/10.21105/joss.03859
 
 .. image:: https://github.com/chasmani/piecewise-regression/actions/workflows/python-package.yml/badge.svg
    :target: https://github.com/chasmani/piecewise-regression/actions/workflows/python-package.yml
@@ -28,7 +29,9 @@ piecewise-regression (aka segmented regression) in python
 
 |
 
-Easy-to-use piecewise regression (aka segmented regression) in Python. For fitting straight lines to data where there are one or more changes in gradient (known as breakpoints). Based on Muggeo's paper "Estimating regression models with unknown break-points" (2003).
+Easy-to-use piecewise regression (aka segmented regression) in Python. For fitting straight lines to data where there are one or more changes in gradient (known as breakpoints). Based on Muggeo's paper "Estimating regression models with unknown break-points" (2003). 
+
+When using the package, please cite the `accompanying paper <https://joss.theoj.org/papers/10.21105/joss.03859>`_.
 
 Example:
 

@@ -498,5 +498,24 @@ class TestPlots(unittest.TestCase):
         self.assertGreater(len(ax.lines), initial_lines_count)
 
 
+    def test_issue_with_breakpoint_ordering(self):
+
+        np.random.seed(4)
+
+        x = list(range(20))
+        y = list(range(0, 5, 1)) + list(range(5, 0, -1)) + list(range(0, 10, 2)) + list(range(10 , 0, -2))
+        pw_fit = Fit(x, y, n_breakpoints=3)
+
+        pw_results = pw_fit.get_results()
+        pw_estimates = pw_results["estimates"]
+
+        self.assertAlmostEqual(
+            pw_estimates["alpha1"]["estimate"], 1, places=0)
+        self.assertAlmostEqual(
+            pw_estimates["alpha2"]["estimate"], -1, places=0)
+
+
 if __name__ == '__main__':
+
     unittest.main()
+

@@ -60,7 +60,7 @@ class NextBreakpoints:
         # Data validation done at a higher level
         self.xx = xx
         self.yy = yy
-        self.current_breakpoints = current_breakpoints
+        self.current_breakpoints = sorted(current_breakpoints)
         self.n_breakpoints = len(current_breakpoints)
 
         self.next_breakpoints = None
@@ -587,7 +587,7 @@ class Muggeo:
             low=min_allowed_bp, high=max_allowed_bp, size=self.n_breakpoints)
         if self.verbose:
             print("Generating some random breakpoints: ", start_values)
-        return start_values
+        return sorted(start_values)
 
 
 class Fit:
