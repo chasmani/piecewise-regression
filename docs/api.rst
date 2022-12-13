@@ -16,10 +16,3 @@ The model selection module is experimental. It compares models with different `n
 .. automodule:: piecewise_regression.model_selection
 	:members:
 
-Davies test
-----------------------
-Implements the Davies hypothesis test for existence of at least one breakpoint.
-
-.. automodule:: piecewise_regression.davies
-	:members:
-

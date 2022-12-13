@@ -14,7 +14,9 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -54,8 +56,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
-      <li>piecewise-regression</li>
+      <li><a href="#" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">piecewise-regression</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -66,9 +68,9 @@
            <div itemprop="articleBody">
              
   <section id="piecewise-regression">
-<h1>piecewise-regression<a class="headerlink" href="#piecewise-regression" title="Permalink to this headline"></a></h1>
+<h1>piecewise-regression<a class="headerlink" href="#piecewise-regression" title="Permalink to this heading"></a></h1>
 <section id="piecewise-regression-aka-segmented-regression-in-python">
-<h2>piecewise-regression (aka segmented regression) in python<a class="headerlink" href="#piecewise-regression-aka-segmented-regression-in-python" title="Permalink to this headline"></a></h2>
+<h2>piecewise-regression (aka segmented regression) in python<a class="headerlink" href="#piecewise-regression-aka-segmented-regression-in-python" title="Permalink to this heading"></a></h2>
 <dl class="field-list simple">
 <dt class="field-odd">piecewise-regression</dt>
 <dd class="field-odd"><p>fitting straight line models with breakpoints</p>
@@ -77,7 +79,7 @@
 <dd class="field-even"><p>Charlie Pilgrim</p>
 </dd>
 <dt class="field-odd">Version</dt>
-<dd class="field-odd"><p>1.2.1</p>
+<dd class="field-odd"><p>1.3.0</p>
 </dd>
 <dt class="field-even">Github</dt>
 <dd class="field-even"><p><a class="reference external" href="https://github.com/chasmani/piecewise-regression">https://github.com/chasmani/piecewise-regression</a></p>
@@ -106,15 +108,15 @@
 </section>
 </section>
 <section id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h1>
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h1>
 <p>You can install piecewise-regression using python’s <a class="reference external" href="https://pypi.org/project/piecewise-regression/">pip package index</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">piecewise</span><span class="o">-</span><span class="n">regression</span>
 </pre></div>
 </div>
-<p>The package is tested on Python 3.7, 3.8 and 3.9.</p>
+<p>The package is tested on Python 3.7, 3.8, 3.9 and 3.10.</p>
 </section>
 <section id="getting-started">
-<h1>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline"></a></h1>
+<h1>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this heading"></a></h1>
 <p>The package requires some x and y data to fit. You need to specify either a) some initial breakpoint guesses as <cite>start_values</cite> or b) how many breakpoints you want to fit as <cite>n_breakpoints</cite> (or both). Here is an elementary example, assuming we already have some data <cite>x</cite> and <cite>y</cite>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">piecewise_regression</span>
 <span class="n">pw_fit</span> <span class="o">=</span> <span class="n">piecewise_regression</span><span class="o">.</span><span class="n">Fit</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">n_breakpoints</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
@@ -123,7 +125,7 @@
 </div>
 </section>
 <section id="example">
-<h1>Example<a class="headerlink" href="#example" title="Permalink to this headline"></a></h1>
+<h1>Example<a class="headerlink" href="#example" title="Permalink to this heading"></a></h1>
 <p><em>For demonstration purposes, substitute with your own data to fit.</em></p>
 <ol class="arabic">
 <li><p>Start-off generating some data with a breakpoint:</p>
@@ -175,11 +177,9 @@
 <span class="o">----------------------------------------------------------------------------------------------------</span>
 <span class="n">alpha2</span>              <span class="o">-</span><span class="mf">2.03084</span>       <span class="mf">0.0218</span>      <span class="o">-</span><span class="mf">93.068</span>    <span class="mf">3.66e-164</span>      <span class="o">-</span><span class="mf">2.0739</span>      <span class="o">-</span><span class="mf">1.9878</span>
 <span class="o">====================================================================================================</span>
-
-<span class="n">Davies</span> <span class="n">test</span> <span class="k">for</span> <span class="n">existence</span> <span class="n">of</span> <span class="n">at</span> <span class="n">least</span> <span class="mi">1</span> <span class="n">breakpoint</span><span class="p">:</span> <span class="n">p</span><span class="o">=</span><span class="mf">5.13032e-295</span> <span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="n">p</span><span class="o">&lt;</span><span class="mf">0.05</span> <span class="n">means</span> <span class="n">reject</span> <span class="n">null</span> <span class="n">hypothesis</span> <span class="n">of</span> <span class="n">no</span> <span class="n">breakpoints</span> <span class="n">at</span> <span class="mi">5</span><span class="o">%</span> <span class="n">significance</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>This includes estimates for all the model variables, along with confidence intervals. The Davies test is a hypothesis test for the existence of at least one breakpoint, against the null hypothesis of no breakpoints.</p>
+<p>This includes estimates for all the model variables, along with confidence intervals. NOTE: The Davies hypothesis test for the existence of at least one breakpoint is not reported, and is under development and testing.</p>
 <ol class="arabic" start="3">
 <li><p>Optional: Plotting the data and model results:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
@@ -207,14 +207,14 @@
 </div>
 </section>
 <section id="how-it-works">
-<h1>How It Works<a class="headerlink" href="#how-it-works" title="Permalink to this headline"></a></h1>
+<h1>How It Works<a class="headerlink" href="#how-it-works" title="Permalink to this heading"></a></h1>
 <p>The package implements Muggeo’s iterative algorithm (Muggeo “Estimating regression models with unknown break-points” (2003)) to find breakpoints quickly. This method simultaneously fits breakpoint positions and the linear models for the different fit segments, and it gives confidence intervals for all the model estimates. See the accompanying paper for more details.</p>
 <p>Muggeo’s method doesn’t always converge on the best solution - sometimes, it finds a locally optimal solution or doesn’t converge at all. For this reason, the Fit method also implements a process called bootstrap restarting which involves taking a bootstrapped resample of the data to try to find a better solution. The number of times this process runs can be controlled with n_boot. To run the Fit without bootstrap restarting, set <code class="docutils literal notranslate"><span class="pre">n_boot=0</span></code>.</p>
 <p>If you do not have (or do not want to use) initial guesses for the number of breakpoints, you can set it to <code class="docutils literal notranslate"><span class="pre">n_breakpoints=3</span></code>, and the algorithm will randomly generate start_values. With a 50% chance, the bootstrap restarting algorithm will either use the best currently converged breakpoints or randomly generate new <code class="docutils literal notranslate"><span class="pre">start_values</span></code>, escaping the local optima in two ways in order to find better global optima.</p>
 <p>As is often the case with fitting non-linear models, even with these measures, the algorithm is not guaranteed to converge to a global optimum. However, increasing <code class="docutils literal notranslate"><span class="pre">n_boot</span></code> raises the probability of global convergence at the cost of computation time.</p>
 </section>
 <section id="model-selection">
-<h1>Model Selection<a class="headerlink" href="#model-selection" title="Permalink to this headline"></a></h1>
+<h1>Model Selection<a class="headerlink" href="#model-selection" title="Permalink to this heading"></a></h1>
 <p>In addition to the main Fit tool, the package also offers a ModelSelection option based on the Bayesian Information Criterion (BIC). This additional tool is experimental and not as thorough as the main Fit function. In particular, the models are generated with random start_values, which can influence the model fit and give different values for the BIC. The tool can help explore other possible models but should not be used to choose the best model at this time.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ms</span> <span class="o">=</span> <span class="n">piecewise_regression</span><span class="o">.</span><span class="n">ModelSelection</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">max_breakpoints</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
 </pre></div>
@@ -242,7 +242,7 @@
 <p>For a robust comparision, you could run the ModelSelection tools many times and take the lowest BIC for each model.</p>
 </section>
 <section id="testing">
-<h1>Testing<a class="headerlink" href="#testing" title="Permalink to this headline"></a></h1>
+<h1>Testing<a class="headerlink" href="#testing" title="Permalink to this heading"></a></h1>
 <p>The package includes comprehensive tests.</p>
 <p>To run all tests, from the main directory run (requires the pytest library):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pytest</span>
@@ -252,10 +252,10 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pytest</span> <span class="o">--</span><span class="n">cov</span><span class="o">=./</span>
 </pre></div>
 </div>
-<p>There are also a series of simulation tests that check the estimates have realistic confidence intervals, and the Davies test gives realistic p-values. These can be found in the folder “tests-manual”.</p>
+<p>There are also a series of simulation tests that check the estimates have realistic confidence intervals. These can be found in the folder “tests-manual”.</p>
 </section>
 <section id="requirements">
-<h1>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline"></a></h1>
+<h1>Requirements<a class="headerlink" href="#requirements" title="Permalink to this heading"></a></h1>
 <p>See requirements.txt for specific version numbers. Required packages, and their uses are:</p>
 <ul class="simple">
 <li><p>matplotlib for plotting.</p></li>
@@ -265,7 +265,7 @@
 </ul>
 </section>
 <section id="community-guidelines-and-contributing">
-<h1>Community Guidelines and Contributing<a class="headerlink" href="#community-guidelines-and-contributing" title="Permalink to this headline"></a></h1>
+<h1>Community Guidelines and Contributing<a class="headerlink" href="#community-guidelines-and-contributing" title="Permalink to this heading"></a></h1>
 <p>We welcome community participation!</p>
 <p>Sourced from <a class="reference external" href="https://opensource.guide/how-to-contribute/">Open Source Guide: How to contribute.</a></p>
 <p><strong>Open an issue in the following situations:</strong></p>
@@ -294,7 +294,7 @@
 </ul>
 </section>
 <section id="installing-from-source">
-<h1>Installing From Source<a class="headerlink" href="#installing-from-source" title="Permalink to this headline"></a></h1>
+<h1>Installing From Source<a class="headerlink" href="#installing-from-source" title="Permalink to this heading"></a></h1>
 <p>To install from source:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">chasmani</span><span class="o">/</span><span class="n">piecewise</span><span class="o">-</span><span class="n">regression</span>
 <span class="n">cd</span> <span class="n">piecewise_regression</span>
@@ -303,7 +303,7 @@
 </div>
 </section>
 <section id="documentation">
-<h1>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline"></a></h1>
+<h1>Documentation<a class="headerlink" href="#documentation" title="Permalink to this heading"></a></h1>
 <p><a class="reference external" href="https://piecewise-regression.readthedocs.io/en/latest/">Full docs, including an API reference.</a></p>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
@@ -311,14 +311,13 @@
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api.html#main">Main</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#model-selection">Model selection</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#davies-test">Davies test</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </section>
 <section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline"></a></h1>
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading"></a></h1>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>

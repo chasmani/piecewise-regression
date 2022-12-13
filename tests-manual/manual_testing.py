@@ -25,8 +25,6 @@ def on_data_1():
 
     pw_fit = Fit(xx, yy, start_values=[5])
 
-    print("p-value is ", pw_fit.davies)
-
     pw_results = pw_fit.get_results()
     pw_estimates = pw_results["estimates"]
     print(pw_results)
