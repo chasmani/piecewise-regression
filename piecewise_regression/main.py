@@ -845,7 +845,34 @@ class Fit:
 
         """
         plt.scatter(self.xx, self.yy, **kwargs)
+        
+    def predict(self, xx, **kwargs):
+        """
+        Predict values based on xx entry vector
+        """
+        if not self.best_muggeo:
+            print("Algorithm didn't converge. No fit to plot.")
+        else:
+            # Get the final results from the fitted model variables
+            # Params are in terms of [intercept, alpha, betas, gammas]
+            final_params = self.best_muggeo.best_fit.raw_params
+            breakpoints = self.best_muggeo.best_fit.next_breakpoints
 
+            # Extract what we need from params etc
+            intercept_hat = final_params[0]
+            alpha_hat = final_params[1]
+            beta_hats = final_params[2:2 + len(breakpoints)]
+
+            # Build the fit plot segment by segment. Betas are defined as
+            # difference in gradient from previous section
+            yy_pred = intercept_hat + alpha_hat * xx
+            for bp_count in range(len(breakpoints)):
+                yy_pred += beta_hats[bp_count] * \
+                    np.maximum(xx - breakpoints[bp_count], 0)
+            return yy_pred
+       
+ 
+        
     def plot_fit(self, **kwargs):
         """
         Plot the fitted model as a series of straight lines.
