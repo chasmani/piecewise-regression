@@ -10,6 +10,7 @@ jobs:
     env:
       OS: ubuntu-latest
       PYTHON: ${{ matrix.python-version }}
+      CODECOV_TOKEN: "5628677a-b891-462c-9828-35a8a796b1ea"
     steps:
     - uses: actions/checkout@master
     - name: Setup Python
@@ -25,8 +26,11 @@ jobs:
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
       with:
-        env_vars: OS,PYTHON
+        env_vars: OS,PYTHON, CODECOV_TOKEN
         fail_ci_if_error: true
         name: codecov-umbrella
         path_to_write_report: tests/coverage/codecov_report.txt
         verbose: true
+
+
+
