@@ -1116,7 +1116,7 @@ class Fit:
                 "Davies test for existence of at least "
                 "1 breakpoint: p={:.6} (e.g. p<0.05 means reject null "
                 "hypothesis of no breakpoints "
-                " at 5% significance)".format(self.davies))
+                "at 5% significance)".format(self.davies))
 
             summary = header + overview + table + davies_result + "\n\n"
 

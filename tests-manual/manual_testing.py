@@ -1,13 +1,14 @@
 
+import os
+import sys
+sys.path.insert(1, os.path.join(sys.path[0], '..'))
 
 from piecewise_regression import ModelSelection
 from piecewise_regression import Fit
 import numpy as np
 import matplotlib.pyplot as plt
 
-import os
-import sys
-sys.path.insert(1, os.path.join(sys.path[0], '..'))
+
 
 
 def on_data_1():
@@ -24,6 +25,8 @@ def on_data_1():
         np.maximum(xx - breakpoint_1, 0) + np.random.normal(size=n_points)
 
     pw_fit = Fit(xx, yy, start_values=[5])
+
+    pw_fit.summary()
 
     print("p-value is ", pw_fit.davies)
 
@@ -275,7 +278,7 @@ def fit_with_initially_diverging_start_values_b():
 
 def fit_with_straight_line():
 
-    np.random.seed(0)
+    np.random.seed(1)
 
     alpha = 10
     intercept = 100
@@ -287,7 +290,7 @@ def fit_with_straight_line():
     yy = intercept + alpha*xx
     yy += np.random.normal(size=n_points)
 
-    pr = Fit(xx, yy, n_breakpoints=0, n_boot=25)
+    pr = Fit(xx, yy, n_breakpoints=1, n_boot=25)
     pr.summary()
 
 
@@ -310,4 +313,4 @@ def model_comparision_straight_line():
 
 if __name__ == "__main__":
 
-    model_comparision_straight_line()
+    on_data_1()

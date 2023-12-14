@@ -4,52 +4,25 @@ import scipy
 import math
 
 
-def get_test_statistic(xx_davies, yy_davies, theta):
-    """
-    Compute a test statistic for the Davies test for the p-value of existence
-    of a breakpoint. Based on Davies(1987) "Hypothesis Testing when a nuisance
-    parameter is present only under the alternative".
-    All the variables in this function are as named and described in that
-    paper.
+def get_test_statistic_wald(xx, yy, theta):
 
-    :param xx_davies: Data series in x-axis (same axis as the breakpoints).
-    :type xx_davies: list of floats
 
-    :param yy_davies: Data series in y-axis.
-    :type yy_davies: list of floats
+    import statsmodels.api as sm
 
-    :param theta: A test value from within the range of data in xx
-    :type theta: float
+    Z = np.array([xx])
 
-    """
-    n = len(xx_davies)
-    s_0 = 0
-    s_1 = 0
-    s_2 = 0
-    s_3 = 0
-    s_4 = 0
+    UU = [(xx - theta ) * np.heaviside(xx-theta, 1)]
+    VV = [np.heaviside(xx - theta, 1)]
 
-    for x in xx_davies:
-        s_0 += x**2
+    Z = np.concatenate((Z, UU, VV))
+    Z = Z.T
+    Z = sm.add_constant(Z, has_constant='add')
 
-        if x > theta:
-            s_1 += x * (x - theta)
-            s_3 += x - theta
+    results = sm.OLS(endog=yy, exog=Z).fit()
 
-        elif x < theta:
-            s_2 += x * (x - theta)
-            s_4 += x - theta
-
-    a_hat = np.sum(yy_davies) / n
-    b_hat = np.sum(xx_davies * yy_davies) / s_0
-    V = s_1 * s_2 / s_0 + s_3 * s_4 / n
-    S = 0
-    for i in range(n):
-        if xx_davies[i] > theta:
-            S += (yy_davies[i] - a_hat - b_hat * xx_davies[i]) * \
-                (xx_davies[i] - theta)
-    S = S / (np.sqrt(np.abs(V)))
-    return S
+    beta_hat = results.params[2]
+    se_beta_hat = results.bse[2]
+    return beta_hat/se_beta_hat
 
 
 def davies_test(xx, yy, k=10, alternative="two_sided"):
@@ -89,15 +62,16 @@ def davies_test(xx, yy, k=10, alternative="two_sided"):
     # As in Muggeo's R package "segmented", cut from second to second to last
     # data point
     # Need more data in the xx than in [L,U] for the test to work
-    L = xx_davies[1]
-    U = xx_davies[-2]
+    # Take off points form edge to be conservative 
+    L = xx_davies[2]
+    U = xx_davies[-3]
 
     # More thetas is better
     thetas = np.linspace(L, U, k)
     # For each value of theta, compute a test statistic
     test_stats = []
     for theta in thetas:
-        test_stat = get_test_statistic(xx_davies, yy_davies, theta)
+        test_stat = get_test_statistic_wald(xx_davies, yy_davies, theta)
         test_stats.append(test_stat)
     if alternative == "two_sided":
         # Two sided test, M as defined by Davies
@@ -119,3 +93,4 @@ def davies_test(xx, yy, k=10, alternative="two_sided"):
         return p * 2
     else:
         return p
+
