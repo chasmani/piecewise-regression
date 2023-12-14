@@ -3,7 +3,7 @@ piecewise-regression (aka segmented regression) in python
 ==========================================================
 :piecewise-regression: fitting straight line models with breakpoints
 :Author: Charlie Pilgrim
-:Version: 1.3.0
+:Version: 1.4.1
 :Github: https://github.com/chasmani/piecewise-regression
 :Documentation: https://piecewise-regression.readthedocs.io/en/master/index.html
 :Paper: https://joss.theoj.org/papers/10.21105/joss.03859
@@ -110,8 +110,9 @@ Example output: ::
 	----------------------------------------------------------------------------------------------------
 	alpha2              -2.03084       0.0218      -93.068    3.66e-164      -2.0739      -1.9878
 	====================================================================================================
+	Davies test for existence of at least 1 breakpoint: p=5.13032e-295 (e.g. p<0.05 means reject null hypothesis of no breakpoints at 5% significance)
 
-This includes estimates for all the model variables, along with confidence intervals. NOTE: The Davies hypothesis test for the existence of at least one breakpoint is not reported, and is under development and testing. 
+This includes estimates for all the model variables, along with confidence intervals. The Davies test is a hypothesis test for the existence of at least one breakpoint, against the null hypothesis of no breakpoints. Following Muggeo ("segmented: An R Package to Fit Regression Models with Broken-Line Relationships" 2008), this uses the Davies test with the Wald statistic on the breakpoint change in gradient. 
 
 3. Optional: Plotting the data and model results: ::
 
@@ -194,7 +195,7 @@ To get code coverage, run (requires pytest and pytest-cov libraries): ::
 
 	pytest --cov=./
 
-There are also a series of simulation tests that check the estimates have realistic confidence intervals. These can be found in the folder "tests-manual". 
+There are also a series of simulation tests that check the estimates have realistic confidence intervals, and the Davies test gives realistic p-values. These can be found in the folder "tests-manual". 
 
 Requirements
 =============

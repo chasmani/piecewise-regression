@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import statsmodels.api as sm
 
 try:
+    import piecewise_regression.davies as davies
     import piecewise_regression.r_squared_calc as r_squared_calc
     from piecewise_regression.data_validation import (
         validate_positive_number,
@@ -16,6 +17,7 @@ try:
         validate_non_negative_integer
     )
 except ImportError:
+    import davies
     import r_squared_calc
     from data_validation import (
         validate_positive_number,
@@ -709,12 +711,16 @@ class Fit:
 
         self.bootstrap_restarting()
 
+        self.davies = davies.davies_test(self.xx, self.yy)
+
     def get_results(self):
         """
         Return a small dictionary with key results form the fit.
         Useful for using this code in a larger analysis. E.g. ModelSelection
         """
-        results = {}
+        results = {
+            "davies": self.davies,
+        }
 
         if self.best_muggeo:
             results["estimates"] = self.best_muggeo.best_fit.estimates
@@ -1106,7 +1112,13 @@ class Fit:
 
             table = double_line + table_header + single_line + table_contents
 
-            summary = header + overview + table + "\n\n"
+            davies_result = (
+                "Davies test for existence of at least "
+                "1 breakpoint: p={:.6} (e.g. p<0.05 means reject null "
+                "hypothesis of no breakpoints "
+                "at 5% significance)".format(self.davies))
+
+            summary = header + overview + table + davies_result + "\n\n"
 
             print(summary)
 

@@ -349,6 +349,7 @@ class TestFit(unittest.TestCase):
         fit = Fit(xx, yy, start_values=bps, verbose=False, n_boot=0)
 
         summary = fit.summary()
+        self.assertIn('Davies', summary)
         self.assertIn('Model Parameters', summary)
         self.assertIn('Degrees of Freedom', summary)
         self.assertIn('Sum of Squares', summary)
