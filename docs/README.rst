@@ -3,7 +3,7 @@ piecewise-regression (aka segmented regression) in python
 ==========================================================
 :piecewise-regression: fitting straight line models with breakpoints
 :Author: Charlie Pilgrim
-:Version: 1.4.2
+:Version: 1.4.3
 :Github: https://github.com/chasmani/piecewise-regression
 :Documentation: https://piecewise-regression.readthedocs.io/en/master/index.html
 :Paper: https://joss.theoj.org/papers/10.21105/joss.03859

@@ -3,7 +3,7 @@ import setuptools
 # This call to setup() does all the work
 setuptools.setup(
     name="piecewise-regression",
-    version="1.4.2",
+    version="1.4.3",
     description="piecewise (segmented) regression in python",
     long_description=   "piecewise-regression provides tools for fitting " 
                         "continuous straight line models to data with "

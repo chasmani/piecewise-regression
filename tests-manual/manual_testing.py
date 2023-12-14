@@ -39,6 +39,8 @@ def on_data_1():
     pw_bootstrap_history = pw_fit.bootstrap_history
     print(pw_bootstrap_history)
 
+    print(pw_fit.get_params())
+
     # print(bp_fit.breakpoint_history)
 
     # bp_fit.plot_data()
@@ -107,6 +109,8 @@ def on_data_1c():
     bp_fit.plot_breakpoint_confidence_intervals()
 
     print("The fit data: ", bp_fit.__dict__)
+
+    print(bp_fit.get_params())
 
     plt.show()
     plt.close()
@@ -313,4 +317,4 @@ def model_comparision_straight_line():
 
 if __name__ == "__main__":
 
-    on_data_1()
+    on_data_1c()

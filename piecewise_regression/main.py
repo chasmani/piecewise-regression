@@ -734,6 +734,19 @@ class Fit:
             results["rss"] = None
         return results
 
+    def get_params(self):
+        """
+        Return a small dictionary with just the fit estimates.
+        """
+        params = {}
+        if self.best_muggeo:
+            params["converged"] = True
+            for estimate_name, estimate_details in self.best_muggeo.best_fit.estimates.items():
+                params[estimate_name] = estimate_details["estimate"]            
+        else:
+            params["converged"] = False
+        return params
+
     def bootstrap_restarting(self):
         """
         The main fitting algorithm. Begins by doing a fit based on
@@ -823,6 +836,8 @@ class Fit:
                 # fit instead
                 else:
                     self.best_muggeo = next_muggeo
+
+
 
     def bootstrap_data(self, xx, yy):
         """
