@@ -1,5 +1,5 @@
 {% set name = "piecewise-regression" %}
-{% set version = "1.0.8" %}
+{% set version = "1.4.2" %}
 
 
 package:
