@@ -60,6 +60,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#piecewise_regression.main.Fit.plot_breakpoints"><code class="docutils literal notranslate"><span class="pre">Fit.plot_breakpoints()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#piecewise_regression.main.Fit.plot_data"><code class="docutils literal notranslate"><span class="pre">Fit.plot_data()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#piecewise_regression.main.Fit.plot_fit"><code class="docutils literal notranslate"><span class="pre">Fit.plot_fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#piecewise_regression.main.Fit.predict"><code class="docutils literal notranslate"><span class="pre">Fit.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#piecewise_regression.main.Fit.summary"><code class="docutils literal notranslate"><span class="pre">Fit.summary()</span></code></a></li>
 </ul>
 </li>
@@ -267,6 +268,18 @@ Passes any kwargs to the matplotlib scatter function, e.g. color=”red”.</p>
 <span class="sig-name descname"><span class="pre">plot_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Fit.plot_fit" title="Link to this definition"></a></dt>
 <dd><p>Plot the fitted model as a series of straight lines.
 Passes any kwargs to the matplotlib plot function, e.g. color=”red”.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="piecewise_regression.main.Fit.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xx_predict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#piecewise_regression.main.Fit.predict" title="Link to this definition"></a></dt>
+<dd><p>Predict y values from x values given the fitted model.
+Returns predictions as a list of numbers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>xx</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em> of </em><em>floats</em>) – Data series in x-axis.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">

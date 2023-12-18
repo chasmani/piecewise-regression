@@ -84,7 +84,7 @@
 <dd class="field-even"><p>Charlie Pilgrim</p>
 </dd>
 <dt class="field-odd">Version<span class="colon">:</span></dt>
-<dd class="field-odd"><p>1.4.3</p>
+<dd class="field-odd"><p>1.5.0</p>
 </dd>
 <dt class="field-even">Github<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://github.com/chasmani/piecewise-regression">https://github.com/chasmani/piecewise-regression</a></p>
@@ -221,7 +221,7 @@
 </section>
 <section id="model-selection">
 <h1>Model Selection<a class="headerlink" href="#model-selection" title="Link to this heading"></a></h1>
-<p>In addition to the main Fit tool, the package also offers a ModelSelection option based on the Bayesian Information Criterion (BIC). This additional tool is experimental and not as thorough as the main Fit function. In particular, the models are generated with random start_values, which can influence the model fit and give different values for the BIC. The tool can help explore other possible models but should not be used to choose the best model at this time.</p>
+<p>In addition to the main Fit tool, the package also offers a ModelSelection option based on the Bayesian Information Criterion (BIC). This additional tool is opinionated in it’s choices (e.g. using the BIC) and not as thorough as the main Fit function. In particular, the models are generated with random start_values, which can influence the model fit and give different values for the BIC. The tool can help explore other possible models but we recommend that caution and domain knowledge are used when interpreting the results.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ms</span> <span class="o">=</span> <span class="n">piecewise_regression</span><span class="o">.</span><span class="n">ModelSelection</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">max_breakpoints</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
 </pre></div>
 </div>

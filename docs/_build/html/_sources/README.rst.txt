@@ -3,7 +3,7 @@ piecewise-regression (aka segmented regression) in python
 ==========================================================
 :piecewise-regression: fitting straight line models with breakpoints
 :Author: Charlie Pilgrim
-:Version: 1.4.3
+:Version: 1.5.0
 :Github: https://github.com/chasmani/piecewise-regression
 :Documentation: https://piecewise-regression.readthedocs.io/en/master/index.html
 :Paper: https://joss.theoj.org/papers/10.21105/joss.03859
@@ -155,7 +155,7 @@ As is often the case with fitting non-linear models, even with these measures, t
 Model Selection
 ==========================
 
-In addition to the main Fit tool, the package also offers a ModelSelection option based on the Bayesian Information Criterion (BIC). This additional tool is experimental and not as thorough as the main Fit function. In particular, the models are generated with random start_values, which can influence the model fit and give different values for the BIC. The tool can help explore other possible models but should not be used to choose the best model at this time. ::
+In addition to the main Fit tool, the package also offers a ModelSelection option based on the Bayesian Information Criterion (BIC). This additional tool is opinionated in it's choices (e.g. using the BIC) and not as thorough as the main Fit function. In particular, the models are generated with random start_values, which can influence the model fit and give different values for the BIC. The tool can help explore other possible models but we recommend that caution and domain knowledge are used when interpreting the results.  ::
 
 	ms = piecewise_regression.ModelSelection(x, y, max_breakpoints=6)
 
