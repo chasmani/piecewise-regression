@@ -923,10 +923,13 @@ class Fit:
         else:
             estimates = self.best_muggeo.best_fit.estimates
 
+            # Default plotting options
+            kwargs.setdefault('alpha', 0.1)
+
             for bp_i in range(self.best_muggeo.n_breakpoints):
                 bp_ci = estimates["breakpoint{}".format(
                     bp_i + 1)]["confidence_interval"]
-                plt.axvspan(bp_ci[0], bp_ci[1], alpha=0.1)
+                plt.axvspan(bp_ci[0], bp_ci[1], **kwargs)
 
     def plot_best_muggeo_breakpoint_history(self, **kwargs):
         """
