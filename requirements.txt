@@ -1,4 +1,4 @@
 matplotlib==3.3.4
 numpy==1.21.1
-scipy==1.7.3
-statsmodels==0.14.0
+scipy==1.6.1
+statsmodels==0.13.0
