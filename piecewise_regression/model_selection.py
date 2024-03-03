@@ -73,11 +73,13 @@ class ModelSelection:
         for model_summary in self.model_summaries:
 
             if model_summary["converged"]:
+                print("=" * 200)
+                print(model_summary)
                 model_row = table_row_template.format(
                     model_summary["n_breakpoints"], 
-                    model_summary["bic"],
+                    model_summary["bayesian_information_criterion"],
                     str(model_summary["converged"]), 
-                    model_summary["rss"])
+                    model_summary["residual_sum_of_squares"])
             else:
                 model_row = table_row_template.format(
                     model_summary["n_breakpoints"], "", 
@@ -110,11 +112,11 @@ class ModelSelection:
         bic = n * np.log(rss / n) + k * np.log(n)
 
         fit_data = {
-            "bic": bic,
+            "bayesian_information_criterion": bic,
             "n_breakpoints": 0,
             "estimates": {},
             "converged": True,
-            "rss": rss
+            "residual_sum_of_squares": rss
         }
 
         fit_data["estimates"]["const"] = results.params[0]

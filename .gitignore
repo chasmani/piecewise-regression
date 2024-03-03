@@ -60,3 +60,4 @@ venv.bak/
 docs/.ipynb_checkpoints/*
 
 
+/tst.py

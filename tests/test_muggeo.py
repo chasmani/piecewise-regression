@@ -78,17 +78,17 @@ class TestMuggeo(unittest.TestCase):
         self.assertAlmostEqual(
             muggeo_bp2, estimates["breakpoint2"]["estimate"], places=1)
 
-        self.assertAlmostEqual(muggeo_c_se, estimates["const"]["se"], places=1)
+        self.assertAlmostEqual(muggeo_c_se, estimates["const"]["standard_error"], places=1)
         self.assertAlmostEqual(
-            muggeo_alpha_se, estimates["alpha1"]["se"], places=1)
+            muggeo_alpha_se, estimates["alpha1"]["standard_error"], places=1)
         self.assertAlmostEqual(
-            muggeo_beta1_se, estimates["beta1"]["se"], places=1)
+            muggeo_beta1_se, estimates["beta1"]["standard_error"], places=1)
         self.assertAlmostEqual(
-            muggeo_beta2_se, estimates["beta2"]["se"], places=1)
+            muggeo_beta2_se, estimates["beta2"]["standard_error"], places=1)
         self.assertAlmostEqual(
-            muggeo_bp1_se, estimates["breakpoint1"]["se"], places=1)
+            muggeo_bp1_se, estimates["breakpoint1"]["standard_error"], places=1)
         self.assertAlmostEqual(
-            muggeo_bp2_se, estimates["breakpoint2"]["se"], places=1)
+            muggeo_bp2_se, estimates["breakpoint2"]["standard_error"], places=1)
 
         print(estimates)
 
@@ -163,13 +163,13 @@ class TestMuggeo(unittest.TestCase):
         self.assertAlmostEqual(
             muggeo_bp1, estimates["breakpoint1"]["estimate"], places=1)
 
-        self.assertAlmostEqual(muggeo_c_se, estimates["const"]["se"], places=1)
+        self.assertAlmostEqual(muggeo_c_se, estimates["const"]["standard_error"], places=1)
         self.assertAlmostEqual(
-            muggeo_alpha_se, estimates["alpha1"]["se"], places=1)
+            muggeo_alpha_se, estimates["alpha1"]["standard_error"], places=1)
         self.assertAlmostEqual(
-            muggeo_beta1_se, estimates["beta1"]["se"], places=1)
+            muggeo_beta1_se, estimates["beta1"]["standard_error"], places=1)
         self.assertAlmostEqual(
-            muggeo_bp1_se, estimates["breakpoint1"]["se"], places=1)
+            muggeo_bp1_se, estimates["breakpoint1"]["standard_error"], places=1)
 
         self.assertAlmostEqual(
             muggeo_c_t, estimates["const"]["t_stat"], delta=1)

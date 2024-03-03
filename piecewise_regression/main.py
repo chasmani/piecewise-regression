@@ -227,18 +227,18 @@ class NextBreakpoints:
         Save to the self.estimates dictionary
         """
         const_ses = self.get_const_standard_error()
-        self.estimates["const"]["se"] = const_ses
+        self.estimates["const"]["standard_error"] = const_ses
 
         beta_ses = self.get_beta_standard_errors()
         bp_ses = self.get_bp_standard_errors()
         for bp_i in range(self.n_breakpoints):
-            self.estimates["beta{}".format(bp_i + 1)]["se"] = beta_ses[bp_i]
+            self.estimates["beta{}".format(bp_i + 1)]["standard_error"] = beta_ses[bp_i]
             self.estimates["breakpoint{}".format(
-                bp_i + 1)]["se"] = bp_ses[bp_i]
+                bp_i + 1)]["standard_error"] = bp_ses[bp_i]
         alpha_ses = self.get_alpha_standard_errors()
         for alpha_i in range(self.n_breakpoints + 1):
             self.estimates["alpha{}".format(
-                alpha_i + 1)]["se"] = alpha_ses[alpha_i]
+                alpha_i + 1)]["standard_error"] = alpha_ses[alpha_i]
 
     def calculate_all_confidence_intervals(self):
         """
@@ -253,8 +253,8 @@ class NextBreakpoints:
         # to all estimators
         for estimator_name, details in self.estimates.items():
             confidence_interval = (
-                details["estimate"] - t_const * details["se"],
-                details["estimate"] + t_const * details["se"])
+                details["estimate"] - t_const * details["standard_error"],
+                details["estimate"] + t_const * details["standard_error"])
             details["confidence_interval"] = confidence_interval
 
     def calculate_all_t_stats(self):
@@ -268,15 +268,15 @@ class NextBreakpoints:
             # H_0 isn't bp=0, it's that bp doesn't exist
             if "breakpoint" in estimator_name:
                 details["t_stat"] = "-"
-                details["p_t"] = "-"
+                details["p_t_stat"] = "-"
             else:
-                t_stat = details["estimate"] / details["se"]
+                t_stat = details["estimate"] / details["standard_error"]
                 p_t = scipy.stats.t.sf(np.abs(t_stat), dof) * 2
                 details["t_stat"] = t_stat
                 if "beta" in estimator_name:
-                    details["p_t"] = "-"
+                    details["p_t_stat"] = "-"
                 else:
-                    details["p_t"] = p_t
+                    details["p_t_stat"] = p_t
 
     def get_predicted_yy(self):
         """
@@ -724,14 +724,14 @@ class Fit:
 
         if self.best_muggeo:
             results["estimates"] = self.best_muggeo.best_fit.estimates
-            results["bic"] = self.best_muggeo.best_fit.bic
-            results["rss"] = self.best_muggeo.best_fit.residual_sum_squares
+            results["bayesian_information_criterion"] = self.best_muggeo.best_fit.bic
+            results["residual_sum_of_squares"] = self.best_muggeo.best_fit.residual_sum_squares
             results["converged"] = True
         else:
             results["converged"] = False
             results["estimates"] = None
-            results["bic"] = None
-            results["rss"] = None
+            results["bayesian_information_criterion"] = None
+            results["residual_sum_of_squares"] = None
         return results
 
     def get_params(self):
@@ -1115,9 +1115,9 @@ class Fit:
                 estimator_row = table_row_template.format(
                     est_name,
                     estimates[est_name]["estimate"],
-                    estimates[est_name]["se"],
+                    estimates[est_name]["standard_error"],
                     estimates[est_name]["t_stat"],
-                    estimates[est_name]["p_t"],
+                    estimates[est_name]["p_t_stat"],
                     estimates[est_name]["confidence_interval"][0],
                     estimates[est_name]["confidence_interval"][1])
                 table_contents += estimator_row
@@ -1136,8 +1136,8 @@ class Fit:
             for est_name in alpha_names:
                 estimator_row = table_row_template.format(
                     est_name, estimates[est_name]["estimate"],
-                    estimates[est_name]["se"],
-                    estimates[est_name]["t_stat"], estimates[est_name]["p_t"],
+                    estimates[est_name]["standard_error"],
+                    estimates[est_name]["t_stat"], estimates[est_name]["p_t_stat"],
                     estimates[est_name]["confidence_interval"][0],
                     estimates[est_name]["confidence_interval"][1])
                 table_contents += estimator_row
